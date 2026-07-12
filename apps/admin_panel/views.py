@@ -32,6 +32,15 @@ def _active_admin_count():
     )
 
 
+def _admin_role_count():
+    return (
+        User.objects
+        .filter(user_roles__role=UserRole.Role.ADMINISTRADOR)
+        .distinct()
+        .count()
+    )
+
+
 @administrador_required
 def dashboard(request):
     stats = get_dashboard_stats()
@@ -178,6 +187,29 @@ def user_toggle_active(request, pk):
 
 
 @administrador_required
+@require_POST
+def user_delete(request, pk):
+    target = get_object_or_404(User, pk=pk)
+
+    if target.pk == request.user.pk:
+        messages.error(request, 'Não pode apagar a sua própria conta.', extra_tags='admin')
+        return redirect(request.POST.get('next') or 'admin_panel:user_list')
+
+    if target.has_role(UserRole.Role.ADMINISTRADOR) and _admin_role_count() <= 1:
+        messages.error(
+            request,
+            'Não pode apagar o último administrador do sistema.',
+            extra_tags='admin',
+        )
+        return redirect(request.POST.get('next') or 'admin_panel:user_list')
+
+    name = target.name
+    target.delete()
+    messages.success(request, f'Utilizador "{name}" foi apagado.', extra_tags='admin')
+    return redirect(request.POST.get('next') or 'admin_panel:user_list')
+
+
+@administrador_required
 def establishment_list(request):
     status = request.GET.get('status', '')
     sort = request.GET.get('sort', 'date')
@@ -240,6 +272,20 @@ def establishment_toggle_active(request, pk):
             f'Estabelecimento "{establishment.name}" foi bloqueado.',
             extra_tags='admin',
         )
+
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+    return redirect('admin_panel:establishment_list')
+
+
+@administrador_required
+@require_POST
+def establishment_delete(request, pk):
+    establishment = get_object_or_404(Establishment, pk=pk)
+    name = establishment.name
+    establishment.delete()
+    messages.success(request, f'Estabelecimento "{name}" foi apagado.', extra_tags='admin')
 
     next_url = request.POST.get('next')
     if next_url:

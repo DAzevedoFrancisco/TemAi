@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .forms import LoginForm, RegisterForm
 from .jwt_utils import clear_jwt_cookies, get_tokens_for_user, set_jwt_cookies
-from .services import get_post_login_redirect_name, register_user_with_default_role
+from .services import ensure_system_admin, get_post_login_redirect_name, register_user_with_default_role
 
 
 class RegisterAPIView(APIView):
@@ -60,6 +60,9 @@ class LoginAPIView(APIView):
                 {'detail': 'Email ou senha inválidos.'},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+
+        ensure_system_admin()
+        user.refresh_from_db()
 
         tokens = get_tokens_for_user(user)
         response = Response({

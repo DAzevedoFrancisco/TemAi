@@ -25,7 +25,7 @@ from .engagement import (
     is_product_favorited,
 )
 from .forms import EstablishmentReviewForm
-from .services import get_post_login_redirect_name, register_user_with_default_role
+from .services import ensure_system_admin, get_post_login_redirect_name, register_user_with_default_role
 from .validators import can_become_seller
 
 User = get_user_model()
@@ -158,6 +158,8 @@ def auth_view(request):
                 user = authenticate(request, username=email, password=password)
 
                 if user is not None:
+                    ensure_system_admin()
+                    user.refresh_from_db()
                     if not user.is_administrador:
                         set_active_profile(request, Profile.CLIENTE)
                     tokens = get_tokens_for_user(user)
@@ -184,7 +186,7 @@ def auth_view(request):
                 if user.is_administrador:
                     messages.success(
                         request,
-                        'Conta criada com sucesso. Como primeiro utilizador, tem acesso de administrador.',
+                        'Conta criada com sucesso. Tem acesso de administrador ao sistema.',
                         extra_tags='general',
                     )
                 else:

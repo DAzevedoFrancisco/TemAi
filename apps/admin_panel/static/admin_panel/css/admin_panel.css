@@ -403,6 +403,82 @@
     border: 1px solid #e2e8f0;
 }
 
+.admin-table-actions {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.admin-table-action-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.admin-icon-btn {
+    width: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.admin-icon-btn-danger {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.admin-icon-btn-danger:hover {
+    background: #fee2e2;
+}
+
+.admin-icon-btn-success {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.admin-icon-btn-success:hover {
+    background: #d1fae5;
+}
+
+.admin-icon-btn-delete {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.admin-icon-btn-delete:hover {
+    background: #ffe4e6;
+}
+
+.admin-icon-btn-ghost {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.admin-icon-btn-ghost:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.admin-est-detail-hero-action-btns {
+    flex-shrink: 0;
+}
+
+.admin-est-detail-owner-form {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .admin-self-note {
     font-size: 0.78rem;
     color: #94a3b8;

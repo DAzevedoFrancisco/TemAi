@@ -86,7 +86,19 @@
                                     {% endif %}
                                 </td>
                                 <td class="table-action">
-                                    <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-action-btn admin-action-btn-ghost">Ver</a>
+                                    <div class="admin-table-actions">
+                                        <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-icon-btn admin-icon-btn-ghost" aria-label="Ver estabelecimento" title="Ver estabelecimento">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        </a>
+                                        {% url 'admin_panel:establishment_toggle_active' pk=establishment.pk as toggle_url %}
+                                        {% url 'admin_panel:establishment_delete' pk=establishment.pk as delete_url %}
+                                        {% if establishment.is_active %}
+                                            {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='block' label='Bloquear estabelecimento' btn_class='admin-icon-btn-danger' next=request.get_full_path %}
+                                        {% else %}
+                                            {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='unblock' label='Desbloquear estabelecimento' btn_class='admin-icon-btn-success' next=request.get_full_path %}
+                                        {% endif %}
+                                        {% include 'admin_panel/partials/icon_action_button.html' with url=delete_url icon_type='delete' label='Apagar estabelecimento' btn_class='admin-icon-btn-delete' next=request.get_full_path confirm='Tem a certeza que deseja apagar este estabelecimento? Os produtos associados também serão removidos.' %}
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}

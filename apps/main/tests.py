@@ -16,6 +16,8 @@ from apps.main.services import (
     assign_cliente_role,
     assign_vendedor_role,
     demote_from_admin,
+    ensure_system_admin,
+    has_system_admin,
     promote_to_admin,
     register_user_with_default_role,
 )
@@ -111,6 +113,46 @@ class UserRoleTests(TestCase):
         )
         self.assertTrue(user.is_cliente)
         self.assertFalse(user.is_administrador)
+
+    def test_ensure_system_admin_promotes_oldest_existing_user(self):
+        user = User.objects.create_user(
+            email='antigo@example.com',
+            password='senha123',
+            name='Utilizador Antigo',
+            date_of_birth='1990-01-01',
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(user)
+        self.assertFalse(has_system_admin())
+
+        promoted = ensure_system_admin()
+        user.refresh_from_db()
+
+        self.assertEqual(promoted.pk, user.pk)
+        self.assertTrue(user.is_administrador)
+
+    def test_registration_promotes_oldest_when_no_admin_exists(self):
+        oldest = User.objects.create_user(
+            email='antigo@example.com',
+            password='senha123',
+            name='Utilizador Antigo',
+            date_of_birth='1990-01-01',
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(oldest)
+
+        new_user = register_user_with_default_role(
+            email='novo@example.com',
+            password='senha123',
+            name='Novo Cliente',
+            date_of_birth='2000-01-01',
+            gender=User.Gender.FEMININO,
+        )
+        oldest.refresh_from_db()
+
+        self.assertTrue(oldest.is_administrador)
+        self.assertTrue(new_user.is_cliente)
+        self.assertFalse(new_user.is_administrador)
 
     def test_assign_admin_role_removes_other_roles(self):
         user = User.objects.create_user(

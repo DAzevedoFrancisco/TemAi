@@ -42,14 +42,16 @@
                         Bloqueado
                     </span>
                 {% endif %}
-                <form method="post" action="{% url 'admin_panel:establishment_toggle_active' pk=establishment.pk %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                    <button type="submit" class="admin-est-detail-action-btn{% if establishment.is_active %} is-danger{% else %} is-success{% endif %}">
-                        <span class="admin-est-detail-btn-text">{% if establishment.is_active %}Bloquear estabelecimento{% else %}Desbloquear estabelecimento{% endif %}</span>
-                        <span class="admin-est-detail-btn-text-short">{% if establishment.is_active %}Bloquear{% else %}Desbloquear{% endif %}</span>
-                    </button>
-                </form>
+                <div class="admin-table-actions admin-est-detail-hero-action-btns">
+                    {% url 'admin_panel:establishment_toggle_active' pk=establishment.pk as toggle_url %}
+                    {% url 'admin_panel:establishment_delete' pk=establishment.pk as delete_url %}
+                    {% if establishment.is_active %}
+                        {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='block' label='Bloquear estabelecimento' btn_class='admin-icon-btn-danger' next=request.get_full_path %}
+                    {% else %}
+                        {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='unblock' label='Desbloquear estabelecimento' btn_class='admin-icon-btn-success' next=request.get_full_path %}
+                    {% endif %}
+                    {% include 'admin_panel/partials/icon_action_button.html' with url=delete_url icon_type='delete' label='Apagar estabelecimento' btn_class='admin-icon-btn-delete' next=request.get_full_path confirm='Tem a certeza que deseja apagar este estabelecimento? Os produtos associados também serão removidos.' %}
+                </div>
             </div>
         </div>
 
@@ -164,13 +166,14 @@
                     </div>
 
                     {% if establishment.owner.pk != user.pk %}
-                        <form method="post" action="{% url 'admin_panel:user_toggle_active' pk=establishment.owner.pk %}" class="admin-est-detail-owner-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                            <button type="submit" class="admin-est-detail-action-btn admin-est-detail-action-btn-block admin-est-detail-action-btn-sm{% if establishment.owner.is_active %} is-danger{% else %} is-success{% endif %}">
-                                {% if establishment.owner.is_active %}Bloquear dono{% else %}Desbloquear dono{% endif %}
-                            </button>
-                        </form>
+                        <div class="admin-est-detail-owner-form">
+                            {% url 'admin_panel:user_toggle_active' pk=establishment.owner.pk as owner_toggle_url %}
+                            {% if establishment.owner.is_active %}
+                                {% include 'admin_panel/partials/icon_action_button.html' with url=owner_toggle_url icon_type='block' label='Bloquear dono' btn_class='admin-icon-btn-danger' next=request.get_full_path %}
+                            {% else %}
+                                {% include 'admin_panel/partials/icon_action_button.html' with url=owner_toggle_url icon_type='unblock' label='Desbloquear dono' btn_class='admin-icon-btn-success' next=request.get_full_path %}
+                            {% endif %}
+                        </div>
                     {% else %}
                         <p class="admin-est-detail-self-note">Esta conta é a sua — não pode ser bloqueada a partir desta página.</p>
                     {% endif %}

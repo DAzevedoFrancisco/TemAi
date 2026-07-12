@@ -25,9 +25,25 @@ def assign_admin_role(user):
     user.add_role(UserRole.Role.ADMINISTRADOR)
 
 
+def has_system_admin():
+    return UserRole.objects.filter(role=UserRole.Role.ADMINISTRADOR).exists()
+
+
+def ensure_system_admin():
+    if has_system_admin():
+        return None
+
+    oldest_user = User.objects.order_by('date_joined', 'pk').first()
+    if oldest_user is None:
+        return None
+
+    assign_admin_role(oldest_user)
+    return oldest_user
+
+
 def register_user_with_default_role(*, email, password, name, date_of_birth, gender):
     with transaction.atomic():
-        first_user = not User.objects.select_for_update().exists()
+        User.objects.select_for_update().exists()
         user = User.objects.create_user(
             email=email,
             password=password,
@@ -35,10 +51,14 @@ def register_user_with_default_role(*, email, password, name, date_of_birth, gen
             date_of_birth=date_of_birth,
             gender=gender,
         )
-        if first_user:
-            assign_admin_role(user)
+        if not has_system_admin():
+            oldest_user = User.objects.order_by('date_joined', 'pk').first()
+            assign_admin_role(oldest_user)
+            if user.pk != oldest_user.pk:
+                assign_cliente_role(user)
         else:
             assign_cliente_role(user)
+        user.refresh_from_db()
         return user
 
 
