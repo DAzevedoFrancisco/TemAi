@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .forms import LoginForm, RegisterForm
 from .jwt_utils import REFRESH_COOKIE, clear_jwt_cookies, get_tokens_for_user, set_jwt_cookies
-from .profile import Profile, set_active_profile
+from .profile import Profile, can_use_client_catalog, get_client_catalog_redirect_name, set_active_profile
 from .search import (
     DISTANCE_FILTER_OPTIONS,
     calculate_distance_km,
@@ -42,6 +42,9 @@ def home(request):
 
 
 def search_results(request):
+    if request.user.is_authenticated and not can_use_client_catalog(request):
+        return redirect(get_client_catalog_redirect_name(request))
+
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
     user_lat, user_lng = parse_search_coordinates(
@@ -124,8 +127,8 @@ def product_detail(request, pk):
         'reviews': get_approved_reviews(establishment, limit=8),
         'user_review': user_review,
         'review_form': review_form,
-        'can_review': can_client_engage_product(request.user, product),
-        'can_favorite': can_client_engage_product(request.user, product),
+        'can_review': can_client_engage_product(request.user, product) and can_use_client_catalog(request),
+        'can_favorite': can_client_engage_product(request.user, product) and can_use_client_catalog(request),
     })
 
 

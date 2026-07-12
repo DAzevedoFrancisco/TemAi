@@ -22,7 +22,7 @@
 
             <div class="container">
                 <div class="search-box">
-                    {% if not user.is_authenticated or active_profile == 'cliente' %}
+                    {% if not user.is_authenticated or can_use_client_catalog %}
                         <div class="text">O Que Procura?</div>
 
                         <form method="get" action="{% url 'search_results' %}" class="search-form">
@@ -50,12 +50,20 @@
                         </form>
                     {% else %}
                         <div class="profile-notice">
-                            <div class="text">Perfil Vendedor ativo</div>
-                            <p>Como vendedor, pode gerir estabelecimentos e produtos. Para pesquisar na plataforma, mude para o perfil de Cliente.</p>
-                            <div class="profile-notice-actions">
-                                <a href="{% url 'switch_profile' %}?profile=cliente" class="profile-switch-btn">Mudar para Cliente</a>
-                                <a href="{% url 'vendor:dashboard' %}" class="profile-switch-btn secondary">Ir para o painel</a>
-                            </div>
+                            {% if user.is_administrador %}
+                                <div class="text">Perfil Administrador</div>
+                                <p>Como administrador, gere utilizadores e estabelecimentos no painel de administração. A pesquisa e favoritos não estão disponíveis neste perfil.</p>
+                                <div class="profile-notice-actions">
+                                    <a href="{% url 'admin_panel:dashboard' %}" class="profile-switch-btn">Ir para o painel</a>
+                                </div>
+                            {% else %}
+                                <div class="text">Perfil Vendedor ativo</div>
+                                <p>Como vendedor, pode gerir estabelecimentos e produtos. Para pesquisar na plataforma, mude para o perfil de Cliente.</p>
+                                <div class="profile-notice-actions">
+                                    <a href="{% url 'switch_profile' %}?profile=cliente" class="profile-switch-btn">Mudar para Cliente</a>
+                                    <a href="{% url 'vendor:dashboard' %}" class="profile-switch-btn secondary">Ir para o painel</a>
+                                </div>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

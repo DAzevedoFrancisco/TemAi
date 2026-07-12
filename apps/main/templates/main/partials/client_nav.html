@@ -2,7 +2,7 @@
 
 <nav class="navbar">
     <div class="box-logo">
-        <a href="{% url 'home' %}">
+        <a href="{{ client_nav_home_url }}">
             <img src="{% static 'main/img/lg.jpeg' %}" width="40" alt="Logo">
         </a>
     </div>
@@ -12,7 +12,7 @@
     </button>
 
     <div class="menu client-mobile-sidebar" id="menu">
-        <a href="{% url 'home' %}" class="client-mobile-brand">
+        <a href="{{ client_nav_home_url }}" class="client-mobile-brand">
             <img src="{% static 'main/img/lg.jpeg' %}" width="36" height="36" alt="Logo" class="client-mobile-brand-img">
             <span class="client-mobile-brand-text">Mob</span>
         </a>

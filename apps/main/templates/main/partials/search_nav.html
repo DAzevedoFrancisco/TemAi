@@ -2,11 +2,12 @@
 
 <nav class="navbar navbar-search">
     <div class="box-logo">
-        <a href="{% url 'home' %}">
+        <a href="{{ client_nav_home_url }}">
             <img src="{% static 'main/img/lg.jpeg' %}" width="40" alt="Logo">
         </a>
     </div>
 
+    {% if can_use_client_catalog %}
     <form method="get" action="{% url 'search_results' %}" class="navbar-search-form">
         <div class="navbar-search-input-wrap">
             <input
@@ -35,13 +36,14 @@
             </button>
         </div>
     </form>
+    {% endif %}
 
     <button type="button" class="menu-toggle client-menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
         <span class="menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
 
     <div class="menu client-mobile-sidebar" id="menu">
-        <a href="{% url 'home' %}" class="client-mobile-brand">
+        <a href="{{ client_nav_home_url }}" class="client-mobile-brand">
             <img src="{% static 'main/img/lg.jpeg' %}" width="36" height="36" alt="Logo" class="client-mobile-brand-img">
             <span class="client-mobile-brand-text">Mob</span>
         </a>

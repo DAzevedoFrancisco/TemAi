@@ -18,7 +18,12 @@
         <main class="account-shell">
             {% include 'main/partials/client_messages.html' with message_scope='account' %}
 
-            {% if active_profile == 'vendedor' %}
+            {% if user.is_administrador %}
+                <a href="{% url 'admin_panel:dashboard' %}" class="account-back-panel">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    Voltar ao painel de administração
+                </a>
+            {% elif active_profile == 'vendedor' %}
                 <a href="{% url 'vendor:dashboard' %}" class="account-back-panel">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                     Voltar ao painel vendedor

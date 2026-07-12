@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from apps.main.profile import Profile, get_active_profile
+from apps.main.profile import can_use_client_catalog, get_client_catalog_redirect_name
 from apps.vendor.decorators import login_required_view, vendedor_required
 from apps.vendor.models import Establishment
 
@@ -19,6 +19,7 @@ from .engagement import (
 )
 from .forms import EstablishmentReviewForm
 from .models import EstablishmentReview
+from .search import get_public_product
 from .vendor_notifications import get_unread_review_count, get_vendor_reviews_queryset, mark_vendor_reviews_read
 
 
@@ -32,8 +33,8 @@ def _product_detail_redirect(product, request):
 
 @login_required_view
 def favorites_list(request):
-    if get_active_profile(request) == Profile.VENDEDOR:
-        return redirect('vendor:dashboard')
+    if not can_use_client_catalog(request):
+        return redirect(get_client_catalog_redirect_name(request))
 
     favorites = get_user_favorite_products(request.user)
     return render(request, 'main/favorites.html', {
@@ -44,6 +45,17 @@ def favorites_list(request):
 @login_required_view
 @require_POST
 def toggle_product_favorite(request, pk):
+    if not can_use_client_catalog(request):
+        messages.error(
+            request,
+            'Não pode gerir favoritos com o perfil actual.',
+            extra_tags='product',
+        )
+        next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+        if next_url:
+            return redirect(next_url)
+        return redirect(get_client_catalog_redirect_name(request))
+
     product = get_public_product(pk)
 
     if not can_client_engage_product(request.user, product):

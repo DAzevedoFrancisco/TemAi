@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 
 from django.core.exceptions import ValidationError
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from apps.main.search import (
@@ -470,6 +470,7 @@ class AccountSettingsTests(TestCase):
         self.assertTrue(self.user.check_password('SenhaSegura123!'))
 
 
+@override_settings(SECURE_SSL_REDIRECT=False)
 class VendorProfileNavigationTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -489,7 +490,7 @@ class VendorProfileNavigationTests(TestCase):
         session.save()
 
     def test_account_settings_hides_client_links_in_vendor_profile(self):
-        self.client.login(username='vendedor@example.com', password='SenhaSegura123!')
+        self.client.force_login(self.user)
         self._activate_vendor_profile()
 
         response = self.client.get(reverse('account_settings'))
@@ -501,10 +502,103 @@ class VendorProfileNavigationTests(TestCase):
         self.assertNotContains(response, 'Painel vendedor</a>')
 
     def test_favorites_redirects_when_vendor_profile_active(self):
-        self.client.login(username='vendedor@example.com', password='SenhaSegura123!')
+        self.client.force_login(self.user)
         self._activate_vendor_profile()
 
         response = self.client.get(reverse('favorites'))
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('vendor:dashboard'))
+
+
+def _create_establishment(owner, *, name='Loja Teste', is_active=True):
+    from apps.vendor.models import Establishment
+
+    return Establishment.objects.create(
+        owner=owner,
+        name=name,
+        address='Rua Teste 1, Beira',
+        phone='841234567',
+        opening_hours='08:00 - 18:00',
+        latitude=-19.8436,
+        longitude=34.8389,
+        is_active=is_active,
+    )
+
+
+class AdminRoleEstablishmentTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='vendor-admin@example.com',
+            password='SenhaSegura123!',
+            name='Vendor Admin',
+            date_of_birth=date(1990, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(self.user)
+        assign_vendedor_role(self.user)
+        self.active_shop = _create_establishment(self.user, name='Loja Activa')
+        self.blocked_shop = _create_establishment(self.user, name='Loja Bloqueada', is_active=False)
+
+    def test_promote_to_admin_suspends_active_establishments_only(self):
+        promote_to_admin(self.user)
+
+        self.active_shop.refresh_from_db()
+        self.blocked_shop.refresh_from_db()
+
+        self.assertFalse(self.active_shop.is_active)
+        self.assertTrue(self.active_shop.suspended_for_admin_role)
+        self.assertFalse(self.blocked_shop.is_active)
+        self.assertFalse(self.blocked_shop.suspended_for_admin_role)
+
+    def test_demote_from_admin_restores_suspended_establishments(self):
+        promote_to_admin(self.user)
+        demote_from_admin(self.user)
+
+        self.active_shop.refresh_from_db()
+        self.blocked_shop.refresh_from_db()
+
+        self.assertTrue(self.active_shop.is_active)
+        self.assertFalse(self.active_shop.suspended_for_admin_role)
+        self.assertFalse(self.blocked_shop.is_active)
+        self.assertFalse(self.blocked_shop.suspended_for_admin_role)
+
+
+@override_settings(SECURE_SSL_REDIRECT=False)
+class AdminClientCatalogTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email='admin@example.com',
+            password='SenhaSegura123!',
+            name='Admin Teste',
+            date_of_birth=date(1990, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_admin_role(self.user)
+
+    def test_search_redirects_admin_to_admin_panel(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('search_results'), {'q': 'arroz'})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('admin_panel:dashboard'))
+
+    def test_favorites_redirects_admin_to_admin_panel(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('favorites'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('admin_panel:dashboard'))
+
+    def test_account_settings_logo_links_to_admin_panel(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('account_settings'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse('admin_panel:dashboard'))
+        self.assertContains(response, 'Voltar ao painel de administração')
+        self.assertNotContains(response, 'Favoritos')
