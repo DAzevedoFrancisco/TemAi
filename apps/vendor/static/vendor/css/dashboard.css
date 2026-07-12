@@ -162,28 +162,37 @@ a {
 .dash-sidebar-footer {
     margin-top: auto;
     padding-top: 1rem;
+    flex-shrink: 0;
+}
+
+.admin-sidebar .dash-sidebar-footer {
+    background: transparent;
 }
 
 .dash-sidebar-logout {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    padding: 0.85rem 1rem;
+    justify-content: flex-start;
+    gap: 0.85rem;
+    padding: 0.8rem 1rem;
     border: none;
     border-radius: 12px;
-    background: #2563eb;
-    color: #fff;
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(248, 113, 113, 0.32);
+    color: #fecaca;
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
     font-family: inherit;
 }
 
-.dash-sidebar-logout:hover {
-    background: #1d4ed8;
+.dash-sidebar-logout:hover,
+.dash-sidebar-logout:focus-visible {
+    background: rgba(220, 38, 38, 0.88);
+    border-color: rgba(220, 38, 38, 0.88);
+    color: #fff;
     transform: translateY(-1px);
 }
 
@@ -2057,10 +2066,13 @@ body.dash-nav-open {
         width: min(18.5rem, 88vw);
         min-width: unset;
         height: 100vh;
+        height: 100dvh;
         z-index: 300;
         padding: 1.25rem 1rem 1rem;
-        gap: 1.25rem;
-        overflow-y: auto;
+        gap: 1rem;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         overscroll-behavior: contain;
         border-top: none;
         border-left: 1px solid rgba(255, 255, 255, 0.08);
@@ -2079,6 +2091,7 @@ body.dash-nav-open {
 
     .dash-brand {
         display: flex;
+        flex-shrink: 0;
     }
 
     .dash-nav {
@@ -2087,7 +2100,10 @@ body.dash-nav-open {
         justify-content: flex-start;
         align-items: stretch;
         gap: 0.35rem;
-        flex: 1;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .dash-nav-item {
@@ -2121,6 +2137,20 @@ body.dash-nav-open {
 
     .dash-sidebar-footer {
         display: block;
+        flex-shrink: 0;
+        margin-top: 0;
+        padding: 0.85rem 0 max(0.65rem, env(safe-area-inset-bottom, 0px));
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: #0f1419;
+    }
+
+    .admin-sidebar .dash-sidebar-footer {
+        background: transparent;
+    }
+
+    .dash-sidebar-logout {
+        display: flex !important;
+        width: 100%;
     }
 
     .dash-body {
@@ -2207,6 +2237,10 @@ body.dash-nav-open {
     }
 
     .dash-content:has(.establishments-page) {
+        padding: 5.15rem 1.15rem 1.35rem;
+    }
+
+    .dash-content:has(.products-page) {
         padding: 5.15rem 1.15rem 1.35rem;
     }
 
@@ -3013,10 +3047,11 @@ body.dash-nav-open {
     }
 
     .products-hero {
-        padding: 0.85rem 0.9rem 0.75rem;
-        border-radius: 12px;
-        margin-bottom: 0.85rem;
-        box-shadow: 0 6px 18px rgba(124, 58, 237, 0.16);
+        padding: 1.15rem 1.2rem 1rem;
+        border-radius: 16px;
+        margin-top: 0.35rem;
+        margin-bottom: 1.15rem;
+        box-shadow: 0 8px 24px rgba(124, 58, 237, 0.18);
     }
 
     .products-hero .hero-orb-1 {
@@ -3211,6 +3246,10 @@ body.dash-nav-open {
         padding: 5rem 1rem 1.25rem;
     }
 
+    .dash-content:has(.products-page) {
+        padding: 5rem 1rem 1.25rem;
+    }
+
     .establishments-page .establishments-hero {
         padding: 1.05rem 1.1rem 0.95rem;
         margin-top: 0.25rem;
@@ -3267,6 +3306,21 @@ body.dash-nav-open {
         width: 2.2rem;
         height: 2.2rem;
         min-width: 2.2rem;
+    }
+
+    .products-page .products-hero {
+        padding: 1.05rem 1.1rem 0.95rem;
+        margin-top: 0.25rem;
+        margin-bottom: 1.1rem;
+        border-radius: 15px;
+    }
+
+    .products-page .products-hero h1 {
+        font-size: 1.28rem;
+    }
+
+    .products-page .products-hero p {
+        font-size: 0.8rem;
     }
 
     .reviews-page .reviews-hero {
@@ -3359,6 +3413,7 @@ body.dash-nav-open {
     .products-hero {
         padding: 0.72rem 0.78rem 0.65rem;
         border-radius: 11px;
+        margin-top: 0.25rem;
         margin-bottom: 0.75rem;
     }
 

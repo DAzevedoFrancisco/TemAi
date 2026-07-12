@@ -47,8 +47,9 @@
                     </span>
                     <span>Mudar para Cliente</span>
                 </a>
-                {% include 'vendor/partials/dash_logout_nav_item.html' %}
             </nav>
+
+            {% include 'vendor/partials/dash_logout_nav_item.html' %}
         </aside>
 
         <div class="dash-body">
@@ -168,7 +169,7 @@
             dashNavBackdrop.addEventListener('click', () => setDashMenuOpen(false));
         }
 
-        dashSidebar?.querySelectorAll('.dash-nav-item, .dash-nav-item-logout').forEach((element) => {
+        dashSidebar?.querySelectorAll('.dash-nav-item, .dash-sidebar-logout').forEach((element) => {
             element.addEventListener('click', () => setDashMenuOpen(false));
         });
 

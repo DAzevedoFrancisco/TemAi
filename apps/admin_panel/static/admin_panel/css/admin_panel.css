@@ -2053,7 +2053,34 @@
     .admin-panel-body .dash-content:has(.admin-scroll-page),
     .admin-panel-body .dash-content:has(.admin-users-list-page),
     .admin-panel-body .dash-content:has(.admin-est-detail-page) {
-        padding: 0.85rem 1rem 1rem;
+        padding: 4.75rem 1rem 1rem;
+    }
+
+    .admin-panel-body .dash-sidebar {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .admin-panel-body .dash-nav {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-panel-body .dash-sidebar-footer {
+        display: block;
+        flex-shrink: 0;
+        margin-top: 0;
+        padding: 0.85rem 0 max(0.65rem, env(safe-area-inset-bottom, 0px));
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        background: transparent;
+    }
+
+    .admin-panel-body .dash-sidebar-logout {
+        display: flex;
+        width: 100%;
     }
 
     .admin-filters,
@@ -2439,7 +2466,7 @@
     .admin-panel-body .dash-content:has(.admin-dashboard-home),
     .admin-panel-body .dash-content:has(.admin-scroll-page),
     .admin-panel-body .dash-content:has(.admin-users-list-page) {
-        padding: 0.75rem 0.8rem 0.9rem;
+        padding: 4.5rem 0.8rem 0.9rem;
     }
 
     .admin-page-header form {

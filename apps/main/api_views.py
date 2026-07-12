@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -8,9 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .forms import LoginForm, RegisterForm
 from .jwt_utils import clear_jwt_cookies, get_tokens_for_user, set_jwt_cookies
-from .services import assign_cliente_role, get_post_login_redirect_name
-
-User = get_user_model()
+from .services import get_post_login_redirect_name, register_user_with_default_role
 
 
 class RegisterAPIView(APIView):
@@ -21,14 +19,13 @@ class RegisterAPIView(APIView):
         if not form.is_valid():
             return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(
+        user = register_user_with_default_role(
             email=form.cleaned_data['email'],
             password=form.cleaned_data['password'],
             name=form.cleaned_data['name'],
             date_of_birth=form.cleaned_data['date_of_birth'],
             gender=form.cleaned_data['gender'],
         )
-        assign_cliente_role(user)
         tokens = get_tokens_for_user(user)
         response = Response({
             'message': 'Conta criada com sucesso.',
@@ -38,7 +35,9 @@ class RegisterAPIView(APIView):
                 'date_of_birth': user.date_of_birth.isoformat(),
                 'gender': user.gender,
                 'roles': user.get_roles_display(),
+                'is_administrador': user.is_administrador,
             },
+            'redirect': get_post_login_redirect_name(user),
             'tokens': tokens,
         }, status=status.HTTP_201_CREATED)
         return set_jwt_cookies(response, tokens)

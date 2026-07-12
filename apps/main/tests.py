@@ -11,7 +11,14 @@ from apps.main.search import (
     parse_search_coordinates,
 )
 from apps.main.models import User, UserRole
-from apps.main.services import assign_admin_role, assign_cliente_role, assign_vendedor_role, demote_from_admin, promote_to_admin
+from apps.main.services import (
+    assign_admin_role,
+    assign_cliente_role,
+    assign_vendedor_role,
+    demote_from_admin,
+    promote_to_admin,
+    register_user_with_default_role,
+)
 from apps.main.validators import (
     MIN_CLIENT_AGE,
     MIN_VENDOR_AGE,
@@ -75,6 +82,35 @@ class UserRoleTests(TestCase):
         assign_cliente_role(user)
         self.assertTrue(user.is_cliente)
         self.assertFalse(user.is_vendedor)
+
+    def test_first_registered_user_becomes_admin(self):
+        user = register_user_with_default_role(
+            email='primeiro@example.com',
+            password='senha123',
+            name='Primeiro Admin',
+            date_of_birth='1990-01-01',
+            gender=User.Gender.MASCULINO,
+        )
+        self.assertTrue(user.is_administrador)
+        self.assertFalse(user.is_cliente)
+
+    def test_second_registered_user_becomes_cliente(self):
+        register_user_with_default_role(
+            email='primeiro@example.com',
+            password='senha123',
+            name='Primeiro Admin',
+            date_of_birth='1990-01-01',
+            gender=User.Gender.MASCULINO,
+        )
+        user = register_user_with_default_role(
+            email='segundo@example.com',
+            password='senha123',
+            name='Segundo Cliente',
+            date_of_birth='2000-01-01',
+            gender=User.Gender.FEMININO,
+        )
+        self.assertTrue(user.is_cliente)
+        self.assertFalse(user.is_administrador)
 
     def test_assign_admin_role_removes_other_roles(self):
         user = User.objects.create_user(

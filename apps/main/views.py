@@ -25,7 +25,7 @@ from .engagement import (
     is_product_favorited,
 )
 from .forms import EstablishmentReviewForm
-from .services import assign_cliente_role, get_post_login_redirect_name
+from .services import get_post_login_redirect_name, register_user_with_default_role
 from .validators import can_become_seller
 
 User = get_user_model()
@@ -171,18 +171,25 @@ def auth_view(request):
             active_panel = 'register'
 
             if register_form.is_valid():
-                user = User.objects.create_user(
+                user = register_user_with_default_role(
                     email=register_form.cleaned_data['email'],
                     password=register_form.cleaned_data['password'],
                     name=register_form.cleaned_data['name'],
                     date_of_birth=register_form.cleaned_data['date_of_birth'],
                     gender=register_form.cleaned_data['gender'],
                 )
-                assign_cliente_role(user)
-                set_active_profile(request, Profile.CLIENTE)
+                if not user.is_administrador:
+                    set_active_profile(request, Profile.CLIENTE)
                 tokens = get_tokens_for_user(user)
-                messages.success(request, 'Conta criada com sucesso!', extra_tags='general')
-                response = redirect('home')
+                if user.is_administrador:
+                    messages.success(
+                        request,
+                        'Conta criada com sucesso. Como primeiro utilizador, tem acesso de administrador.',
+                        extra_tags='general',
+                    )
+                else:
+                    messages.success(request, 'Conta criada com sucesso!', extra_tags='general')
+                response = redirect(get_post_login_redirect_name(user))
                 return set_jwt_cookies(response, tokens)
 
     return render(request, 'main/auth.html', {
