@@ -6,7 +6,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from .form_utils import apply_pt_field_errors
-from .services import DELETE_CONFIRMATION_TEXT
 from .validators import (
     MIN_CLIENT_AGE,
     MIN_NAME_LENGTH,
@@ -280,47 +279,6 @@ class AccountPasswordForm(forms.Form):
         if new_password and confirm_password and new_password != confirm_password:
             raise forms.ValidationError('A confirmação da senha não coincide.')
         return cleaned_data
-
-
-class AccountDeleteForm(forms.Form):
-    password = forms.CharField(
-        label='Senha',
-        error_messages={'required': 'A senha é obrigatória para eliminar a conta.'},
-        widget=forms.PasswordInput(attrs={
-            'id': 'account-delete-password',
-            'placeholder': '••••••••',
-            'autocomplete': 'current-password',
-        }),
-    )
-    confirmation = forms.CharField(
-        label='Confirmar eliminação',
-        error_messages={'required': 'Escreva APAGAR para confirmar a eliminação.'},
-        widget=forms.TextInput(attrs={
-            'id': 'account-delete-confirmation',
-            'placeholder': DELETE_CONFIRMATION_TEXT,
-            'autocomplete': 'off',
-            'spellcheck': 'false',
-        }),
-    )
-
-    def __init__(self, *args, user=None, **kwargs):
-        self.user = user
-        super().__init__(*args, **kwargs)
-        apply_pt_field_errors(self)
-
-    def clean_password(self):
-        password = self.cleaned_data.get('password', '')
-        if self.user is not None and not self.user.check_password(password):
-            raise forms.ValidationError('A senha está incorrecta.')
-        return password
-
-    def clean_confirmation(self):
-        value = (self.cleaned_data.get('confirmation') or '').strip().upper()
-        if value != DELETE_CONFIRMATION_TEXT:
-            raise forms.ValidationError(
-                f'Escreva {DELETE_CONFIRMATION_TEXT} para confirmar a eliminação.'
-            )
-        return value
 
 
 class EstablishmentReviewForm(forms.Form):
