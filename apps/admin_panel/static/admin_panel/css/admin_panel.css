@@ -33,7 +33,8 @@
 }
 
 .admin-panel-body .dash-content:has(.admin-scroll-page),
-.admin-panel-body .dash-content:has(.admin-users-list-page) {
+.admin-panel-body .dash-content:has(.admin-users-list-page),
+.admin-panel-body .dash-content:has(.admin-establishments-list-page) {
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -221,6 +222,57 @@
     color: rgba(255, 255, 255, 0.72);
     text-align: center;
     line-height: 1.2;
+}
+
+.admin-list-page-hero {
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.admin-dashboard-hero-badge.is-users {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+}
+
+.admin-dashboard-hero-badge.is-establishments {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    box-shadow: 0 10px 22px rgba(124, 58, 237, 0.35);
+}
+
+.admin-dashboard-hero-metric.is-active {
+    background: rgba(16, 185, 129, 0.16);
+    border-color: rgba(110, 231, 183, 0.28);
+}
+
+.admin-dashboard-hero-metric.is-active strong {
+    color: #bbf7d0;
+}
+
+.admin-dashboard-hero-metric.is-blocked {
+    background: rgba(239, 68, 68, 0.16);
+    border-color: rgba(252, 165, 165, 0.28);
+}
+
+.admin-dashboard-hero-metric.is-blocked strong {
+    color: #fecaca;
+}
+
+.admin-dashboard-hero-metric.is-admin {
+    background: rgba(244, 63, 94, 0.16);
+    border-color: rgba(253, 164, 175, 0.28);
+}
+
+.admin-dashboard-hero-metric.is-admin strong {
+    color: #fecdd3;
+}
+
+.admin-dashboard-hero-metric.is-products {
+    background: rgba(139, 92, 246, 0.16);
+    border-color: rgba(196, 181, 253, 0.28);
+}
+
+.admin-dashboard-hero-metric.is-products strong {
+    color: #ddd6fe;
 }
 
 .admin-dashboard-quick-nav {
@@ -1564,8 +1616,9 @@
     text-overflow: ellipsis;
 }
 
-/* Lista de utilizadores — layout compacto */
-.admin-users-list-page {
+/* Lista de utilizadores e estabelecimentos — layout compacto */
+.admin-users-list-page,
+.admin-establishments-list-page {
     display: flex;
     flex-direction: column;
     gap: 0.55rem;

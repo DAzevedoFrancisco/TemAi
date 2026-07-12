@@ -4,16 +4,37 @@
 
 {% block content %}
 <div class="admin-page admin-scroll-page admin-establishments-list-page">
-    <header class="admin-page-header admin-scroll-page-header admin-mobile-surface">
-        <div>
-            <p class="dashboard-eyebrow">Gestão de negócios</p>
-            <h1>Estabelecimentos</h1>
-        </div>
-        <div class="admin-inline-stats">
-            <span class="admin-inline-stat">{{ establishments_total }} total</span>
-            <span class="admin-inline-stat admin-inline-stat-active">{{ establishments_active_count }} ativos</span>
-            <span class="admin-inline-stat admin-inline-stat-blocked">{{ establishments_blocked_count }} bloqueados</span>
-            <span class="admin-inline-stat admin-inline-stat-products">{{ products_total }} produtos</span>
+    <header class="admin-dashboard-hero admin-list-page-hero">
+        <div class="admin-dashboard-hero-bg" aria-hidden="true"></div>
+        <div class="admin-dashboard-hero-inner">
+            <div class="admin-dashboard-hero-main">
+                <div class="admin-dashboard-hero-badge is-establishments" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div>
+                    <p class="admin-dashboard-eyebrow">Gestão de negócios</p>
+                    <h1>Estabelecimentos</h1>
+                    <p class="admin-dashboard-hero-lead">Acompanhe lojas, donos, catálogo e estado de cada negócio na plataforma.</p>
+                </div>
+            </div>
+            <div class="admin-dashboard-hero-metrics" aria-label="Resumo de estabelecimentos">
+                <article class="admin-dashboard-hero-metric">
+                    <strong>{{ establishments_total }}</strong>
+                    <span>Total</span>
+                </article>
+                <article class="admin-dashboard-hero-metric is-active">
+                    <strong>{{ establishments_active_count }}</strong>
+                    <span>Ativos</span>
+                </article>
+                <article class="admin-dashboard-hero-metric is-blocked">
+                    <strong>{{ establishments_blocked_count }}</strong>
+                    <span>Bloqueados</span>
+                </article>
+                <article class="admin-dashboard-hero-metric is-products">
+                    <strong>{{ products_total }}</strong>
+                    <span>Produtos</span>
+                </article>
+            </div>
         </div>
     </header>
 

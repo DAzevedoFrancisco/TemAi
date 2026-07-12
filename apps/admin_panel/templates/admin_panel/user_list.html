@@ -4,16 +4,37 @@
 
 {% block content %}
 <div class="admin-page admin-scroll-page admin-users-list-page">
-    <header class="admin-page-header admin-scroll-page-header admin-mobile-surface">
-        <div>
-            <p class="dashboard-eyebrow">Gestão de contas</p>
-            <h1>Utilizadores</h1>
-        </div>
-        <div class="admin-inline-stats">
-            <span class="admin-inline-stat">{{ users_total }} total</span>
-            <span class="admin-inline-stat admin-inline-stat-active">{{ users_active_count }} ativos</span>
-            <span class="admin-inline-stat admin-inline-stat-blocked">{{ users_blocked_count }} bloqueados</span>
-            <span class="admin-inline-stat admin-inline-stat-admin">{{ users_admins_count }} admins</span>
+    <header class="admin-dashboard-hero admin-list-page-hero">
+        <div class="admin-dashboard-hero-bg" aria-hidden="true"></div>
+        <div class="admin-dashboard-hero-inner">
+            <div class="admin-dashboard-hero-main">
+                <div class="admin-dashboard-hero-badge is-users" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                    <p class="admin-dashboard-eyebrow">Gestão de contas</p>
+                    <h1>Utilizadores</h1>
+                    <p class="admin-dashboard-hero-lead">Consulte, filtre e gira todas as contas registadas na plataforma.</p>
+                </div>
+            </div>
+            <div class="admin-dashboard-hero-metrics" aria-label="Resumo de utilizadores">
+                <article class="admin-dashboard-hero-metric">
+                    <strong>{{ users_total }}</strong>
+                    <span>Total</span>
+                </article>
+                <article class="admin-dashboard-hero-metric is-active">
+                    <strong>{{ users_active_count }}</strong>
+                    <span>Ativos</span>
+                </article>
+                <article class="admin-dashboard-hero-metric is-blocked">
+                    <strong>{{ users_blocked_count }}</strong>
+                    <span>Bloqueados</span>
+                </article>
+                <article class="admin-dashboard-hero-metric is-admin">
+                    <strong>{{ users_admins_count }}</strong>
+                    <span>Admins</span>
+                </article>
+            </div>
         </div>
     </header>
 
