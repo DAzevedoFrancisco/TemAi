@@ -92,7 +92,7 @@
             </div>
             <div class="admin-dashboard-panel-body">
                 {% if recent_users %}
-                    <div class="dash-table-wrap admin-dashboard-panel-scroll">
+                    <div class="dash-table-wrap admin-dashboard-panel-content">
                         <table class="dash-table admin-table">
                             <thead>
                                 <tr>
@@ -105,12 +105,7 @@
                             <tbody>
                                 {% for item in recent_users %}
                                     <tr>
-                                        <td>
-                                            <div class="admin-dashboard-person">
-                                                <span class="admin-dashboard-avatar" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
-                                                <span>{{ item.name }}</span>
-                                            </div>
-                                        </td>
+                                        <td>{{ item.name }}</td>
                                         <td class="admin-table-cell-email" title="{{ item.email }}">{{ item.email }}</td>
                                         <td>
                                             <div class="admin-directory-roles admin-directory-roles-inline">
@@ -136,11 +131,10 @@
                         </table>
                     </div>
 
-                    <div class="admin-dashboard-mobile-list admin-dashboard-panel-scroll">
+                    <div class="admin-dashboard-mobile-list admin-dashboard-panel-content">
                         {% for item in recent_users %}
                             <article class="admin-dashboard-mobile-card">
                                 <div class="admin-dashboard-mobile-card-head">
-                                    <span class="admin-dashboard-avatar" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
                                     <div class="admin-dashboard-mobile-card-info">
                                         <strong>{{ item.name }}</strong>
                                         <span>{{ item.email }}</span>
@@ -179,7 +173,7 @@
             </div>
             <div class="admin-dashboard-panel-body">
                 {% if recent_establishments %}
-                    <div class="dash-table-wrap admin-dashboard-panel-scroll">
+                    <div class="dash-table-wrap admin-dashboard-panel-content">
                         <table class="dash-table admin-table">
                             <thead>
                                 <tr>
@@ -193,10 +187,7 @@
                                 {% for establishment in recent_establishments %}
                                     <tr>
                                         <td>
-                                            <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-dashboard-person admin-table-link">
-                                                <span class="admin-dashboard-avatar admin-dashboard-avatar-est" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
-                                                <span>{{ establishment.name }}</span>
-                                            </a>
+                                            <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-table-link">{{ establishment.name }}</a>
                                         </td>
                                         <td>{{ establishment.owner.name }}</td>
                                         <td><span class="table-badge">{{ establishment.products_count }}</span></td>
@@ -213,11 +204,10 @@
                         </table>
                     </div>
 
-                    <div class="admin-dashboard-mobile-list admin-dashboard-panel-scroll">
+                    <div class="admin-dashboard-mobile-list admin-dashboard-panel-content">
                         {% for establishment in recent_establishments %}
                             <article class="admin-dashboard-mobile-card">
                                 <div class="admin-dashboard-mobile-card-head">
-                                    <span class="admin-dashboard-avatar admin-dashboard-avatar-est" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
                                     <div class="admin-dashboard-mobile-card-info">
                                         <strong>{{ establishment.name }}</strong>
                                         <span>{{ establishment.owner.name }}</span>

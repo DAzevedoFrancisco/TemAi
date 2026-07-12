@@ -193,17 +193,32 @@
         const establishmentLat = {{ establishment_lat }};
         const establishmentLng = {{ establishment_lng }};
         const establishmentName = "{{ establishment.name|escapejs }}";
+        let adminEstablishmentMap = null;
 
         function refreshAdminEstablishmentMap(map) {
+            const activeMap = map || adminEstablishmentMap;
+            if (!activeMap) {
+                return;
+            }
+            activeMap.invalidateSize({ animate: false });
+        }
+
+        function scheduleAdminEstablishmentMapRefresh(map) {
             if (!map) {
                 return;
             }
-            map.invalidateSize({ animate: false });
+
+            const refresh = () => refreshAdminEstablishmentMap(map);
+            map.whenReady(refresh);
+            requestAnimationFrame(refresh);
+            [120, 350, 700, 1200].forEach((delay) => {
+                window.setTimeout(refresh, delay);
+            });
         }
 
         function initAdminEstablishmentMap() {
             const mapEl = document.getElementById('admin-est-detail-map');
-            if (!mapEl || typeof MobLocationMap === 'undefined') {
+            if (!mapEl || typeof MobLocationMap === 'undefined' || typeof L === 'undefined') {
                 return;
             }
 
@@ -221,14 +236,18 @@
                 return;
             }
 
-            requestAnimationFrame(() => refreshAdminEstablishmentMap(map));
-            setTimeout(() => refreshAdminEstablishmentMap(map), 250);
-            setTimeout(() => refreshAdminEstablishmentMap(map), 700);
+            adminEstablishmentMap = map;
+            scheduleAdminEstablishmentMapRefresh(map);
 
             window.addEventListener('resize', () => refreshAdminEstablishmentMap(map));
             window.addEventListener('orientationchange', () => {
-                setTimeout(() => refreshAdminEstablishmentMap(map), 350);
+                window.setTimeout(() => refreshAdminEstablishmentMap(map), 350);
             });
+
+            const scrollParent = document.querySelector('.admin-panel-body .dash-content');
+            if (scrollParent) {
+                scrollParent.addEventListener('scroll', () => refreshAdminEstablishmentMap(map), { passive: true });
+            }
 
             if ('IntersectionObserver' in window) {
                 const observer = new IntersectionObserver((entries) => {
@@ -237,16 +256,27 @@
                             refreshAdminEstablishmentMap(map);
                         }
                     });
-                }, { threshold: 0.15 });
+                }, { threshold: 0.1 });
 
                 observer.observe(mapEl);
             }
+
+            if (typeof ResizeObserver !== 'undefined') {
+                const resizeObserver = new ResizeObserver(() => refreshAdminEstablishmentMap(map));
+                resizeObserver.observe(mapEl);
+            }
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initAdminEstablishmentMap);
+        function bootAdminEstablishmentMap() {
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(initAdminEstablishmentMap);
+            });
+        }
+
+        if (document.readyState === 'complete') {
+            bootAdminEstablishmentMap();
         } else {
-            initAdminEstablishmentMap();
+            window.addEventListener('load', bootAdminEstablishmentMap, { once: true });
         }
     })();
 </script>

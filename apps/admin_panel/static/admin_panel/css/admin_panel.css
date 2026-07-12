@@ -187,6 +187,39 @@
     line-height: 1.2;
 }
 
+@media (min-width: 901px) {
+    .admin-stats-strip {
+        gap: 0.6rem;
+    }
+
+    .admin-stat-chip {
+        padding: 0.62rem 0.75rem;
+        gap: 0.55rem;
+    }
+
+    .admin-stat-chip-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .admin-stat-chip-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .admin-stat-chip-value {
+        font-size: 1.12rem;
+    }
+
+    .admin-stat-chip-label {
+        font-size: 0.68rem;
+    }
+
+    .admin-stat-chip-meta {
+        font-size: 0.65rem;
+    }
+}
+
 .admin-dashboard-hero-main h1 {
     font-size: 1.2rem;
     font-weight: 700;
@@ -242,19 +275,25 @@
     overflow: hidden;
 }
 
-.admin-dashboard-panel-scroll {
+.admin-dashboard-panel-content {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
 }
 
-.admin-dashboard-panel-scroll .dash-table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: #fff;
-    box-shadow: 0 1px 0 #f1f5f9;
+.admin-dashboard-panel .dash-table th,
+.admin-dashboard-panel .dash-table td {
+    padding: 0.42rem 0.65rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+}
+
+.admin-dashboard-panel .dash-panel-head {
+    padding: 0.6rem 0.85rem;
+}
+
+.admin-dashboard-panel .dash-panel-head h2 {
+    font-size: 0.88rem;
 }
 
 .admin-panel-body .admin-dashboard-panel .dash-table-wrap {
@@ -2027,7 +2066,8 @@
     position: relative;
     z-index: 1;
     background: #eef2f7;
-    isolation: isolate;
+    overflow: hidden;
+    border-radius: 0 0 1rem 1rem;
 }
 
 .admin-est-detail-map .leaflet-container {
@@ -2298,6 +2338,10 @@
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.admin-est-detail-card.admin-est-detail-card-map {
+    overflow: visible;
 }
 
 .admin-est-detail-card-head {
@@ -2856,6 +2900,40 @@
         display: block;
     }
 
+    .admin-dashboard-panel-subtitle {
+        display: none;
+    }
+
+    .admin-dashboard-panel .dash-panel-head {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .admin-dashboard-mobile-card {
+        padding: 0.42rem 0.75rem;
+    }
+
+    .admin-dashboard-mobile-card-head {
+        gap: 0.45rem;
+        align-items: center;
+    }
+
+    .admin-dashboard-mobile-card-info strong {
+        font-size: 0.78rem;
+    }
+
+    .admin-dashboard-mobile-card-info span {
+        font-size: 0.68rem;
+    }
+
+    .admin-dashboard-mobile-card .admin-directory-roles {
+        margin-top: 0.2rem;
+        gap: 0.2rem;
+    }
+
+    .admin-dashboard-mobile-card-foot {
+        margin-top: 0.3rem;
+    }
+
     .admin-panel-body .admin-compact-panel .dash-table-wrap {
         max-height: 240px;
     }
@@ -3223,6 +3301,26 @@
     .admin-dashboard-quick-link {
         flex: 1 1 auto;
         justify-content: center;
+    }
+
+    .admin-panel-body .admin-dashboard-panels {
+        gap: 0.45rem;
+    }
+
+    .admin-dashboard-panel .dash-panel-head {
+        padding: 0.45rem 0.65rem;
+    }
+
+    .admin-dashboard-mobile-card {
+        padding: 0.35rem 0.65rem;
+    }
+
+    .admin-dashboard-mobile-card-foot {
+        margin-top: 0.2rem;
+    }
+
+    .admin-dashboard-mobile-card .admin-directory-roles {
+        margin-top: 0.15rem;
     }
 
     .admin-filter-group,
