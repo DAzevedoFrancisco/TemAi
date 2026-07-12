@@ -11,3 +11,5 @@ PyMySQL==1.2.0
 sqlparse==0.5.5
 tzdata==2026.2
 whitenoise==6.9.0
+cloudinary==1.44.1
+django-cloudinary-storage==0.3.0
