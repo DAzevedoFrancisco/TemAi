@@ -1,5 +1,9 @@
 from urllib.parse import urlencode
 
+import logging
+
+from django.db import transaction
+
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -20,6 +24,50 @@ from apps.main.vendor_notifications import (
 from .decorators import login_required_view, vendedor_required
 from .forms import EstablishmentForm, ProductForm
 from .models import Establishment, Product
+
+logger = logging.getLogger(__name__)
+
+
+def _save_product_from_form(form, establishment):
+    product = form.save(commit=False)
+    product.establishment = establishment
+    with transaction.atomic():
+        product.save()
+    return product
+
+
+def _product_image_save_error_message():
+    from django.conf import settings
+
+    if settings.USE_CLOUDINARY:
+        return (
+            'Não foi possível enviar a imagem do produto. '
+            'Confirme as credenciais Cloudinary no servidor ou contacte o suporte.'
+        )
+    return 'Não foi possível guardar a imagem do produto. Tente novamente com outro ficheiro.'
+
+
+def _handle_product_form_submission(request, *, form, establishment, success_message, redirect_url):
+    if request.method != 'POST' or not form.is_valid():
+        return None
+
+    try:
+        if establishment is not None:
+            _save_product_from_form(form, establishment)
+        else:
+            with transaction.atomic():
+                form.save()
+    except Exception:
+        logger.exception('Failed to save product for establishment %s', getattr(establishment, 'pk', None))
+        messages.error(
+            request,
+            _product_image_save_error_message(),
+            extra_tags='vendor',
+        )
+        return None
+
+    messages.success(request, success_message, extra_tags='vendor')
+    return redirect(redirect_url)
 
 
 @login_required_view
@@ -189,12 +237,15 @@ def product_create(request, est_pk):
     establishment = get_object_or_404(Establishment, pk=est_pk, owner=request.user)
     form = ProductForm(request.POST or None, request.FILES or None)
 
-    if request.method == 'POST' and form.is_valid():
-        product = form.save(commit=False)
-        product.establishment = establishment
-        product.save()
-        messages.success(request, 'Produto cadastrado com sucesso!', extra_tags='vendor')
-        return redirect('vendor:product_list', pk=establishment.pk)
+    response = _handle_product_form_submission(
+        request,
+        form=form,
+        establishment=establishment,
+        success_message='Produto cadastrado com sucesso!',
+        redirect_url=reverse('vendor:product_list', kwargs={'pk': establishment.pk}),
+    )
+    if response is not None:
+        return response
 
     return render(request, 'vendor/product_form.html', {
         'form': form,
@@ -213,10 +264,15 @@ def product_edit(request, pk):
     )
     form = ProductForm(request.POST or None, request.FILES or None, instance=product)
 
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, 'Produto atualizado com sucesso!', extra_tags='vendor')
-        return redirect('vendor:product_list', pk=product.establishment.pk)
+    response = _handle_product_form_submission(
+        request,
+        form=form,
+        establishment=None,
+        success_message='Produto atualizado com sucesso!',
+        redirect_url=reverse('vendor:product_list', kwargs={'pk': product.establishment.pk}),
+    )
+    if response is not None:
+        return response
 
     return render(request, 'vendor/product_form.html', {
         'form': form,

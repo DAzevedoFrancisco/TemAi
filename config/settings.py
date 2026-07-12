@@ -49,6 +49,19 @@ CSRF_TRUSTED_ORIGINS = [
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
 
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '').strip()
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '').strip()
+
+
+def _cloudinary_env_ready():
+    placeholder_values = {'', 'false', 'none', 'null', 'undefined', 'changeme'}
+    values = (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)
+    return all(value and value.lower() not in placeholder_values for value in values)
+
+
+USE_CLOUDINARY = _cloudinary_env_ready()
+
 
 # Application definition
 
@@ -58,6 +71,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+if USE_CLOUDINARY:
+    INSTALLED_APPS += [
+        'cloudinary_storage',
+        'cloudinary',
+    ]
+
+INSTALLED_APPS += [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -202,13 +224,10 @@ STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
-CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+if RENDER_EXTERNAL_HOSTNAME and not USE_CLOUDINARY:
+    MEDIA_ROOT = Path('/tmp/temai-media')
 
-USE_CLOUDINARY = bool(
-    CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET
-)
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 if USE_CLOUDINARY:
     CLOUDINARY_STORAGE = {
