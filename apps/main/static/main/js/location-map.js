@@ -39,7 +39,7 @@
             fitPadding = 0.2,
             defaultZoom = 15,
             openFirstPopup = true,
-            preferCanvas = window.matchMedia('(pointer: coarse)').matches,
+            preferCanvas = false,
         } = options;
 
         const containerRect = container.getBoundingClientRect();
@@ -59,7 +59,6 @@
 
         const map = L.map(containerId, {
             scrollWheelZoom: false,
-            tap: true,
             preferCanvas,
         });
         L.tileLayer(MobMapTiles.url, MobMapTiles.options).addTo(map);

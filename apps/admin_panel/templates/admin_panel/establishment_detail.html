@@ -86,7 +86,35 @@
                         <p class="admin-est-detail-card-subtitle">Posição registada na cidade da Beira</p>
                     </div>
                 </div>
-            <div id="admin-est-detail-map" class="admin-est-detail-map" role="img" aria-label="Mapa do estabelecimento"></div>
+            <div
+                id="admin-est-detail-map"
+                class="admin-est-detail-map"
+                role="img"
+                aria-label="Mapa do estabelecimento"
+                data-lat="{{ establishment_lat }}"
+                data-lng="{{ establishment_lng }}"
+                data-name="{{ establishment.name|escapejs }}"
+                data-marker-icon="{% static 'main/vendor/leaflet/images/marker-icon.png' %}"
+                data-marker-icon2x="{% static 'main/vendor/leaflet/images/marker-icon-2x.png' %}"
+                data-marker-shadow="{% static 'main/vendor/leaflet/images/marker-shadow.png' %}"
+            ></div>
+            <div id="admin-est-detail-map-fallback" class="admin-est-detail-map-fallback" hidden>
+                <iframe
+                    id="admin-est-detail-map-fallback-frame"
+                    title="Mapa do estabelecimento"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+                <a
+                    id="admin-est-detail-map-fallback-link"
+                    class="admin-est-detail-map-fallback-link"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Abrir mapa completo
+                </a>
+            </div>
         </article>
 
         <div class="admin-est-detail-side">
@@ -188,145 +216,5 @@
 <script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
 <script src="{% static 'main/js/map-tiles.js' %}"></script>
 <script src="{% static 'main/js/location-map.js' %}"></script>
-<script>
-    (function () {
-        const establishmentLat = {{ establishment_lat }};
-        const establishmentLng = {{ establishment_lng }};
-        const establishmentName = "{{ establishment.name|escapejs }}";
-        const mapContainerId = 'admin-est-detail-map';
-        let adminEstablishmentMap = null;
-        let mapVisibilityObserver = null;
-
-        function getAdminMapScrollRoot() {
-            return document.querySelector('.admin-panel-body .dash-content');
-        }
-
-        function refreshAdminEstablishmentMap(map) {
-            const activeMap = map || adminEstablishmentMap;
-            if (!activeMap) {
-                return;
-            }
-            activeMap.invalidateSize({ animate: false });
-        }
-
-        function scheduleAdminEstablishmentMapRefresh(map) {
-            if (!map) {
-                return;
-            }
-
-            const refresh = () => refreshAdminEstablishmentMap(map);
-            map.whenReady(refresh);
-            requestAnimationFrame(refresh);
-            [120, 350, 700, 1200].forEach((delay) => {
-                window.setTimeout(refresh, delay);
-            });
-        }
-
-        function initAdminEstablishmentMap() {
-            if (adminEstablishmentMap) {
-                refreshAdminEstablishmentMap(adminEstablishmentMap);
-                return adminEstablishmentMap;
-            }
-
-            const mapEl = document.getElementById(mapContainerId);
-            if (!mapEl || typeof MobLocationMap === 'undefined' || typeof L === 'undefined') {
-                return null;
-            }
-
-            const map = MobLocationMap.init(mapContainerId, {
-                markers: [{
-                    lat: establishmentLat,
-                    lng: establishmentLng,
-                    popup: establishmentName,
-                }],
-                defaultZoom: 15,
-                openFirstPopup: true,
-            });
-
-            if (!map) {
-                return null;
-            }
-
-            adminEstablishmentMap = map;
-            scheduleAdminEstablishmentMapRefresh(map);
-
-            window.addEventListener('resize', () => refreshAdminEstablishmentMap(map));
-            window.addEventListener('orientationchange', () => {
-                window.setTimeout(() => refreshAdminEstablishmentMap(map), 350);
-            });
-
-            const scrollParent = getAdminMapScrollRoot();
-            if (scrollParent) {
-                scrollParent.addEventListener('scroll', () => refreshAdminEstablishmentMap(map), { passive: true });
-            }
-
-            if (typeof ResizeObserver !== 'undefined') {
-                const resizeObserver = new ResizeObserver(() => refreshAdminEstablishmentMap(map));
-                resizeObserver.observe(mapEl);
-            }
-
-            return map;
-        }
-
-        function tryInitAdminEstablishmentMap() {
-            window.requestAnimationFrame(() => {
-                initAdminEstablishmentMap();
-            });
-        }
-
-        function watchAdminEstablishmentMap() {
-            const mapEl = document.getElementById(mapContainerId);
-            if (!mapEl) {
-                return;
-            }
-
-            const onMapVisible = () => {
-                tryInitAdminEstablishmentMap();
-                if (adminEstablishmentMap) {
-                    scheduleAdminEstablishmentMapRefresh(adminEstablishmentMap);
-                }
-            };
-
-            if ('IntersectionObserver' in window) {
-                mapVisibilityObserver = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            onMapVisible();
-                        } else if (adminEstablishmentMap) {
-                            refreshAdminEstablishmentMap(adminEstablishmentMap);
-                        }
-                    });
-                }, {
-                    root: getAdminMapScrollRoot(),
-                    threshold: 0.01,
-                    rootMargin: '64px 0px',
-                });
-
-                mapVisibilityObserver.observe(mapEl);
-
-                const scrollParent = getAdminMapScrollRoot();
-                if (scrollParent) {
-                    const initOnScroll = () => {
-                        onMapVisible();
-                        if (adminEstablishmentMap) {
-                            scrollParent.removeEventListener('scroll', initOnScroll);
-                        }
-                    };
-                    scrollParent.addEventListener('scroll', initOnScroll, { passive: true });
-                }
-
-                return;
-            }
-
-            const boot = () => tryInitAdminEstablishmentMap();
-            if (document.readyState === 'complete') {
-                boot();
-            } else {
-                window.addEventListener('load', boot, { once: true });
-            }
-        }
-
-        watchAdminEstablishmentMap();
-    })();
-</script>
+<script src="{% static 'admin_panel/js/admin-establishment-map.js' %}"></script>
 {% endblock %}
