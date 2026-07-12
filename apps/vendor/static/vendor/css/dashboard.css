@@ -139,6 +139,26 @@ a {
     line-height: 1.3;
 }
 
+.dash-nav-item-logout {
+    margin-top: auto;
+    width: 100%;
+    border: none;
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(248, 113, 113, 0.32);
+    color: #fecaca;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+}
+
+.dash-nav-item-logout:hover,
+.dash-nav-item-logout:focus-visible {
+    background: rgba(220, 38, 38, 0.88);
+    border-color: rgba(220, 38, 38, 0.88);
+    color: #fff;
+}
+
 .dash-sidebar-footer {
     margin-top: auto;
     padding-top: 1rem;
@@ -2092,6 +2112,11 @@ body.dash-nav-open {
     .dash-nav-item .nav-icon svg {
         width: 18px;
         height: 18px;
+    }
+
+    .dash-nav-item-logout {
+        margin-top: auto;
+        flex-shrink: 0;
     }
 
     .dash-sidebar-footer {
