@@ -7,9 +7,15 @@
         </a>
     </div>
 
-    <button type="button" class="menu-toggle client-menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
-        <span class="menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-    </button>
+    <div class="client-navbar-end">
+        {% if not user.is_authenticated %}
+            <a href="{% url 'auth' %}" class="client-navbar-entrar">Entrar</a>
+        {% endif %}
+
+        <button type="button" class="menu-toggle client-menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
+            <span class="menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+    </div>
 
     <div class="menu client-mobile-sidebar" id="menu">
         <a href="{% url 'home' %}" class="client-mobile-brand">
