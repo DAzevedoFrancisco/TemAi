@@ -39,7 +39,13 @@
             fitPadding = 0.2,
             defaultZoom = 15,
             openFirstPopup = true,
+            preferCanvas = window.matchMedia('(pointer: coarse)').matches,
         } = options;
+
+        const containerRect = container.getBoundingClientRect();
+        if (containerRect.width < 1 || containerRect.height < 1) {
+            return null;
+        }
 
         let normalizedUserLat = userLat;
         let normalizedUserLng = userLng;
@@ -51,7 +57,11 @@
 
         destroyMap(container);
 
-        const map = L.map(containerId, { scrollWheelZoom: false });
+        const map = L.map(containerId, {
+            scrollWheelZoom: false,
+            tap: true,
+            preferCanvas,
+        });
         L.tileLayer(MobMapTiles.url, MobMapTiles.options).addTo(map);
         container._mobMap = map;
 
@@ -88,7 +98,10 @@
         }
 
         const refresh = () => map.invalidateSize({ animate: false });
+        map.whenReady(refresh);
+        requestAnimationFrame(refresh);
         setTimeout(refresh, 200);
+        setTimeout(refresh, 600);
         window.addEventListener('resize', refresh);
 
         return map;

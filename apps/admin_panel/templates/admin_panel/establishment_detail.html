@@ -4,7 +4,7 @@
 {% block title %}{{ establishment.name }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="stylesheet" href="{% static 'main/vendor/leaflet/leaflet.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -185,7 +185,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
 <script src="{% static 'main/js/map-tiles.js' %}"></script>
 <script src="{% static 'main/js/location-map.js' %}"></script>
 <script>
@@ -193,7 +193,13 @@
         const establishmentLat = {{ establishment_lat }};
         const establishmentLng = {{ establishment_lng }};
         const establishmentName = "{{ establishment.name|escapejs }}";
+        const mapContainerId = 'admin-est-detail-map';
         let adminEstablishmentMap = null;
+        let mapVisibilityObserver = null;
+
+        function getAdminMapScrollRoot() {
+            return document.querySelector('.admin-panel-body .dash-content');
+        }
 
         function refreshAdminEstablishmentMap(map) {
             const activeMap = map || adminEstablishmentMap;
@@ -217,12 +223,17 @@
         }
 
         function initAdminEstablishmentMap() {
-            const mapEl = document.getElementById('admin-est-detail-map');
-            if (!mapEl || typeof MobLocationMap === 'undefined' || typeof L === 'undefined') {
-                return;
+            if (adminEstablishmentMap) {
+                refreshAdminEstablishmentMap(adminEstablishmentMap);
+                return adminEstablishmentMap;
             }
 
-            const map = MobLocationMap.init('admin-est-detail-map', {
+            const mapEl = document.getElementById(mapContainerId);
+            if (!mapEl || typeof MobLocationMap === 'undefined' || typeof L === 'undefined') {
+                return null;
+            }
+
+            const map = MobLocationMap.init(mapContainerId, {
                 markers: [{
                     lat: establishmentLat,
                     lng: establishmentLng,
@@ -233,7 +244,7 @@
             });
 
             if (!map) {
-                return;
+                return null;
             }
 
             adminEstablishmentMap = map;
@@ -244,40 +255,78 @@
                 window.setTimeout(() => refreshAdminEstablishmentMap(map), 350);
             });
 
-            const scrollParent = document.querySelector('.admin-panel-body .dash-content');
+            const scrollParent = getAdminMapScrollRoot();
             if (scrollParent) {
                 scrollParent.addEventListener('scroll', () => refreshAdminEstablishmentMap(map), { passive: true });
-            }
-
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            refreshAdminEstablishmentMap(map);
-                        }
-                    });
-                }, { threshold: 0.1 });
-
-                observer.observe(mapEl);
             }
 
             if (typeof ResizeObserver !== 'undefined') {
                 const resizeObserver = new ResizeObserver(() => refreshAdminEstablishmentMap(map));
                 resizeObserver.observe(mapEl);
             }
+
+            return map;
         }
 
-        function bootAdminEstablishmentMap() {
+        function tryInitAdminEstablishmentMap() {
             window.requestAnimationFrame(() => {
-                window.requestAnimationFrame(initAdminEstablishmentMap);
+                initAdminEstablishmentMap();
             });
         }
 
-        if (document.readyState === 'complete') {
-            bootAdminEstablishmentMap();
-        } else {
-            window.addEventListener('load', bootAdminEstablishmentMap, { once: true });
+        function watchAdminEstablishmentMap() {
+            const mapEl = document.getElementById(mapContainerId);
+            if (!mapEl) {
+                return;
+            }
+
+            const onMapVisible = () => {
+                tryInitAdminEstablishmentMap();
+                if (adminEstablishmentMap) {
+                    scheduleAdminEstablishmentMapRefresh(adminEstablishmentMap);
+                }
+            };
+
+            if ('IntersectionObserver' in window) {
+                mapVisibilityObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            onMapVisible();
+                        } else if (adminEstablishmentMap) {
+                            refreshAdminEstablishmentMap(adminEstablishmentMap);
+                        }
+                    });
+                }, {
+                    root: getAdminMapScrollRoot(),
+                    threshold: 0.01,
+                    rootMargin: '64px 0px',
+                });
+
+                mapVisibilityObserver.observe(mapEl);
+
+                const scrollParent = getAdminMapScrollRoot();
+                if (scrollParent) {
+                    const initOnScroll = () => {
+                        onMapVisible();
+                        if (adminEstablishmentMap) {
+                            scrollParent.removeEventListener('scroll', initOnScroll);
+                        }
+                    };
+                    scrollParent.addEventListener('scroll', initOnScroll, { passive: true });
+                }
+
+                return;
+            }
+
+            const boot = () => tryInitAdminEstablishmentMap();
+            if (document.readyState === 'complete') {
+                boot();
+            } else {
+                window.addEventListener('load', boot, { once: true });
+            }
         }
+
+        watchAdminEstablishmentMap();
     })();
 </script>
 {% endblock %}

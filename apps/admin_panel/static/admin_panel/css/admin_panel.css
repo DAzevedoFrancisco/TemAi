@@ -2372,6 +2372,13 @@
     height: 100%;
     min-height: inherit;
     font-family: inherit;
+    touch-action: pan-x pan-y;
+}
+
+.admin-est-detail-map .leaflet-pane,
+.admin-est-detail-map .leaflet-tile-pane,
+.admin-est-detail-map .leaflet-overlay-pane {
+    z-index: 1;
 }
 
 .admin-est-detail-card-map {
@@ -3058,6 +3065,8 @@
     .admin-est-detail-map {
         min-height: 240px;
         height: 260px;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
 
     .admin-panel-body .dash-sidebar {
@@ -3568,6 +3577,13 @@
     .admin-est-detail-map {
         min-height: 240px;
         height: 260px;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    .admin-est-detail-card.admin-est-detail-card-map {
+        overflow: visible;
+        transform: none;
     }
 
     .admin-est-detail-facts-grid {
@@ -3604,6 +3620,8 @@
     .admin-est-detail-map {
         min-height: 220px;
         height: 220px;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
 
     .admin-est-detail-metric-coords {
@@ -3909,6 +3927,8 @@
     .admin-est-detail-map {
         min-height: 200px;
         height: 200px;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
 
     .admin-est-detail-card-head {
