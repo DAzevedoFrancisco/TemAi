@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    <title>{% block page_title %}Mob{% endblock %}</title>
+</head>
+<body>
+    <div class="content legal-page">
+        {% include 'main/partials/client_nav.html' %}
+
+        <main class="legal-shell">
+            <article class="legal-doc">
+                <header class="legal-doc-header">
+                    <h1>{% block legal_title %}{% endblock %}</h1>
+                    <p class="legal-updated">Última atualização: {% block legal_updated %}9 de julho de 2026{% endblock %}</p>
+                </header>
+
+                <div class="legal-intro">
+                    {% block legal_intro %}{% endblock %}
+                </div>
+
+                {% block legal_toc %}{% endblock %}
+
+                <div class="legal-body">
+                    {% block legal_body %}{% endblock %}
+                </div>
+            </article>
+        </main>
+
+        {% include 'main/partials/client_footer.html' %}
+    </div>
+
+    {% include 'main/partials/client_light_scripts.html' %}
+</body>
+</html>

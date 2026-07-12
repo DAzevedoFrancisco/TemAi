@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    <title>Tornar-me vendedor | Mob</title>
+</head>
+<body>
+    <div class="content become-seller-page">
+        {% include 'main/partials/client_nav.html' %}
+
+        <div class="become-seller-shell">
+            {% include 'main/partials/client_messages.html' with message_scope='vendor' %}
+
+            <a href="{% url 'home' %}" class="become-seller-back">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Voltar ao início
+            </a>
+
+            <section class="become-seller-card{% if not eligible %} become-seller-card--blocked{% endif %}">
+                <div class="become-seller-icon" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+
+                <h1>Tornar-me vendedor</h1>
+
+                {% if eligible %}
+                    <p class="become-seller-lead">
+                        Ao confirmar, o seu perfil de vendedor será ativado.
+                    </p>
+                    <ul class="become-seller-requirements">
+                        <li>Ter pelo menos <strong>{{ min_vendor_age }} anos</strong> — requisito cumprido ({{ user_age }} anos)</li>
+                        <li>Cadastrar pelo menos um estabelecimento na Beira</li>
+                        <li>Manter informações e produtos atualizados</li>
+                    </ul>
+                    <form method="post" class="become-seller-form">
+                        {% csrf_token %}
+                        <button type="submit" class="become-seller-confirm">Confirmar e continuar</button>
+                    </form>
+                {% else %}
+                    <p class="become-seller-lead become-seller-lead--blocked">
+                        Não é possível ativar o perfil de vendedor com a data de nascimento associada à sua conta.
+                    </p>
+                    <div class="become-seller-alert">
+                        <strong>Requisito de idade não cumprido</strong>
+                        <p>Para se tornar vendedor na Mob, precisa de ter pelo menos <strong>{{ min_vendor_age }} anos</strong>. A sua conta indica <strong>{{ user_age }} anos</strong>.</p>
+                    </div>
+                    <a href="{% url 'home' %}" class="become-seller-cancel">Voltar ao início</a>
+                {% endif %}
+            </section>
+        </div>
+
+        {% include 'main/partials/client_footer.html' %}
+    </div>
+
+    {% include 'main/partials/client_light_scripts.html' %}
+</body>
+</html>

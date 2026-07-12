@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/account.css' %}">
+    <title>Minha conta | Mob</title>
+</head>
+<body class="account-page-body">
+    <div class="content account-page">
+        {% include 'main/partials/client_nav.html' %}
+
+        <main class="account-shell">
+            {% include 'main/partials/client_messages.html' with message_scope='account' %}
+
+            {% if active_profile == 'vendedor' %}
+                <a href="{% url 'vendor:dashboard' %}" class="account-back-panel">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    Voltar ao painel vendedor
+                </a>
+            {% endif %}
+
+            <header class="account-hero">
+                <div class="account-hero-accent" aria-hidden="true"></div>
+                <div class="account-hero-main">
+                    <div class="account-avatar" aria-hidden="true">{{ user.first_name|slice:":1"|upper }}</div>
+                    <div class="account-hero-text">
+                        <p class="account-eyebrow">A sua conta</p>
+                        <h1>{{ user.first_name }}</h1>
+                        <p class="account-hero-email">{{ user.email }}</p>
+                        <div class="account-role-chips">
+                            {% for role in user_roles %}
+                                <span class="account-role-chip">{{ role }}</span>
+                            {% empty %}
+                                <span class="account-role-chip">Utilizador</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="account-hero-meta">
+                        <span class="account-meta-label">Membro desde</span>
+                        <strong>{{ user.date_joined|date:"d M Y" }}</strong>
+                    </div>
+                </div>
+            </header>
+
+            <div class="account-grid">
+                <section class="account-card account-card-profile">
+                    <div class="account-card-head">
+                        <div class="account-card-icon account-card-icon-profile">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <h2>Dados pessoais</h2>
+                            <p>Actualize o seu nome, email e informações de perfil.</p>
+                        </div>
+                    </div>
+
+                    <form method="post" class="account-form" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="profile">
+
+                        {% if profile_form.non_field_errors %}
+                            <div class="account-alert account-alert-error">
+                                {% for error in profile_form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="account-field">
+                            <label for="account-name">Nome completo</label>
+                            <div class="account-input-wrap">
+                                <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                {{ profile_form.name }}
+                            </div>
+                            {% for error in profile_form.name.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="account-row-dob-gender">
+                            <div class="account-field">
+                                <label for="account-dob">Data de nascimento</label>
+                                <div class="account-input-wrap account-input-wrap-plain">
+                                    {{ profile_form.date_of_birth }}
+                                </div>
+                                {% for error in profile_form.date_of_birth.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                            </div>
+                            <div class="account-field account-gender-field">
+                                <span class="account-gender-label">Sexo</span>
+                                <div class="account-gender-options">
+                                    {{ profile_form.gender }}
+                                </div>
+                                {% for error in profile_form.gender.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="account-field">
+                            <label for="account-email">Email</label>
+                            <div class="account-input-wrap">
+                                <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                {{ profile_form.email }}
+                            </div>
+                            {% for error in profile_form.email.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <button type="submit" class="account-btn account-btn-primary">Guardar alterações</button>
+                    </form>
+                </section>
+
+                <section class="account-card account-card-security">
+                    <div class="account-card-head">
+                        <div class="account-card-icon account-card-icon-security">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <div>
+                            <h2>Segurança</h2>
+                            <p>Altere a sua senha para manter a conta protegida.</p>
+                        </div>
+                    </div>
+
+                    <form method="post" class="account-form" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="password">
+
+                        {% if password_form.non_field_errors %}
+                            <div class="account-alert account-alert-error">
+                                {% for error in password_form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="account-field">
+                            <label for="account-current-password">Senha actual</label>
+                            <div class="account-input-wrap">
+                                <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                {{ password_form.current_password }}
+                            </div>
+                            {% for error in password_form.current_password.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="account-field">
+                            <label for="account-new-password">Nova senha</label>
+                            <div class="account-input-wrap">
+                                <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                {{ password_form.new_password }}
+                            </div>
+                            {% for error in password_form.new_password.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <div class="account-field">
+                            <label for="account-confirm-password">Confirmar nova senha</label>
+                            <div class="account-input-wrap">
+                                <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                {{ password_form.confirm_password }}
+                            </div>
+                            {% for error in password_form.confirm_password.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                        </div>
+
+                        <button type="submit" class="account-btn account-btn-secondary">Alterar senha</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        {% include 'main/partials/client_footer.html' %}
+    </div>
+
+    {% include 'main/partials/client_scripts.html' %}
+    <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
+</body>
+</html>

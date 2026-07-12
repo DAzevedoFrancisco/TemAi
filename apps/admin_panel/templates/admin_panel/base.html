@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'vendor/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'admin_panel/css/admin_panel.css' %}">
+    {% block extra_css %}{% endblock %}
+    <title>{% block title %}Administração{% endblock %} | Mob</title>
+</head>
+<body class="admin-panel-body">
+    <div class="dash-layout admin-dash-layout">
+        <aside class="dash-sidebar admin-sidebar">
+            <a href="{% url 'admin_panel:dashboard' %}" class="dash-brand">
+                <img src="{% static 'main/img/lg.jpeg' %}" width="36" height="36" alt="Logo" class="dash-brand-img">
+                <span class="dash-brand-text">Mob Admin</span>
+            </a>
+
+            <nav class="dash-nav">
+                <a href="{% url 'admin_panel:dashboard' %}" class="dash-nav-item{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'admin_panel:user_list' %}" class="dash-nav-item{% if request.resolver_match.url_name == 'user_list' %} active{% endif %}">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
+                    <span>Utilizadores</span>
+                </a>
+                <a href="{% url 'admin_panel:establishment_list' %}" class="dash-nav-item{% if request.resolver_match.url_name == 'establishment_list' or request.resolver_match.url_name == 'establishment_detail' %} active{% endif %}">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </span>
+                    <span>Estabelecimentos</span>
+                </a>
+                <a href="{% url 'admin_panel:admin_users' %}" class="dash-nav-item{% if request.resolver_match.url_name == 'admin_users' %} active{% endif %}">
+                    <span class="nav-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </span>
+                    <span>Administradores</span>
+                </a>
+            </nav>
+
+            <div class="dash-sidebar-footer">
+                <button type="button" class="dash-sidebar-logout" id="dash-logout-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Sair
+                </button>
+            </div>
+        </aside>
+
+        <div class="dash-body">
+            <header class="dash-topbar">
+                <a href="{% url 'admin_panel:dashboard' %}" class="dash-mobile-brand">
+                    <img src="{% static 'main/img/lg.jpeg' %}" width="32" height="32" alt="Logo" class="dash-brand-img">
+                    <span class="dash-brand-text">Mob Admin</span>
+                </a>
+                <div class="dash-search admin-topbar-title">
+                    <span>Painel de administração do sistema</span>
+                </div>
+                <div class="dash-topbar-actions">
+                    <button type="button" class="dash-mobile-logout" id="dash-logout-btn-mobile" aria-label="Sair">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                    <div class="dash-user-block">
+                        <div class="dash-user-info">
+                            <a href="{% url 'account_settings' %}" class="dash-name dash-name-link">{{ user.first_name|upper }}</a>
+                            <span class="dash-role">Administrador</span>
+                        </div>
+                        <div class="dash-avatar admin-avatar" title="{{ user.name }}">
+                            {{ user.first_name|slice:":1"|upper }}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="dash-content">
+                {% if messages %}
+                    <div class="dash-messages">
+                        {% for message in messages %}
+                            {% if 'admin' in message.tags %}
+                                <div class="dash-message {{ message.tags }}">{{ message }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <div class="dash-modal" id="dash-logout-modal" hidden>
+        <div class="dash-modal-overlay" id="dash-logout-overlay"></div>
+        <div class="dash-modal-box" role="dialog" aria-labelledby="dash-logout-title" aria-modal="true">
+            <h3 id="dash-logout-title">Confirmar saída</h3>
+            <p>Tem a certeza de que deseja terminar a sessão?</p>
+            <div class="dash-modal-actions">
+                <button type="button" class="btn-secondary" id="dash-logout-cancel">Cancelar</button>
+                <button type="button" class="btn-danger" id="dash-logout-confirm">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'logout' %}" id="dash-logout-form" hidden>
+        {% csrf_token %}
+    </form>
+
+    <script>
+        const dashLogoutModal = document.getElementById('dash-logout-modal');
+        const dashLogoutBtn = document.getElementById('dash-logout-btn');
+        const dashLogoutForm = document.getElementById('dash-logout-form');
+        const dashLogoutCancel = document.getElementById('dash-logout-cancel');
+        const dashLogoutConfirm = document.getElementById('dash-logout-confirm');
+        const dashLogoutOverlay = document.getElementById('dash-logout-overlay');
+
+        function openDashLogoutModal() {
+            dashLogoutModal.hidden = false;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDashLogoutModal() {
+            dashLogoutModal.hidden = true;
+            document.body.style.overflow = window.innerWidth <= 900 ? 'auto' : '';
+        }
+
+        if (dashLogoutBtn) dashLogoutBtn.addEventListener('click', openDashLogoutModal);
+        const dashLogoutBtnMobile = document.getElementById('dash-logout-btn-mobile');
+        if (dashLogoutBtnMobile) dashLogoutBtnMobile.addEventListener('click', openDashLogoutModal);
+        dashLogoutCancel.addEventListener('click', closeDashLogoutModal);
+        dashLogoutOverlay.addEventListener('click', closeDashLogoutModal);
+        dashLogoutConfirm.addEventListener('click', () => dashLogoutForm.submit());
+    </script>
+    <script src="{% static 'main/js/flash-messages.js' %}"></script>
+    <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

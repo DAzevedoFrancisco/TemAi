@@ -1,0 +1,211 @@
+{% extends 'main/legal_base.html' %}
+
+{% block page_title %}Termos de Serviço | Mob{% endblock %}
+
+{% block legal_title %}Termos de Serviço{% endblock %}
+
+{% block legal_intro %}
+<p>Obrigado por utilizar a <strong>Mob</strong>! Antes de aceder aos nossos serviços, leia estes Termos de Serviço.</p>
+<p>Estes Termos regulam o seu acesso e utilização da plataforma <strong>Mob</strong> — um catálogo digital para descobrir produtos e estabelecimentos na cidade da <strong>Beira, Sofala, Moçambique</strong> (os <strong>"Serviços"</strong>).</p>
+<p>A Mob é uma plataforma de <strong>descoberta e informação</strong>. Não processamos pagamentos, não gerimos encomendas e não intermediamos transações comerciais entre clientes e vendedores.</p>
+<p>Leia estes Termos juntamente com a nossa <a href="{% url 'privacy' %}">Política de Privacidade</a>. Ao registar-se, iniciar sessão ou utilizar os Serviços, concorda com ambos os documentos.</p>
+<p>Podemos atualizar estes Termos publicando uma nova versão nesta página. A data da última atualização aparece no topo do documento.</p>
+{% endblock %}
+
+{% block legal_toc %}
+<nav class="legal-toc" aria-label="Índice dos termos">
+    <p class="legal-toc-title">Este documento aborda o seguinte:</p>
+    <ol>
+        <li><a href="#conta">I. Conta, registo e segurança</a></li>
+        <li><a href="#utilizacao">II. Utilização dos Serviços</a></li>
+        <li><a href="#pesquisa">III. Pesquisa e localização</a></li>
+        <li><a href="#perfis">IV. Perfis de Cliente e Vendedor</a></li>
+        <li><a href="#conteudo">V. Conteúdos publicados por vendedores</a></li>
+        <li><a href="#propriedade">VI. Propriedade intelectual</a></li>
+        <li><a href="#dados">VII. Dados pessoais</a></li>
+        <li><a href="#responsabilidade">VIII. Responsabilidade e limitações</a></li>
+        <li><a href="#contacto">IX. Alterações e contacto</a></li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block legal_body %}
+<section id="conta" class="legal-section">
+    <h2>I. Conta, registo e segurança</h2>
+
+    <h3>1. Quem pode utilizar a Mob</h3>
+    <p>Os Serviços destinam-se a utilizadores com idade adequada para celebrar acordos vinculativos na sua jurisdição. Ao registar-se, declara que a informação que fornece é verdadeira.</p>
+
+    <h3>2. Criação de conta</h3>
+    <p>Para aceder a funcionalidades como pesquisa com perfil de cliente, painel de vendedor ou gestão de estabelecimentos, deve criar uma conta em <strong>/auth/</strong> ou através da API <strong>/api/auth/register/</strong>.</p>
+    <p>No registo, pedimos:</p>
+    <ul>
+        <li><strong>nome</strong> (mínimo 6 caracteres);</li>
+        <li><strong>email</strong> (utilizado para iniciar sessão);</li>
+        <li><strong>data de nascimento</strong>;</li>
+        <li><strong>palavra-passe</strong> (armazenada de forma encriptada).</li>
+    </ul>
+    <p>Após o registo, é automaticamente atribuído o papel de <strong>Cliente</strong>. Pode mais tarde ativar o papel de <strong>Vendedor</strong> se pretender publicar estabelecimentos e produtos.</p>
+
+    <h3>3. Início e fim de sessão</h3>
+    <p>O início de sessão pode ser feito na página <strong>/auth/</strong> ou via API <strong>/api/auth/login/</strong>. Após autenticação, a plataforma utiliza cookies de autenticação (<code>access_token</code> e <code>refresh_token</code>) e uma sessão para gerir o perfil ativo.</p>
+    <p>O encerramento de sessão em <strong>/logout/</strong> invalida o token de renovação e remove os cookies de autenticação.</p>
+
+    <h3>4. Segurança da conta</h3>
+    <p>A sua conta é pessoal. É responsável por manter a confidencialidade da palavra-passe e por todas as ações realizadas com a sua conta. Não partilhe as suas credenciais com terceiros.</p>
+
+    <h3>5. Suspensão ou encerramento</h3>
+    <p>Podemos restringir, suspender ou encerrar contas que violem estes Termos, publiquem informação falsa ou prejudiquem outros utilizadores ou a integridade da plataforma.</p>
+</section>
+
+<section id="utilizacao" class="legal-section">
+    <h2>II. Utilização dos Serviços</h2>
+
+    <h3>1. O que a Mob oferece</h3>
+    <p>A Mob permite:</p>
+    <ul>
+        <li><strong>pesquisar produtos</strong> por nome, descrição ou categoria;</li>
+        <li><strong>consultar detalhes</strong> de produtos e estabelecimentos;</li>
+        <li><strong>ver localização</strong> de estabelecimentos num mapa;</li>
+        <li><strong>contactar estabelecimentos</strong> através do telefone publicado;</li>
+        <li><strong>gerir estabelecimentos e produtos</strong>, no caso de vendedores.</li>
+    </ul>
+
+    <h3>2. O que a Mob não oferece</h3>
+    <p>A plataforma <strong>não</strong> inclui, nesta versão:</p>
+    <ul>
+        <li>pagamentos online ou carrinho de compras;</li>
+        <li>gestão de encomendas ou entregas;</li>
+        <li>mensagens ou chat entre clientes e vendedores;</li>
+        <li>publicação de preços nos produtos;</li>
+        <li>garantia de stock ou disponibilidade em tempo real.</li>
+    </ul>
+
+    <h3>3. Área geográfica</h3>
+    <p>Os estabelecimentos registados na plataforma devem estar localizados dentro dos limites geográficos da cidade da <strong>Beira</strong>, conforme validado pelo sistema no momento do registo ou edição.</p>
+
+    <h3>4. Condutas proibidas</h3>
+    <p>É proibido:</p>
+    <ol type="a">
+        <li>aceder a áreas ou dados não autorizados;</li>
+        <li>extrair automaticamente conteúdos da plataforma (scraping, crawling, etc.);</li>
+        <li>publicar informação falsa, enganosa, ofensiva ou ilegal;</li>
+        <li>interferir com o funcionamento normal dos Serviços;</li>
+        <li>utilizar a plataforma para fins fraudulentos ou abusivos.</li>
+    </ol>
+
+    <h3>5. Serviços de terceiros</h3>
+    <p>A plataforma integra serviços externos, nomeadamente:</p>
+    <ul>
+        <li><strong>Google Fonts</strong> — tipografia das páginas;</li>
+        <li><strong>Leaflet</strong> e <strong>OpenStreetMap</strong> — mapas na página de detalhe do produto.</li>
+    </ul>
+    <p>Esses serviços estão sujeitos às políticas dos respetivos fornecedores. A Mob não controla nem é responsável pelo funcionamento desses serviços externos.</p>
+</section>
+
+<section id="pesquisa" class="legal-section">
+    <h2>III. Pesquisa e localização</h2>
+
+    <h3>1. Pesquisa de produtos</h3>
+    <p>A pesquisa em <strong>/pesquisa/</strong> devolve produtos cujo <strong>nome</strong>, <strong>descrição</strong> ou <strong>categoria</strong> contenham o termo introduzido. A pesquisa <strong>não</strong> filtra pelo nome do estabelecimento.</p>
+    <p>É necessário introduzir um termo de pesquisa; sem termo, não são apresentados resultados. Apenas produtos, estabelecimentos e categorias <strong>ativos</strong> aparecem nos resultados.</p>
+
+    <h3>2. Disponibilidade dos produtos</h3>
+    <p>Os produtos podem ser marcados como <strong>Disponível</strong> ou <strong>Indisponível</strong> pelo vendedor. Esta informação é apresentada nos resultados e na página de detalhe, mas produtos indisponíveis podem continuar a aparecer na pesquisa. Confirme sempre a disponibilidade contactando o estabelecimento.</p>
+
+    <h3>3. Filtros de categoria e distância</h3>
+    <p>Pode filtrar resultados por <strong>categoria</strong> e, quando a localização estiver ativa, por distância máxima de <strong>2, 5, 10 ou 25 km</strong>. As distâncias são calculadas entre a sua posição e as coordenadas do estabelecimento, com base na fórmula de Haversine.</p>
+
+    <h3>4. Localização do visitante</h3>
+    <p>Se clicar em <strong>"Usar minha localização"</strong>, o browser pedirá autorização para aceder ao GPS do seu dispositivo. As coordenadas são adicionadas temporariamente à URL da página (<code>lat</code> e <code>lng</code>) para calcular distâncias.</p>
+    <p><strong>Importante:</strong> a Mob não grava a sua localização na base de dados. A localização só é utilizada na sessão de navegação enquanto os parâmetros estiverem presentes na URL. Consulte a <a href="{% url 'privacy' %}">Política de Privacidade</a> para mais detalhes.</p>
+
+    <h3>5. Página de detalhe do produto</h3>
+    <p>Em <strong>/produtos/&lt;id&gt;/</strong> são mostrados o nome, descrição, imagem, categoria, estado de disponibilidade do produto e, do estabelecimento, o nome, morada, telefone, horário de funcionamento e mapa com a localização em Beira. O contacto é feito através do número de telefone publicado.</p>
+</section>
+
+<section id="perfis" class="legal-section">
+    <h2>IV. Perfis de Cliente e Vendedor</h2>
+
+    <h3>1. Perfil de Cliente</h3>
+    <p>Permite pesquisar produtos, ver detalhes, usar filtros de categoria e distância e aceder às páginas públicas da plataforma. Na página inicial, a caixa de pesquisa só é apresentada quando não tem sessão iniciada ou quando o perfil ativo é <strong>Cliente</strong>.</p>
+
+    <h3>2. Perfil de Vendedor</h3>
+    <p>Permite gerir estabelecimentos e produtos no painel em <strong>/vendedor/</strong>. Para ativar este perfil, utilize a opção <strong>"Tornar-me vendedor"</strong>. Ao fazê-lo, aceita publicar informação comercial verdadeira e atualizada.</p>
+    <p>Como vendedor, pode:</p>
+    <ul>
+        <li>criar e editar estabelecimentos (nome, morada, telefone, horário, localização no mapa);</li>
+        <li>criar, editar e eliminar produtos (nome, descrição, imagem, categoria, disponibilidade);</li>
+        <li>alterar a disponibilidade de produtos (Disponível / Indisponível);</li>
+        <li>consultar estatísticas básicas no dashboard (número de estabelecimentos, produtos e categorias).</li>
+    </ul>
+    <p>O telefone do estabelecimento deve ser um número moçambicano válido (prefixos 82, 83, 84, 85, 86 ou 87).</p>
+
+    <h3>3. Alternância entre perfis</h3>
+    <p>Se tiver ambos os papéis, pode alternar entre Cliente e Vendedor em <strong>/perfil/alterar/</strong>. O perfil ativo determina a experiência apresentada na plataforma (por exemplo, pesquisa na home ou painel de vendedor).</p>
+</section>
+
+<section id="conteudo" class="legal-section">
+    <h2>V. Conteúdos publicados por vendedores</h2>
+
+    <h3>1. Responsabilidade pelo conteúdo</h3>
+    <p>Cada vendedor é o único responsável pelos dados que publica: informação do estabelecimento (morada, telefone, horário, coordenadas) e dos produtos (nome, descrição, imagem, categoria e disponibilidade).</p>
+
+    <h3>2. Declarações do vendedor</h3>
+    <p>Ao publicar conteúdos, declara que:</p>
+    <ol type="a">
+        <li>possui direito para usar as imagens e textos que submete;</li>
+        <li>a informação é verdadeira e atualizada na medida do possível;</li>
+        <li>o estabelecimento está efetivamente localizado na Beira;</li>
+        <li>tem autorização para publicar os contactos do estabelecimento.</li>
+    </ol>
+
+    <h3>3. Visibilidade pública</h3>
+    <p>Os seguintes dados tornam-se <strong>públicos</strong> para qualquer visitante da plataforma:</p>
+    <ul>
+        <li>nome, morada, telefone, horário e localização do estabelecimento;</li>
+        <li>nome, descrição, imagem, categoria e disponibilidade dos produtos.</li>
+    </ul>
+    <p>O seu email de conta e data de nascimento <strong>não</strong> são exibidos publicamente.</p>
+
+    <h3>4. Moderação</h3>
+    <p>Podemos ocultar, editar ou remover conteúdos que violem estes Termos, sem aviso prévio. A eliminação de um estabelecimento remove também os produtos associados.</p>
+
+    <h3>5. Licença de utilização</h3>
+    <p>Ao publicar conteúdos, concede à Mob uma licença não exclusiva para alojar, exibir e distribuir esse conteúdo na plataforma, exclusivamente para operar os Serviços.</p>
+</section>
+
+<section id="propriedade" class="legal-section">
+    <h2>VI. Propriedade intelectual</h2>
+    <p>Salvo quanto aos conteúdos publicados por vendedores, a marca, design, código e estrutura da plataforma Mob pertencem à Mob ou aos seus licenciadores.</p>
+    <p>Concedemos-lhe uma licença limitada, pessoal e revogável para utilizar os Serviços conforme estes Termos. Não pode copiar, modificar ou redistribuir a plataforma sem autorização prévia.</p>
+</section>
+
+<section id="dados" class="legal-section">
+    <h2>VII. Dados pessoais</h2>
+    <p>O tratamento dos seus dados pessoais é descrito na <a href="{% url 'privacy' %}">Política de Privacidade</a>. Ao utilizar os Serviços, aceita essa política.</p>
+    <p>Se publicar telefones ou outros dados de contacto de terceiros no perfil de vendedor, é responsável por ter autorização para o fazer.</p>
+</section>
+
+<section id="responsabilidade" class="legal-section">
+    <h2>VIII. Responsabilidade e limitações</h2>
+
+    <h3>1. Serviços "tal como estão"</h3>
+    <p>Os Serviços são fornecidos "tal como estão" e "conforme disponíveis". Não garantimos que a plataforma estará sempre disponível, sem erros ou que toda a informação publicada por vendedores será exata ou atualizada.</p>
+
+    <h3>2. Relação entre clientes e vendedores</h3>
+    <p>A Mob apenas facilita a descoberta de produtos e estabelecimentos. Qualquer negociação, compra ou acordo comercial é da exclusiva responsabilidade do cliente e do estabelecimento. Não somos parte dessas transações.</p>
+
+    <h3>3. Informação de terceiros</h3>
+    <p>Moradas, horários, disponibilidade de produtos e distâncias calculadas são indicativos. Confirme sempre diretamente com o estabelecimento antes de se deslocar ou tomar decisões com base na informação da plataforma.</p>
+
+    <h3>4. Limitação de responsabilidade</h3>
+    <p>Na medida permitida por lei, a Mob não será responsável por danos indiretos ou consequenciais resultantes da utilização ou impossibilidade de utilização dos Serviços.</p>
+</section>
+
+<section id="contacto" class="legal-section">
+    <h2>IX. Alterações e contacto</h2>
+    <p>Podemos atualizar estes Termos publicando uma nova versão nesta página. A utilização continuada dos Serviços após a publicação constitui aceitação dos Termos atualizados.</p>
+    <p>Para questões sobre estes Termos, contacte: <a href="mailto:legal@mob.pt">legal@mob.pt</a>.</p>
+</section>
+{% endblock %}

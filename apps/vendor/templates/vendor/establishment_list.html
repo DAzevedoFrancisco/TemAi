@@ -1,0 +1,130 @@
+{% extends 'vendor/base.html' %}
+
+{% block title %}Estabelecimentos{% endblock %}
+
+{% block content %}
+<div class="establishments-page">
+    <section class="establishments-hero">
+        <div class="establishments-hero-bg" aria-hidden="true">
+            <span class="hero-orb hero-orb-1"></span>
+            <span class="hero-orb hero-orb-2"></span>
+            <span class="hero-orb hero-orb-3"></span>
+        </div>
+        <div class="establishments-hero-content">
+            <div class="establishments-hero-text">
+                <span class="establishments-eyebrow">Gestão de negócios</span>
+                <h1>Os seus estabelecimentos</h1>
+                <p>Gerencie locais, produtos e presença na cidade da Beira num só lugar.</p>
+            </div>
+            <a href="{% url 'vendor:establishment_create' %}" class="btn-add-establishment btn-add-establishment-hero">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span class="btn-add-establishment-label">Novo estabelecimento</span>
+                <span class="btn-add-establishment-label-short">Novo</span>
+            </a>
+        </div>
+        <div class="establishments-stats">
+            <div class="est-stat-pill">
+                <span class="est-stat-value">{{ establishments|length }}</span>
+                <span class="est-stat-label">Estabelecimentos</span>
+            </div>
+            <div class="est-stat-pill">
+                <span class="est-stat-value">{{ products_count }}</span>
+                <span class="est-stat-label">Produtos totais</span>
+            </div>
+            <div class="est-stat-pill est-stat-pill-accent">
+                <span class="est-stat-value">Beira</span>
+                <span class="est-stat-label">Cidade ativa</span>
+            </div>
+        </div>
+    </section>
+
+    {% if establishments %}
+        <div class="establishments-grid">
+            {% for establishment in establishments %}
+                {% cycle 'blue' 'violet' 'amber' 'emerald' as card_theme silent %}
+                <article class="est-card est-card--{{ card_theme }}">
+                    <div class="est-card-banner">
+                        <div class="est-card-banner-pattern" aria-hidden="true"></div>
+                        <div class="est-card-banner-content">
+                            <div class="est-card-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                            </div>
+                            <div class="est-card-banner-meta">
+                                <span class="est-card-status">
+                                    <span class="est-status-dot"></span>
+                                    Ativo
+                                </span>
+                                <span class="est-card-badge">{{ establishment.products.count }} produto{{ establishment.products.count|pluralize:"s" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="est-card-body">
+                        <h3 class="est-card-title">{{ establishment.name }}</h3>
+
+                        <ul class="est-card-details">
+                            <li>
+                                <span class="est-detail-icon">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                </span>
+                                <span>{{ establishment.address|truncatechars:60 }}</span>
+                            </li>
+                            <li>
+                                <span class="est-detail-icon">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                </span>
+                                <span>{{ establishment.phone }}</span>
+                            </li>
+                            <li>
+                                <span class="est-detail-icon">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </span>
+                                <span>{{ establishment.opening_hours }}</span>
+                            </li>
+                        </ul>
+
+                        <div class="est-card-actions">
+                            <a href="{% url 'vendor:product_list' pk=establishment.pk %}" class="est-btn est-btn-primary">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                                <span class="est-btn-label-long">Gerir produtos</span>
+                                <span class="est-btn-label-short">Produtos</span>
+                            </a>
+                            <div class="est-card-actions-secondary">
+                                <a href="{% url 'vendor:establishment_reviews' pk=establishment.pk %}" class="est-btn est-btn-ghost" aria-label="Comentários">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    <span class="est-btn-text">Comentários</span>
+                                </a>
+                                <a href="{% url 'vendor:establishment_edit' pk=establishment.pk %}" class="est-btn est-btn-ghost" aria-label="Editar estabelecimento">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    <span class="est-btn-text">Editar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="establishments-empty">
+            <div class="establishments-empty-visual" aria-hidden="true">
+                <span class="empty-orb empty-orb-1"></span>
+                <span class="empty-orb empty-orb-2"></span>
+                <div class="establishments-empty-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+            </div>
+            <h3>A sua primeira loja começa aqui</h3>
+            <p>Cadastre um estabelecimento na Beira e comece a adicionar produtos para os clientes encontrarem.</p>
+            <a href="{% url 'vendor:establishment_create' %}" class="btn-add-establishment">Cadastrar estabelecimento</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

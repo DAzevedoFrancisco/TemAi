@@ -1,0 +1,46 @@
+<div class="logout-modal" id="logout-modal" hidden>
+    <div class="logout-modal-overlay" id="logout-modal-overlay"></div>
+    <div class="logout-modal-content client-light-modal" role="dialog" aria-labelledby="logout-modal-title" aria-modal="true">
+        <h3 id="logout-modal-title">Confirmar saída</h3>
+        <p>Tem a certeza de que deseja terminar a sessão?</p>
+        <div class="logout-modal-actions">
+            <button type="button" class="logout-modal-cancel" id="logout-cancel">Cancelar</button>
+            <button type="button" class="logout-modal-confirm" id="logout-confirm">Sair</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const logoutModal = document.getElementById("logout-modal");
+    const logoutBtn = document.getElementById("logout-btn");
+    const logoutForm = document.getElementById("logout-form");
+    const logoutCancel = document.getElementById("logout-cancel");
+    const logoutConfirm = document.getElementById("logout-confirm");
+    const logoutOverlay = document.getElementById("logout-modal-overlay");
+
+    if (logoutBtn && logoutModal && logoutForm) {
+        logoutBtn.addEventListener("click", () => {
+            logoutModal.hidden = false;
+            document.body.style.overflow = "hidden";
+        });
+
+        logoutCancel.addEventListener("click", () => {
+            logoutModal.hidden = true;
+            if (!document.body.classList.contains('mobile-nav-open')) {
+                document.body.style.overflow = "";
+            }
+        });
+
+        logoutOverlay.addEventListener("click", () => {
+            logoutModal.hidden = true;
+            if (!document.body.classList.contains('mobile-nav-open')) {
+                document.body.style.overflow = "";
+            }
+        });
+
+        logoutConfirm.addEventListener("click", () => logoutForm.submit());
+    }
+</script>
+{% load static %}
+<script src="{% static 'main/js/mobile-nav.js' %}"></script>
+<script src="{% static 'main/js/auth-cache-guard.js' %}"></script>

@@ -1,0 +1,90 @@
+{% load static %}
+
+<header class="client-page-nav">
+
+    <nav class="navbar client-page-navbar">
+
+        <div class="client-nav-brand">
+
+            <a href="{% url 'home' %}" class="client-nav-brand-link">
+
+                <img src="{% static 'main/img/lg.jpeg' %}" width="36" height="36" alt="Logo" class="client-nav-logo">
+
+                <span class="client-nav-brand-text">
+
+                    <span class="client-nav-brand-name">Mob</span>
+
+                    <span class="client-nav-brand-tagline">Beira, MZ</span>
+
+                </span>
+
+            </a>
+
+        </div>
+
+
+
+        <button type="button" class="menu-toggle client-nav-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
+            <span class="menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+
+
+
+        <div class="menu client-nav-menu" id="menu">
+
+            <div class="client-nav-links">
+
+                <a href="{% url 'home' %}#about" class="client-nav-link">Sobre</a>
+
+                {% if user.is_authenticated %}
+
+                    <a href="{% url 'favorites' %}" class="client-nav-link">Favoritos</a>
+
+                {% endif %}
+
+            </div>
+
+
+
+            <div class="client-nav-divider" aria-hidden="true"></div>
+
+
+
+            <div class="client-nav-actions">
+
+                {% if user.is_authenticated %}
+
+                    {% if user.is_vendedor %}
+
+                        <a href="{% url 'switch_profile' %}?profile=vendedor" class="client-nav-btn client-nav-btn-ghost vendor-link">Painel</a>
+
+                    {% else %}
+
+                        <a href="{% url 'vendor:become_seller' %}" class="client-nav-btn client-nav-btn-ghost vendor-link">Vender</a>
+
+                    {% endif %}
+
+                    {% include 'main/partials/nav_user_chip.html' %}
+
+                    <form method="post" action="{% url 'logout' %}" class="logout-form" id="logout-form">
+
+                        {% csrf_token %}
+
+                        <button type="button" class="logout client-nav-btn client-nav-btn-outline" id="logout-btn">Sair</button>
+
+                    </form>
+
+                {% else %}
+
+                    <a href="{% url 'auth' %}" class="login client-nav-btn client-nav-btn-primary">Entrar</a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </nav>
+
+</header>
+

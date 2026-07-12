@@ -1,0 +1,323 @@
+{% extends 'vendor/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{% endblock %}
+
+{% block content %}
+<div class="form-page establishment-form-page">
+    <form method="post" class="establishment-form-layout" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="establishment-form-alert">
+                <div class="form-alert error establishment-form-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="establishment-form-shell">
+            <header class="establishment-form-hero">
+                <div class="establishment-form-hero-bg" aria-hidden="true">
+                    <span class="hero-orb hero-orb-1"></span>
+                    <span class="hero-orb hero-orb-2"></span>
+                    <span class="hero-orb hero-orb-3"></span>
+                </div>
+
+                <div class="establishment-form-hero-content">
+                    <div class="establishment-form-hero-text">
+                        <span class="establishment-form-eyebrow">{% if is_edit %}Editar negócio{% else %}Novo negócio{% endif %}</span>
+                        <h2 class="profile-style-title">{{ title }}</h2>
+                        <p class="establishment-form-subtitle">Preencha os dados do estabelecimento e marque a localização na cidade da Beira.</p>
+                    </div>
+
+                    <div class="establishment-form-hero-icon" aria-hidden="true">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                            <path d="M3 9.5 12 4l9 5.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+                            <path d="M9 21V12h6v9"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="establishment-form-hero-steps" aria-hidden="true">
+                    <span class="establishment-form-hero-chip">
+                        <span class="establishment-form-hero-chip-num">1</span>
+                        Informações
+                    </span>
+                    <span class="establishment-form-hero-chip">
+                        <span class="establishment-form-hero-chip-num">2</span>
+                        Localização
+                    </span>
+                </div>
+            </header>
+
+            <div class="establishment-form-cards">
+                <div class="establishment-form-card establishment-form-card-info">
+                    <section class="establishment-form-panel">
+                        <div class="establishment-form-panel-head">
+                            <span class="establishment-form-step" aria-hidden="true">1</span>
+                            <div class="establishment-form-panel-copy">
+                                <h3>Informações do estabelecimento</h3>
+                                <p>Dados visíveis para os clientes na plataforma.</p>
+                            </div>
+                        </div>
+
+                        <div class="establishment-form-stack establishment-info-grid">
+                            <div class="establishment-form-row profile-field full">
+                                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                                {{ form.name }}
+                                {% for error in form.name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                            </div>
+
+                            <div class="establishment-form-row profile-field full">
+                                <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                                {{ form.address }}
+                                {% for error in form.address.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                            </div>
+
+                            <div class="establishment-form-row profile-field half">
+                                <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                                {{ form.phone }}
+                                {% for error in form.phone.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                            </div>
+
+                            <div class="establishment-form-row profile-field half">
+                                <label for="{{ form.opening_hours.id_for_label }}">{{ form.opening_hours.label }}</label>
+                                {{ form.opening_hours }}
+                                {% for error in form.opening_hours.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="establishment-form-card establishment-form-card-map">
+                    <section class="establishment-form-panel establishment-form-panel-map">
+                        <div class="establishment-form-panel-head">
+                            <span class="establishment-form-step" aria-hidden="true">2</span>
+                            <div class="establishment-form-panel-copy">
+                                <h3>Localização geográfica</h3>
+                                <p>Confirme o ponto exato do estabelecimento no mapa.</p>
+                            </div>
+                        </div>
+
+                        <div class="establishment-map-panel">
+                            <div class="establishment-map-toolbar">
+                                <p class="establishment-map-hint">Toque no mapa ou use a sua localização atual na Beira.</p>
+                                <button type="button" class="btn-geo-location" id="btn-geo-location">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"/>
+                                        <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
+                                        <path d="M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                                    </svg>
+                                    <span class="btn-geo-label">Minha localização</span>
+                                    <span class="btn-geo-label-short">Localizar</span>
+                                </button>
+                            </div>
+
+                            <p class="establishment-geo-status" id="geo-status" role="status" aria-live="polite" hidden></p>
+
+                            {{ form.latitude }}
+                            {{ form.longitude }}
+                            {% for error in form.latitude.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                            {% for error in form.longitude.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+
+                            <div class="establishment-map-frame">
+                                <div class="map-compact establishment-map">
+                                    <div id="map"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <footer class="establishment-form-footer">
+                    <div class="establishment-form-actions">
+                        <a href="{% if is_edit %}{% url 'vendor:establishment_list' %}{% else %}{% url 'vendor:dashboard' %}{% endif %}" class="btn-discard">Cancelar</a>
+                        <button type="submit" class="btn-save">
+                            {% if is_edit %}Guardar alterações{% else %}Cadastrar{% endif %}
+                        </button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{% static 'main/js/map-tiles.js' %}"></script>
+<script>
+    const BEIRA_BOUNDS = L.latLngBounds(L.latLng(-19.902, 34.802), L.latLng(-19.768, 34.928));
+    const BEIRA_CENTER = [-19.8436, 34.8389];
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+    const savedLat = parseFloat(latInput.value);
+    const savedLng = parseFloat(lngInput.value);
+    const hasSavedLocation = !Number.isNaN(savedLat) && !Number.isNaN(savedLng)
+        && BEIRA_BOUNDS.contains(L.latLng(savedLat, savedLng));
+
+    const map = L.map('map', {
+        maxBounds: BEIRA_BOUNDS,
+        maxBoundsViscosity: 1.0,
+        minZoom: 12,
+    }).setView(hasSavedLocation ? [savedLat, savedLng] : BEIRA_CENTER, 13);
+
+    L.tileLayer(MobMapTiles.url, MobMapTiles.options).addTo(map);
+
+    L.rectangle(BEIRA_BOUNDS, {
+        color: '#f2994a',
+        weight: 2,
+        fillColor: '#f2994a',
+        fillOpacity: 0.08,
+    }).addTo(map);
+
+    let marker = null;
+
+    function isInsideBeira(lat, lng) {
+        return BEIRA_BOUNDS.contains(L.latLng(lat, lng));
+    }
+
+    function setMarker(lat, lng) {
+        if (!isInsideBeira(lat, lng)) {
+            alert('Selecione um ponto dentro da cidade da Beira.');
+            return;
+        }
+
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker.on('dragend', (e) => {
+                const pos = e.target.getLatLng();
+                if (!isInsideBeira(pos.lat, pos.lng)) {
+                    alert('A localização deve permanecer dentro da cidade da Beira.');
+                    marker.setLatLng([parseFloat(latInput.value), parseFloat(lngInput.value)]);
+                    return;
+                }
+                latInput.value = pos.lat.toFixed(6);
+                lngInput.value = pos.lng.toFixed(6);
+            });
+        }
+
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+    }
+
+    if (hasSavedLocation) setMarker(savedLat, savedLng);
+
+    map.on('click', (e) => setMarker(e.latlng.lat, e.latlng.lng));
+
+    const geoBtn = document.getElementById('btn-geo-location');
+    const geoStatus = document.getElementById('geo-status');
+
+    function setGeoStatus(message, type = 'info') {
+        if (!message) {
+            geoStatus.hidden = true;
+            geoStatus.textContent = '';
+            geoStatus.className = 'establishment-geo-status';
+            return;
+        }
+        geoStatus.hidden = false;
+        geoStatus.textContent = message;
+        geoStatus.className = `establishment-geo-status establishment-geo-status--${type}`;
+    }
+
+    function setGeoLoading(isLoading) {
+        geoBtn.disabled = isLoading;
+        geoBtn.classList.toggle('is-loading', isLoading);
+        const longLabel = geoBtn.querySelector('.btn-geo-label');
+        const shortLabel = geoBtn.querySelector('.btn-geo-label-short');
+        if (longLabel) {
+            longLabel.textContent = isLoading ? 'A localizar...' : 'Minha localização';
+        }
+        if (shortLabel) {
+            shortLabel.textContent = isLoading ? '...' : 'Localizar';
+        }
+    }
+
+    function geoErrorMessage(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                return 'Permita o acesso à localização nas definições do dispositivo.';
+            case error.POSITION_UNAVAILABLE:
+                return 'Não foi possível obter a localização atual.';
+            case error.TIMEOUT:
+                return 'A deteção da localização demorou demasiado. Tente novamente.';
+            default:
+                return 'Não foi possível obter a localização.';
+        }
+    }
+
+    function applyCurrentLocation(position, { auto = false } = {}) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        map.setView([lat, lng], 16, { animate: true });
+
+        if (isInsideBeira(lat, lng)) {
+            setMarker(lat, lng);
+            setGeoStatus('Localização atual aplicada no mapa.', 'success');
+        } else {
+            setGeoStatus(
+                auto
+                    ? 'A sua localização está fora da Beira. Toque no mapa para marcar o local.'
+                    : 'A sua localização está fora da cidade da Beira. Selecione o ponto no mapa.',
+                'warning'
+            );
+        }
+    }
+
+    function requestCurrentLocation({ auto = false } = {}) {
+        if (!navigator.geolocation) {
+            setGeoStatus('O seu dispositivo não suporta geolocalização.', 'error');
+            return;
+        }
+
+        setGeoLoading(true);
+        if (!auto) setGeoStatus('A obter a sua localização...', 'info');
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setGeoLoading(false);
+                applyCurrentLocation(position, { auto });
+            },
+            (error) => {
+                setGeoLoading(false);
+                setGeoStatus(geoErrorMessage(error), 'error');
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 12000,
+                maximumAge: 60000,
+            }
+        );
+    }
+
+    geoBtn.addEventListener('click', () => requestCurrentLocation({ auto: false }));
+
+    if (!hasSavedLocation) {
+        requestCurrentLocation({ auto: true });
+    }
+
+    function refreshMapSize() {
+        map.invalidateSize({ animate: false });
+    }
+
+    setTimeout(refreshMapSize, 100);
+    window.addEventListener('resize', refreshMapSize);
+    window.addEventListener('orientationchange', () => setTimeout(refreshMapSize, 300));
+
+    const mapContainer = document.querySelector('.establishment-map');
+    if (mapContainer && window.ResizeObserver) {
+        const mapObserver = new ResizeObserver(() => refreshMapSize());
+        mapObserver.observe(mapContainer);
+    }
+</script>
+{% endblock %}

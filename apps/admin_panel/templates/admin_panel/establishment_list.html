@@ -1,0 +1,103 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Estabelecimentos{% endblock %}
+
+{% block content %}
+<div class="admin-page admin-scroll-page admin-establishments-list-page">
+    <header class="admin-page-header admin-scroll-page-header">
+        <div>
+            <p class="dashboard-eyebrow">Gestão de negócios</p>
+            <h1>Estabelecimentos</h1>
+        </div>
+        <div class="admin-inline-stats">
+            <span class="admin-inline-stat">{{ establishments_total }} total</span>
+            <span class="admin-inline-stat admin-inline-stat-active">{{ establishments_active_count }} ativos</span>
+            <span class="admin-inline-stat admin-inline-stat-blocked">{{ establishments_blocked_count }} bloqueados</span>
+            <span class="admin-inline-stat admin-inline-stat-products">{{ products_total }} produtos</span>
+        </div>
+    </header>
+
+    <form method="get" class="admin-filters admin-filters-compact">
+        <div class="admin-filter-group admin-filter-group-compact admin-filter-group-wide">
+            <label for="filter-q">Pesquisar</label>
+            <input type="search" name="q" id="filter-q" value="{{ filters.q }}" placeholder="Nome, morada ou dono">
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-status">Estado</label>
+            <select name="status" id="filter-status">
+                <option value="">Todos</option>
+                <option value="active"{% if filters.status == 'active' %} selected{% endif %}>Ativos</option>
+                <option value="blocked"{% if filters.status == 'blocked' %} selected{% endif %}>Bloqueados</option>
+            </select>
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-sort">Ordenar</label>
+            <select name="sort" id="filter-sort">
+                <option value="date"{% if filters.sort == 'date' %} selected{% endif %}>Data</option>
+                <option value="name"{% if filters.sort == 'name' %} selected{% endif %}>Nome</option>
+                <option value="owner"{% if filters.sort == 'owner' %} selected{% endif %}>Dono</option>
+            </select>
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-order">Ordem</label>
+            <select name="order" id="filter-order">
+                <option value="desc"{% if filters.order == 'desc' %} selected{% endif %}>Desc</option>
+                <option value="asc"{% if filters.order == 'asc' %} selected{% endif %}>Asc</option>
+            </select>
+        </div>
+        <div class="admin-filters-actions">
+            <button type="submit" class="admin-filter-btn admin-filter-btn-compact">Filtrar</button>
+            <a href="{% url 'admin_panel:establishment_list' %}" class="admin-filter-reset admin-filter-reset-compact">Limpar</a>
+        </div>
+    </form>
+
+    <article class="dash-panel dash-panel-table admin-scroll-table-panel admin-establishments-table-panel">
+        {% if establishments %}
+            <div class="dash-table-wrap admin-scroll-table-wrap">
+                <table class="dash-table admin-table admin-data-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Dono</th>
+                            <th>Telefone</th>
+                            <th>Morada</th>
+                            <th>Produtos</th>
+                            <th>Criado</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for establishment in establishments %}
+                            <tr class="{% if not establishment.is_active %}admin-row-blocked{% endif %}">
+                                <td class="admin-table-cell-wrap">
+                                    <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-table-link">{{ establishment.name }}</a>
+                                </td>
+                                <td>{{ establishment.owner.name }}</td>
+                                <td>{{ establishment.phone }}</td>
+                                <td class="admin-table-cell-wrap" title="{{ establishment.address }}">{{ establishment.address }}</td>
+                                <td>{{ establishment.products_count }}</td>
+                                <td>{{ establishment.created_at|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if establishment.is_active %}
+                                        <span class="admin-badge admin-badge-active">Ativo</span>
+                                    {% else %}
+                                        <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="table-action">
+                                    <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-action-btn admin-action-btn-ghost">Ver</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="dash-panel-empty admin-panel-empty-compact">
+                <p>Nenhum estabelecimento encontrado.</p>
+            </div>
+        {% endif %}
+    </article>
+</div>
+{% endblock %}

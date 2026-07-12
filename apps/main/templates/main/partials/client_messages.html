@@ -1,0 +1,11 @@
+{% load static %}
+{% if messages %}
+    <div class="client-messages" role="status">
+        {% for message in messages %}
+            {% if not message_scope or message_scope in message.tags %}
+                <div class="client-message client-message-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <script src="{% static 'main/js/flash-messages.js' %}"></script>
+{% endif %}

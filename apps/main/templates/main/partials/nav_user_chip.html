@@ -1,0 +1,6 @@
+{% if user.is_authenticated %}
+<a href="{% url 'account_settings' %}" class="nav-user-chip{% if request.resolver_match.url_name == 'account_settings' %} is-active{% endif %}" title="{{ user.name }}">
+    <span class="nav-user-chip-avatar" aria-hidden="true">{{ user.first_name|slice:":1"|upper }}</span>
+    <span class="nav-user-chip-name">{{ user.first_name }}</span>
+</a>
+{% endif %}

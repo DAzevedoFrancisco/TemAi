@@ -1,0 +1,16 @@
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('vendor', '0002_category_product_image_product_category_and_more'),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='product',
+            name='is_available',
+            field=models.BooleanField(default=True),
+        ),
+    ]

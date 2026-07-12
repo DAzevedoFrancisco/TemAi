@@ -1,0 +1,221 @@
+{% extends 'main/legal_base.html' %}
+
+{% block page_title %}Política de Privacidade | Mob{% endblock %}
+
+{% block legal_title %}Política de Privacidade{% endblock %}
+
+{% block legal_intro %}
+<p>Obrigado por utilizar a <strong>Mob</strong>! Esta Política de Privacidade explica que dados recolhemos, como os utilizamos e quais os seus direitos.</p>
+<p>Aplica-se ao acesso e utilização da plataforma Mob — catálogo digital de produtos e estabelecimentos na <strong>Beira, Sofala, Moçambique</strong> — incluindo o website, o painel de vendedor e a API de autenticação.</p>
+<p>Se não concordar com esta política, não deve utilizar os Serviços.</p>
+<p>Esta política deve ser lida em conjunto com os nossos <a href="{% url 'terms' %}">Termos de Serviço</a>.</p>
+{% endblock %}
+
+{% block legal_toc %}
+<nav class="legal-toc" aria-label="Índice da política de privacidade">
+    <p class="legal-toc-title">Esta política aborda o seguinte:</p>
+    <ol>
+        <li><a href="#recolha">I. Dados que recolhemos</a></li>
+        <li><a href="#nao-gravamos">II. Dados que não gravamos</a></li>
+        <li><a href="#utilizacao">III. Como utilizamos os dados</a></li>
+        <li><a href="#cookies">IV. Cookies e autenticação</a></li>
+        <li><a href="#divulgacao">V. Partilha e visibilidade</a></li>
+        <li><a href="#terceiros">VI. Serviços de terceiros</a></li>
+        <li><a href="#retencao">VII. Retenção e eliminação</a></li>
+        <li><a href="#seguranca">VIII. Segurança</a></li>
+        <li><a href="#direitos">IX. Os seus direitos</a></li>
+        <li><a href="#atualizacoes">X. Atualizações</a></li>
+        <li><a href="#contacto">XI. Contacto</a></li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block legal_body %}
+<section id="recolha" class="legal-section">
+    <h2>I. Dados que recolhemos</h2>
+    <p><strong>Dados pessoais</strong> são informações que identificam ou podem identificar uma pessoa. Na Mob, recolhemos os seguintes dados:</p>
+
+    <h3>1. Dados de conta (registo e login)</h3>
+    <p>Quando cria conta em <strong>/auth/</strong> ou via <strong>/api/auth/register/</strong>, guardamos:</p>
+    <ul>
+        <li><strong>nome</strong>;</li>
+        <li><strong>email</strong> (usado para iniciar sessão);</li>
+        <li><strong>data de nascimento</strong>;</li>
+        <li><strong>palavra-passe</strong> (armazenada de forma encriptada, nunca em texto simples);</li>
+        <li><strong>data de registo</strong> e <strong>último acesso</strong>.</li>
+    </ul>
+    <p>Também registamos os <strong>papéis</strong> associados à conta: <strong>Cliente</strong> e/ou <strong>Vendedor</strong>, bem como o <strong>perfil ativo</strong> selecionado (Cliente ou Vendedor) na sessão.</p>
+
+    <h3>2. Dados publicados por vendedores</h3>
+    <p>Se ativar o perfil de Vendedor e gerir estabelecimentos em <strong>/vendedor/</strong>, guardamos:</p>
+    <ul>
+        <li><strong>Estabelecimento:</strong> nome, morada, telefone, horário de funcionamento, latitude, longitude, estado ativo/inativo;</li>
+        <li><strong>Produto:</strong> nome, descrição, imagem, categoria, disponibilidade (Disponível/Indisponível), estado ativo/inativo.</li>
+    </ul>
+    <p>Estes dados tornam-se <strong>públicos</strong> nas páginas de pesquisa e detalhe de produto. O telefone do estabelecimento é apresentado a todos os visitantes e pode ser utilizado para contacto direto.</p>
+
+    <h3>3. Imagens carregadas</h3>
+    <p>As imagens de produtos são armazenadas no servidor em <strong>/media/products/</strong>, organizadas por estabelecimento. São públicas quando o produto está ativo.</p>
+
+    <h3>4. Tokens de autenticação</h3>
+    <p>Após login, gerimos tokens JWT (<code>access_token</code> e <code>refresh_token</code>) em cookies. No logout, o token de renovação é invalidado (blacklist). Podemos manter registos de tokens emitidos até à respetiva expiração.</p>
+
+    <h3>5. API de autenticação</h3>
+    <p>A API em <strong>/api/auth/</strong> permite registo, login, logout, renovação de token e consulta do perfil (<strong>/api/auth/me/</strong>). O endpoint <code>/me</code> devolve: nome, email, data de nascimento, papéis e se é vendedor. <strong>Não existe API pública</strong> para produtos, estabelecimentos ou pesquisa — esses dados são acedidos apenas pelas páginas web.</p>
+</section>
+
+<section id="nao-gravamos" class="legal-section">
+    <h2>II. Dados que não gravamos</h2>
+    <p>É importante saber o que a plataforma <strong>não persiste</strong> na base de dados:</p>
+    <ul>
+        <li><strong>Termos de pesquisa</strong> (<code>q</code>) — existem apenas na URL enquanto navega;</li>
+        <li><strong>Coordenadas GPS do visitante</strong> (<code>lat</code>, <code>lng</code>) — obtidas pelo browser com o seu consentimento e colocadas na URL; <strong>não são guardadas no servidor</strong>;</li>
+        <li><strong>Filtros de categoria e distância</strong> — apenas parâmetros temporários na URL;</li>
+        <li><strong>Histórico de pesquisas</strong> — não mantemos registo das suas pesquisas;</li>
+        <li><strong>Analytics ou tracking</strong> — não utilizamos Google Analytics, pixels de marketing ou ferramentas semelhantes de rastreio de comportamento.</li>
+    </ul>
+    <p>O servidor web que aloja a aplicação pode processar automaticamente dados técnicos de ligação (como endereço IP) nos registos do sistema operativo ou do serviço de alojamento. A aplicação Mob em si não implementa recolha nem armazenamento dedicado desses registos.</p>
+</section>
+
+<section id="utilizacao" class="legal-section">
+    <h2>III. Como utilizamos os dados</h2>
+    <p>Utilizamos os dados recolhidos exclusivamente para:</p>
+    <ol type="a">
+        <li><strong>criar e autenticar a sua conta</strong> e manter a sessão iniciada;</li>
+        <li><strong>gerir perfis</strong> de Cliente e Vendedor e a alternância entre eles;</li>
+        <li><strong>apresentar resultados de pesquisa</strong> de produtos (processamento em tempo real, sem gravação do termo);</li>
+        <li><strong>calcular distâncias</strong> quando fornece coordenadas na URL (processamento em tempo real, sem gravação);</li>
+        <li><strong>publicar e gerir</strong> estabelecimentos e produtos no painel de vendedor;</li>
+        <li><strong>exibir mapas</strong> com a localização dos estabelecimentos;</li>
+        <li><strong>proteger a plataforma</strong> (autenticação, prevenção de acesso não autorizado);</li>
+        <li><strong>cumprir obrigações legais</strong>, quando aplicável.</li>
+    </ol>
+    <p><strong>Bases de tratamento:</strong> execução do serviço (conta e funcionalidades), consentimento (localização via browser) e interesse legítimo (segurança da plataforma).</p>
+</section>
+
+<section id="cookies" class="legal-section">
+    <h2>IV. Cookies e autenticação</h2>
+    <p>A Mob utiliza cookies estritamente necessários ao funcionamento da plataforma:</p>
+
+    <table class="legal-table">
+        <thead>
+            <tr>
+                <th>Cookie</th>
+                <th>Finalidade</th>
+                <th>Duração</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>sessionid</code></td>
+                <td>Sessão Django (perfil ativo Cliente/Vendedor)</td>
+                <td>Sessão do browser</td>
+            </tr>
+            <tr>
+                <td><code>csrftoken</code></td>
+                <td>Proteção contra ataques CSRF em formulários</td>
+                <td>Sessão do browser</td>
+            </tr>
+            <tr>
+                <td><code>access_token</code></td>
+                <td>Autenticação JWT (acesso à conta)</td>
+                <td>60 minutos</td>
+            </tr>
+            <tr>
+                <td><code>refresh_token</code></td>
+                <td>Renovação da sessão autenticada</td>
+                <td>7 dias</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Os cookies <code>access_token</code> e <code>refresh_token</code> são <strong>HttpOnly</strong> (não acessíveis por JavaScript) e têm <strong>SameSite=Lax</strong>. Em produção, são transmitidos apenas por ligação segura (HTTPS).</p>
+    <p><strong>Não utilizamos</strong> cookies de publicidade ou de rastreio de marketing. Pode gerir ou eliminar cookies nas definições do seu browser, mas isso pode impedir o início de sessão ou o funcionamento de formulários.</p>
+</section>
+
+<section id="divulgacao" class="legal-section">
+    <h2>V. Partilha e visibilidade</h2>
+
+    <h3>1. Dados públicos</h3>
+    <p>Qualquer visitante da Mob pode ver, sem necessidade de conta:</p>
+    <ul>
+        <li>produtos ativos (nome, descrição, imagem, categoria, disponibilidade);</li>
+        <li>estabelecimentos ativos (nome, morada, telefone, horário, localização no mapa).</li>
+    </ul>
+
+    <h3>2. Dados privados da conta</h3>
+    <p>O seu <strong>email</strong>, <strong>data de nascimento</strong> e <strong>palavra-passe</strong> não são exibidos a outros utilizadores.</p>
+
+    <h3>3. Partilha com terceiros</h3>
+    <p>Não vendemos os seus dados pessoais. Podemos partilhar dados apenas:</p>
+    <ol type="a">
+        <li>com autoridades competentes, quando exigido por lei;</li>
+        <li>com prestadores de infraestrutura que alojam a plataforma, sob obrigações de confidencialidade;</li>
+        <li>quando publica voluntariamente dados de estabelecimento (visíveis a todos os visitantes).</li>
+    </ol>
+</section>
+
+<section id="terceiros" class="legal-section">
+    <h2>VI. Serviços de terceiros</h2>
+    <p>Ao utilizar a Mob, o seu browser pode comunicar com serviços externos:</p>
+    <ul>
+        <li><strong>Google Fonts</strong> (<code>fonts.googleapis.com</code>, <code>fonts.gstatic.com</code>) — carregamento de tipografia. O Google pode receber o seu endereço IP.</li>
+        <li><strong>Leaflet</strong> (<code>unpkg.com</code>) — biblioteca de mapas na página de detalhe do produto.</li>
+        <li><strong>OpenStreetMap</strong> (<code>tile.openstreetmap.org</code>) — tiles do mapa. O OpenStreetMap pode receber pedidos do seu browser, incluindo IP e área geográfica aproximada.</li>
+        <li><strong>Geolocalização do browser</strong> — ao clicar "Usar minha localização", o pedido é processado pelo seu dispositivo/sistema operativo, não pela Mob diretamente.</li>
+    </ul>
+    <p>Recomendamos que consulte as políticas de privacidade desses fornecedores. A Mob não controla o tratamento de dados por esses serviços.</p>
+</section>
+
+<section id="retencao" class="legal-section">
+    <h2>VII. Retenção e eliminação</h2>
+    <p>Conservamos os dados da sua conta e os conteúdos publicados enquanto a conta existir e forem necessários para prestar os Serviços.</p>
+    <ul>
+        <li>Ao <strong>eliminar um produto</strong>, a respetiva imagem e dados são removidos.</li>
+        <li>Ao <strong>eliminar um estabelecimento</strong>, os produtos associados são também removidos.</li>
+        <li>Os <strong>tokens JWT</strong> expirados podem ser limpos periodicamente do sistema de blacklist.</li>
+    </ul>
+    <p>Atualmente <strong>não existe</strong> uma opção na plataforma para o utilizador eliminar a própria conta de forma autónoma. Para solicitar eliminação ou exportação dos seus dados, contacte <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a>.</p>
+</section>
+
+<section id="seguranca" class="legal-section">
+    <h2>VIII. Segurança</h2>
+    <p>Aplicamos medidas técnicas para proteger os seus dados:</p>
+    <ul>
+        <li>palavras-passe armazenadas com hash seguro (nunca em texto simples);</li>
+        <li>cookies de autenticação HttpOnly e, em produção, apenas por HTTPS;</li>
+        <li>invalidação de tokens no logout;</li>
+        <li>acesso ao painel de vendedor restrito ao proprietário dos estabelecimentos.</li>
+    </ul>
+    <p>Nenhuma transmissão pela Internet é 100% segura. Embora nos esforcemos por proteger os seus dados, não podemos garantir segurança absoluta.</p>
+</section>
+
+<section id="direitos" class="legal-section">
+    <h2>IX. Os seus direitos</h2>
+    <p>De acordo com a legislação aplicável em Moçambique e, quando relevante, o Regulamento Geral de Proteção de Dados (RGPD), pode ter direito a:</p>
+    <ol type="a">
+        <li>aceder aos dados que temos sobre si;</li>
+        <li>retificar dados incorretos ou incompletos;</li>
+        <li>solicitar a eliminação dos seus dados;</li>
+        <li>limitar ou opor-se a determinado tratamento;</li>
+        <li>retirar o consentimento (por exemplo, para localização — pode revogar nas definições do browser);</li>
+        <li>apresentar reclamação junto da autoridade de proteção de dados competente.</li>
+    </ol>
+    <p>Para exercer estes direitos, envie pedido para <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a> com o assunto <strong>"Proteção de Dados / Mob"</strong>. Responderemos no prazo previsto pela lei aplicável.</p>
+</section>
+
+<section id="atualizacoes" class="legal-section">
+    <h2>X. Atualizações</h2>
+    <p>Podemos atualizar esta Política de Privacidade quando alterarmos funcionalidades da plataforma ou quando a lei o exigir. A versão atualizada será publicada nesta página com a data de atualização no topo.</p>
+</section>
+
+<section id="contacto" class="legal-section">
+    <h2>XI. Contacto</h2>
+    <p>Para questões sobre privacidade e dados pessoais:</p>
+    <ul>
+        <li>Email: <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a></li>
+        <li>Assunto: Proteção de Dados / Mob</li>
+    </ul>
+    <p>Se os seus dados de contacto foram publicados por um vendedor na ficha de um estabelecimento, contacte diretamente esse estabelecimento para pedidos relacionados com essa informação.</p>
+</section>
+{% endblock %}

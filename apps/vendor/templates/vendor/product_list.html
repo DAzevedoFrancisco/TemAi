@@ -1,0 +1,169 @@
+{% extends 'vendor/base.html' %}
+
+{% block title %}Produtos - {{ establishment.name }}{% endblock %}
+
+{% block content %}
+<div class="products-page">
+    <section class="products-hero">
+        <div class="products-hero-bg" aria-hidden="true">
+            <span class="hero-orb hero-orb-1"></span>
+            <span class="hero-orb hero-orb-2"></span>
+            <span class="hero-orb hero-orb-3"></span>
+        </div>
+        <div class="products-hero-content">
+            <div class="products-hero-text">
+                <a href="{% url 'vendor:establishment_list' %}" class="products-back-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    Estabelecimentos
+                </a>
+                <span class="products-eyebrow">Catálogo de produtos</span>
+                <h1>{{ establishment.name }}</h1>
+                <p>Gerencie os produtos disponíveis neste estabelecimento.</p>
+            </div>
+            <a href="{% url 'vendor:product_create' est_pk=establishment.pk %}" class="btn-add-product btn-add-product-hero">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Novo produto
+            </a>
+        </div>
+        <div class="products-stats">
+            <div class="prod-stat-pill">
+                <span class="prod-stat-value">{{ products_count }}</span>
+                <span class="prod-stat-label">Produtos</span>
+            </div>
+            <div class="prod-stat-pill">
+                <span class="prod-stat-value">{{ categories_count }}</span>
+                <span class="prod-stat-label">Categorias</span>
+            </div>
+            <div class="prod-stat-pill prod-stat-pill-accent">
+                <span class="prod-stat-value">{{ available_count }}</span>
+                <span class="prod-stat-label">Disponíveis</span>
+            </div>
+        </div>
+    </section>
+
+    {% if products_count %}
+        <section class="products-toolbar">
+            <form method="get" class="products-search-form">
+                <div class="products-search dash-search">
+                    <svg class="dash-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ query }}"
+                        placeholder="Pesquisar produtos deste estabelecimento..."
+                        autocomplete="off"
+                    />
+                </div>
+                {% if active_availability %}
+                    <input type="hidden" name="disponibilidade" value="{{ active_availability }}">
+                {% endif %}
+                <button type="submit" class="products-search-submit">Pesquisar</button>
+                {% if query %}
+                    <a href="{% url 'vendor:product_list' pk=establishment.pk %}{% if active_availability %}?disponibilidade={{ active_availability }}{% endif %}" class="products-search-clear">Limpar</a>
+                {% endif %}
+            </form>
+
+            <div class="products-filters" role="group" aria-label="Filtrar por disponibilidade">
+                <a href="{% url 'vendor:product_list' pk=establishment.pk %}{% if query %}?q={{ query|urlencode }}{% endif %}" class="products-filter-pill{% if not active_availability %} is-active{% endif %}">Todos</a>
+                <a href="{% url 'vendor:product_list' pk=establishment.pk %}?disponibilidade=disponivel{% if query %}&q={{ query|urlencode }}{% endif %}" class="products-filter-pill{% if active_availability == 'disponivel' %} is-active{% endif %}">Disponíveis</a>
+                <a href="{% url 'vendor:product_list' pk=establishment.pk %}?disponibilidade=indisponivel{% if query %}&q={{ query|urlencode }}{% endif %}" class="products-filter-pill{% if active_availability == 'indisponivel' %} is-active{% endif %}">Indisponíveis</a>
+            </div>
+
+            {% if query or active_availability %}
+                <p class="products-results-meta">
+                    {% if filtered_count %}
+                        {{ filtered_count }} produto{{ filtered_count|pluralize:"s" }} encontrado{{ filtered_count|pluralize:"s" }}
+                    {% else %}
+                        Nenhum produto corresponde aos filtros aplicados
+                    {% endif %}
+                </p>
+            {% endif %}
+        </section>
+    {% endif %}
+
+    {% if products %}
+        <div class="products-grid">
+            {% for product in products %}
+                {% cycle 'violet' 'blue' 'amber' 'emerald' as card_theme silent %}
+                <article class="prod-card prod-card--{{ card_theme }}">
+                    <div class="prod-card-media">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="prod-card-placeholder">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                        <span class="prod-card-category">{{ product.category.name }}</span>
+                        {% if product.is_available %}
+                            <span class="prod-card-availability prod-card-availability-on">Disponível</span>
+                        {% else %}
+                            <span class="prod-card-availability prod-card-availability-off">Indisponível</span>
+                        {% endif %}
+                    </div>
+                    <div class="prod-card-body">
+                        <h3 class="prod-card-title">{{ product.name }}</h3>
+                        <p class="prod-card-desc">{{ product.description|truncatechars:90 }}</p>
+                        <div class="prod-card-actions">
+                            <form method="post" action="{% url 'vendor:product_toggle_availability' pk=product.pk %}" class="prod-availability-form">
+                                {% csrf_token %}
+                                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                                {% if active_availability %}<input type="hidden" name="disponibilidade" value="{{ active_availability }}">{% endif %}
+                                <button type="submit" class="prod-btn prod-btn-availability{% if product.is_available %} is-available{% else %} is-unavailable{% endif %}">
+                                    {% if product.is_available %}Marcar indisponível{% else %}Marcar disponível{% endif %}
+                                </button>
+                            </form>
+                            <div class="prod-card-actions-row">
+                                <a href="{% url 'vendor:product_edit' pk=product.pk %}" class="prod-btn prod-btn-primary" aria-label="Editar produto">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    <span class="prod-btn-text">Editar</span>
+                                </a>
+                                <a href="{% url 'vendor:product_delete' pk=product.pk %}" class="prod-btn prod-btn-danger" aria-label="Eliminar produto">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    <span class="prod-btn-text">Eliminar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% elif products_count %}
+        <div class="products-empty products-empty-filtered">
+            <div class="products-empty-visual" aria-hidden="true">
+                <span class="empty-orb empty-orb-1"></span>
+                <span class="empty-orb empty-orb-2"></span>
+                <div class="products-empty-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                </div>
+            </div>
+            <h3>Nenhum produto encontrado</h3>
+            <p>Tente outro termo de pesquisa ou remova o filtro de disponibilidade.</p>
+            <a href="{% url 'vendor:product_list' pk=establishment.pk %}" class="btn-add-product">Ver todos os produtos</a>
+        </div>
+    {% else %}
+        <div class="products-empty">
+            <div class="products-empty-visual" aria-hidden="true">
+                <span class="empty-orb empty-orb-1"></span>
+                <span class="empty-orb empty-orb-2"></span>
+                <div class="products-empty-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                </div>
+            </div>
+            <h3>Sem produtos neste estabelecimento</h3>
+            <p>Adicione o primeiro produto ao catálogo para os clientes encontrarem.</p>
+            <a href="{% url 'vendor:product_create' est_pk=establishment.pk %}" class="btn-add-product">Adicionar produto</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

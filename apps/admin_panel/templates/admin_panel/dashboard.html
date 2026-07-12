@@ -1,0 +1,134 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-home admin-dashboard-home">
+    <header class="dashboard-welcome admin-dashboard-welcome">
+        <div>
+            <p class="dashboard-eyebrow">Administração do sistema</p>
+            <h1>Visão geral</h1>
+        </div>
+    </header>
+
+    <section class="admin-stats-board" aria-label="Estatísticas da plataforma">
+        <article class="admin-stat-tile admin-stat-tile-users">
+            <span class="admin-stat-tile-value">{{ users_total }}</span>
+            <span class="admin-stat-tile-label">Utilizadores</span>
+            <span class="admin-stat-tile-meta">{{ users_active }} ativos · {{ users_blocked }} bloqueados</span>
+        </article>
+        <article class="admin-stat-tile admin-stat-tile-establishments">
+            <span class="admin-stat-tile-value">{{ establishments_total }}</span>
+            <span class="admin-stat-tile-label">Estabelecimentos</span>
+            <span class="admin-stat-tile-meta">{{ establishments_active }} ativos · {{ establishments_blocked }} bloqueados</span>
+        </article>
+        <article class="admin-stat-tile admin-stat-tile-products">
+            <span class="admin-stat-tile-value">{{ products_count }}</span>
+            <span class="admin-stat-tile-label">Produtos</span>
+            <span class="admin-stat-tile-meta">No catálogo</span>
+        </article>
+        <article class="admin-stat-tile admin-stat-tile-roles">
+            <span class="admin-stat-tile-value">{{ clients_count }}</span>
+            <span class="admin-stat-tile-label">Clientes</span>
+            <span class="admin-stat-tile-meta">{{ vendors_count }} vendedores</span>
+        </article>
+        <article class="admin-stat-tile admin-stat-tile-admins">
+            <span class="admin-stat-tile-value">{{ admins_count }}</span>
+            <span class="admin-stat-tile-label">Administradores</span>
+            <span class="admin-stat-tile-meta">{{ users_blocked|add:establishments_blocked }} bloqueios totais</span>
+        </article>
+    </section>
+
+    <section class="dashboard-panels admin-dashboard-panels">
+        <article class="dash-panel dash-panel-table admin-compact-panel">
+            <div class="dash-panel-head">
+                <h2>Utilizadores recentes</h2>
+                <a href="{% url 'admin_panel:user_list' %}" class="dash-panel-link">Ver todos</a>
+            </div>
+            {% if recent_users %}
+                <div class="dash-table-wrap">
+                    <table class="dash-table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Perfis</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_users %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.email }}</td>
+                                    <td>
+                                        <div class="admin-directory-roles admin-directory-roles-inline">
+                                            {% for user_role in item.user_roles.all %}
+                                                <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
+                                                    {{ user_role.get_role_display }}
+                                                </span>
+                                            {% empty %}
+                                                <span class="admin-directory-no-role">—</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if item.is_active %}
+                                            <span class="admin-badge admin-badge-active">Ativo</span>
+                                        {% else %}
+                                            <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="dash-panel-empty"><p>Sem utilizadores registados.</p></div>
+            {% endif %}
+        </article>
+
+        <article class="dash-panel dash-panel-table admin-compact-panel">
+            <div class="dash-panel-head">
+                <h2>Estabelecimentos recentes</h2>
+                <a href="{% url 'admin_panel:establishment_list' %}" class="dash-panel-link">Ver todos</a>
+            </div>
+            {% if recent_establishments %}
+                <div class="dash-table-wrap">
+                    <table class="dash-table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Dono</th>
+                                <th>Produtos</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for establishment in recent_establishments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-table-link">{{ establishment.name }}</a>
+                                    </td>
+                                    <td>{{ establishment.owner.name }}</td>
+                                    <td>{{ establishment.products_count }}</td>
+                                    <td>
+                                        {% if establishment.is_active %}
+                                            <span class="admin-badge admin-badge-active">Ativo</span>
+                                        {% else %}
+                                            <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="dash-panel-empty"><p>Sem estabelecimentos registados.</p></div>
+            {% endif %}
+        </article>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'vendor/base.html' %}
+
+{% block title %}Comentários - {{ establishment.name }}{% endblock %}
+
+{% block content %}
+<div class="reviews-page">
+    <section class="reviews-hero">
+        <div class="reviews-hero-bg" aria-hidden="true">
+            <span class="hero-orb hero-orb-1"></span>
+            <span class="hero-orb hero-orb-2"></span>
+        </div>
+        <div class="reviews-hero-content">
+            <div class="reviews-hero-text">
+                <a href="{% url 'vendor:review_inbox' %}" class="reviews-back-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    Todos os comentários
+                </a>
+                <span class="reviews-eyebrow">Avaliações</span>
+                <h1>{{ establishment.name }}</h1>
+                <p>Comentários dos clientes sobre este estabelecimento.</p>
+            </div>
+        </div>
+        <div class="reviews-stats">
+            <div class="review-stat-pill">
+                <span class="review-stat-value">{{ reviews|length }}</span>
+                <span class="review-stat-label">Comentários</span>
+            </div>
+            {% if unread_reviews_count %}
+                <div class="review-stat-pill review-stat-pill-accent">
+                    <span class="review-stat-value">{{ unread_reviews_count }}</span>
+                    <span class="review-stat-label">Por ler</span>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if reviews %}
+        <div class="reviews-list">
+            {% for review in reviews %}
+                <article class="review-moderation-card review-inbox-card{% if not review.viewed_by_vendor_at %} is-unread{% endif %}">
+                    <div class="review-moderation-header">
+                        <div>
+                            <strong>{{ review.user.first_name }}</strong>
+                            <span class="review-moderation-date">{{ review.created_at|date:"d M Y, H:i" }}</span>
+                            {% if not review.viewed_by_vendor_at %}
+                                <span class="review-unread-tag">Novo</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if review.product %}
+                        <a href="{% url 'product_detail' pk=review.product.pk %}" class="review-inbox-product" target="_blank" rel="noopener">
+                            <span class="review-inbox-product-label">Produto</span>
+                            <strong>{{ review.product.name }}</strong>
+                        </a>
+                    {% endif %}
+
+                    {% if review.rating %}
+                        <div class="review-moderation-stars" aria-label="{{ review.rating }} de 5 estrelas">
+                            {% for i in "12345" %}
+                                <span class="review-star{% if forloop.counter > review.rating %} is-empty{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if review.comment %}
+                        <p class="review-moderation-comment">{{ review.comment }}</p>
+                    {% else %}
+                        <p class="review-moderation-comment review-moderation-comment-empty">Sem comentário escrito.</p>
+                    {% endif %}
+
+                    {% if not review.viewed_by_vendor_at %}
+                        <form method="post" action="{% url 'vendor:mark_review_read' pk=review.pk %}" class="review-mark-read-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <button type="submit" class="review-mark-read-btn" aria-label="Marcar como lido">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span class="review-mark-read-text">Marcar como lido</span>
+                            </button>
+                        </form>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="reviews-empty">
+            <h3>Sem comentários ainda</h3>
+            <p>Quando clientes avaliarem este estabelecimento, os comentários aparecerão aqui.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

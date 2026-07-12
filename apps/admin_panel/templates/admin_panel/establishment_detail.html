@@ -1,0 +1,207 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}{{ establishment.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{% endblock %}
+
+{% block content %}
+<div class="admin-page admin-est-detail-page">
+    <nav class="admin-est-detail-nav">
+        <a href="{% url 'admin_panel:establishment_list' %}" class="admin-est-detail-back">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            <span class="admin-est-detail-back-text">Voltar aos estabelecimentos</span>
+            <span class="admin-est-detail-back-text-short">Voltar</span>
+        </a>
+    </nav>
+
+    <section class="admin-est-detail-hero{% if not establishment.is_active %} is-blocked{% endif %}">
+        <div class="admin-est-detail-hero-bg" aria-hidden="true"></div>
+        <div class="admin-est-detail-hero-main">
+            <div class="admin-est-detail-identity">
+                <div class="admin-est-detail-avatar" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</div>
+                <div>
+                    <span class="admin-est-detail-eyebrow">Estabelecimento</span>
+                    <h1>{{ establishment.name }}</h1>
+                    <p class="admin-est-detail-address">{{ establishment.address }}</p>
+                </div>
+            </div>
+            <div class="admin-est-detail-hero-actions">
+                {% if establishment.is_active %}
+                    <span class="admin-est-detail-status is-active">
+                        <span class="admin-est-detail-status-dot"></span>
+                        Ativo
+                    </span>
+                {% else %}
+                    <span class="admin-est-detail-status is-blocked">
+                        <span class="admin-est-detail-status-dot"></span>
+                        Bloqueado
+                    </span>
+                {% endif %}
+                <form method="post" action="{% url 'admin_panel:establishment_toggle_active' pk=establishment.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="admin-est-detail-action-btn{% if establishment.is_active %} is-danger{% else %} is-success{% endif %}">
+                        <span class="admin-est-detail-btn-text">{% if establishment.is_active %}Bloquear estabelecimento{% else %}Desbloquear estabelecimento{% endif %}</span>
+                        <span class="admin-est-detail-btn-text-short">{% if establishment.is_active %}Bloquear{% else %}Desbloquear{% endif %}</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="admin-est-detail-metrics">
+            <article class="admin-est-detail-metric">
+                <span class="admin-est-detail-metric-label">Produtos</span>
+                <strong>{{ establishment.products_count }}</strong>
+            </article>
+            <article class="admin-est-detail-metric">
+                <span class="admin-est-detail-metric-label">Criado em</span>
+                <strong>{{ establishment.created_at|date:"d M Y" }}</strong>
+            </article>
+            <article class="admin-est-detail-metric admin-est-detail-metric-date">
+                <span class="admin-est-detail-metric-label">Última actualização</span>
+                <strong>{{ establishment.updated_at|date:"d M Y, H:i" }}</strong>
+            </article>
+            <article class="admin-est-detail-metric admin-est-detail-metric-coords">
+                <span class="admin-est-detail-metric-label">Coordenadas</span>
+                <strong>{{ establishment.latitude }}, {{ establishment.longitude }}</strong>
+            </article>
+        </div>
+    </section>
+
+    <section class="admin-est-detail-grid">
+        <article class="admin-est-detail-card admin-est-detail-card-map">
+                <div class="admin-est-detail-card-head admin-est-detail-card-head-compact">
+                    <div class="admin-est-detail-card-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div>
+                        <h2>Localização</h2>
+                        <p class="admin-est-detail-card-subtitle">Posição registada na cidade da Beira</p>
+                    </div>
+                </div>
+            <div id="admin-est-detail-map" class="admin-est-detail-map" role="img" aria-label="Mapa do estabelecimento"></div>
+        </article>
+
+        <div class="admin-est-detail-side">
+            <article class="admin-est-detail-card">
+                <div class="admin-est-detail-card-head admin-est-detail-card-head-compact">
+                    <div class="admin-est-detail-card-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </div>
+                    <div>
+                        <h2>Informações</h2>
+                        <p class="admin-est-detail-card-subtitle">Dados públicos do estabelecimento</p>
+                    </div>
+                </div>
+                <ul class="admin-est-detail-facts admin-est-detail-facts-grid">
+                    <li>
+                        <span class="admin-est-detail-fact-label">Telefone</span>
+                        <a href="tel:{{ establishment.phone }}" class="admin-est-detail-fact-value is-link">{{ establishment.phone }}</a>
+                    </li>
+                    <li>
+                        <span class="admin-est-detail-fact-label">Horário</span>
+                        <span class="admin-est-detail-fact-value">{{ establishment.opening_hours }}</span>
+                    </li>
+                    <li>
+                        <span class="admin-est-detail-fact-label">Endereço</span>
+                        <span class="admin-est-detail-fact-value">{{ establishment.address }}</span>
+                    </li>
+                    <li>
+                        <span class="admin-est-detail-fact-label">Estado</span>
+                        <span class="admin-est-detail-fact-value">
+                            {% if establishment.is_active %}
+                                <span class="admin-badge admin-badge-active">Ativo</span>
+                            {% else %}
+                                <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+            </article>
+
+            <article class="admin-est-detail-card admin-est-detail-card-owner">
+                <div class="admin-est-detail-owner-compact">
+                    <div class="admin-est-detail-owner-top">
+                        <div class="admin-est-detail-card-icon admin-est-detail-card-icon-owner">
+                            {{ establishment.owner.name|slice:":1"|upper }}
+                        </div>
+                        <div class="admin-est-detail-owner-main">
+                            <div class="admin-est-detail-owner-title-row">
+                                <h2>{{ establishment.owner.name }}</h2>
+                                {% if establishment.owner.is_active %}
+                                    <span class="admin-badge admin-badge-active">Conta ativa</span>
+                                {% else %}
+                                    <span class="admin-badge admin-badge-blocked">Conta bloqueada</span>
+                                {% endif %}
+                            </div>
+                            <a href="mailto:{{ establishment.owner.email }}" class="admin-est-detail-owner-email">{{ establishment.owner.email }}</a>
+                            <div class="admin-est-detail-owner-roles">
+                                {% for role in establishment.owner.get_roles_display %}
+                                    <span class="admin-est-detail-role-chip">{{ role }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-est-detail-owner-meta">
+                        <div class="admin-est-detail-owner-meta-item">
+                            <span class="admin-est-detail-owner-meta-label">Sexo</span>
+                            <span class="admin-est-detail-owner-meta-value">{{ establishment.owner.get_gender_display }}</span>
+                        </div>
+                        <div class="admin-est-detail-owner-meta-item">
+                            <span class="admin-est-detail-owner-meta-label">Nascimento</span>
+                            <span class="admin-est-detail-owner-meta-value">{{ establishment.owner.date_of_birth|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="admin-est-detail-owner-meta-item">
+                            <span class="admin-est-detail-owner-meta-label">Registo</span>
+                            <span class="admin-est-detail-owner-meta-value">{{ establishment.owner.date_joined|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+
+                    {% if establishment.owner.pk != user.pk %}
+                        <form method="post" action="{% url 'admin_panel:user_toggle_active' pk=establishment.owner.pk %}" class="admin-est-detail-owner-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <button type="submit" class="admin-est-detail-action-btn admin-est-detail-action-btn-block admin-est-detail-action-btn-sm{% if establishment.owner.is_active %} is-danger{% else %} is-success{% endif %}">
+                                {% if establishment.owner.is_active %}Bloquear dono{% else %}Desbloquear dono{% endif %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <p class="admin-est-detail-self-note">Esta conta é a sua — não pode ser bloqueada a partir desta página.</p>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{% static 'main/js/map-tiles.js' %}"></script>
+<script>
+    const establishmentLat = {{ establishment_lat }};
+    const establishmentLng = {{ establishment_lng }};
+
+    const map = L.map('admin-est-detail-map', {
+        scrollWheelZoom: false,
+        zoomControl: true,
+    }).setView([establishmentLat, establishmentLng], 15);
+
+    L.tileLayer(MobMapTiles.url, MobMapTiles.options).addTo(map);
+
+    const marker = L.marker([establishmentLat, establishmentLng]).addTo(map);
+    marker.bindPopup("{{ establishment.name|escapejs }}").openPopup();
+
+    setTimeout(() => map.invalidateSize({ animate: false }), 200);
+    window.addEventListener('resize', () => map.invalidateSize({ animate: false }));
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => map.invalidateSize({ animate: false }), 300);
+    });
+</script>
+{% endblock %}

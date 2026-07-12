@@ -1,0 +1,134 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Utilizadores{% endblock %}
+
+{% block content %}
+<div class="admin-page admin-scroll-page admin-users-list-page">
+    <header class="admin-page-header admin-scroll-page-header">
+        <div>
+            <p class="dashboard-eyebrow">Gestão de contas</p>
+            <h1>Utilizadores</h1>
+        </div>
+        <div class="admin-inline-stats">
+            <span class="admin-inline-stat">{{ users_total }} total</span>
+            <span class="admin-inline-stat admin-inline-stat-active">{{ users_active_count }} ativos</span>
+            <span class="admin-inline-stat admin-inline-stat-blocked">{{ users_blocked_count }} bloqueados</span>
+            <span class="admin-inline-stat admin-inline-stat-admin">{{ users_admins_count }} admins</span>
+        </div>
+    </header>
+
+    <form method="get" class="admin-filters admin-filters-compact">
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-role">Tipo</label>
+            <select name="role" id="filter-role">
+                <option value="">Todos</option>
+                {% for value, label in role_choices %}
+                    <option value="{{ value }}"{% if filters.role == value %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-gender">Sexo</label>
+            <select name="gender" id="filter-gender">
+                <option value="">Todos</option>
+                {% for value, label in gender_choices %}
+                    <option value="{{ value }}"{% if filters.gender == value %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-status">Estado</label>
+            <select name="status" id="filter-status">
+                <option value="">Todos</option>
+                <option value="active"{% if filters.status == 'active' %} selected{% endif %}>Ativos</option>
+                <option value="blocked"{% if filters.status == 'blocked' %} selected{% endif %}>Bloqueados</option>
+            </select>
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-sort">Ordenar</label>
+            <select name="sort" id="filter-sort">
+                <option value="date"{% if filters.sort == 'date' %} selected{% endif %}>Data</option>
+                <option value="name"{% if filters.sort == 'name' %} selected{% endif %}>Nome</option>
+                <option value="email"{% if filters.sort == 'email' %} selected{% endif %}>Email</option>
+            </select>
+        </div>
+        <div class="admin-filter-group admin-filter-group-compact">
+            <label for="filter-order">Ordem</label>
+            <select name="order" id="filter-order">
+                <option value="desc"{% if filters.order == 'desc' %} selected{% endif %}>Desc</option>
+                <option value="asc"{% if filters.order == 'asc' %} selected{% endif %}>Asc</option>
+            </select>
+        </div>
+        <div class="admin-filters-actions">
+            <button type="submit" class="admin-filter-btn admin-filter-btn-compact">Filtrar</button>
+            <a href="{% url 'admin_panel:user_list' %}" class="admin-filter-reset admin-filter-reset-compact">Limpar</a>
+        </div>
+    </form>
+
+    <article class="dash-panel dash-panel-table admin-scroll-table-panel admin-users-table-panel">
+        {% if users %}
+            <div class="dash-table-wrap admin-scroll-table-wrap">
+                <table class="dash-table admin-table admin-data-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Sexo</th>
+                            <th>Perfis</th>
+                            <th>Registo</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in users %}
+                            <tr class="{% if item.is_administrador %}admin-table-row-admin{% endif %}{% if not item.is_active %} admin-row-blocked{% endif %}{% if item.pk == user.pk %} admin-table-row-self{% endif %}">
+                                <td>
+                                    <span class="admin-table-name">{{ item.name }}</span>
+                                    {% if item.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
+                                </td>
+                                <td class="admin-table-cell-email" title="{{ item.email }}">{{ item.email }}</td>
+                                <td>{{ item.get_gender_display }}</td>
+                                <td class="admin-table-cell-wrap">
+                                    {% for user_role in item.user_roles.all %}
+                                        <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
+                                            {{ user_role.get_role_display }}
+                                        </span>
+                                    {% empty %}
+                                        <span class="admin-directory-no-role">—</span>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ item.date_joined|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if item.is_active %}
+                                        <span class="admin-badge admin-badge-active">Ativo</span>
+                                    {% else %}
+                                        <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="table-action">
+                                    {% if item.pk != user.pk %}
+                                        <form method="post" action="{% url 'admin_panel:user_toggle_active' pk=item.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                            <button type="submit" class="admin-action-btn{% if item.is_active %} admin-action-btn-danger{% else %} admin-action-btn-success{% endif %}">
+                                                {% if item.is_active %}Bloquear{% else %}Desbloquear{% endif %}
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="admin-self-note">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="dash-panel-empty admin-panel-empty-compact">
+                <p>Nenhum utilizador encontrado.</p>
+            </div>
+        {% endif %}
+    </article>
+</div>
+{% endblock %}

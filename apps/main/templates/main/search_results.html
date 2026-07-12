@@ -1,0 +1,325 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="pt">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+
+    <title>{% if query %}Pesquisa: {{ query }}{% else %}Pesquisa{% endif %} | Mob</title>
+
+</head>
+
+<body>
+
+    <div class="content search-page-images">
+
+        <div class="content-primary search-page-primary">
+
+            {% include 'main/partials/search_nav.html' %}
+
+
+
+            <div class="search-results-page">
+
+                {% if query %}
+
+                    <div class="search-results-header">
+
+                        <div class="search-results-summary">
+
+                            <span class="search-results-count">{{ results_count }}</span>
+
+                            <div class="search-results-summary-text">
+
+                                {% if results_count %}
+
+                                    <span class="search-results-summary-label">produto{{ results_count|pluralize:"s" }} encontrado{{ results_count|pluralize:"s" }}</span>
+
+                                {% else %}
+
+                                    <span class="search-results-summary-label">Nenhum produto encontrado</span>
+
+                                {% endif %}
+
+                                <span class="search-results-query">"{{ query }}"</span>
+
+                            </div>
+
+                        </div>
+
+                        {% if active_category %}
+
+                            {% for category in categories %}
+
+                                {% if category.slug == active_category %}
+
+                                    <span class="search-results-filter-tag">{{ category.name }}</span>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                        {% if has_location and active_distance %}
+
+                            <span class="search-results-filter-tag search-results-filter-tag-distance">Até {{ active_distance }} km</span>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <div class="search-location-bar">
+
+                        {% if has_location %}
+
+                            <span class="search-location-status">
+
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+
+                                Localização ativa
+
+                            </span>
+
+                            <button type="button" class="search-refresh-location" id="search-refresh-location">
+                                <span class="search-location-btn-label">Atualizar localização</span>
+                            </button>
+
+                        {% elif location_invalid %}
+
+                            <span class="search-location-warning">
+                                Localização inválida. Use o botão abaixo para atualizar a sua posição.
+                            </span>
+
+                            <button type="button" class="search-use-location" id="search-use-location">
+                                <span class="search-location-btn-label">Usar minha localização</span>
+                            </button>
+
+                        {% else %}
+
+                            <button type="button" class="search-use-location" id="search-use-location">
+
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+
+                                <span class="search-location-btn-label">Usar minha localização</span>
+
+                            </button>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    {% if has_location %}
+
+                        <div class="search-distance-filters search-category-scroll">
+
+                            {% for distance_value, distance_label in distance_options %}
+
+                                <a
+
+                                    href="{% url 'search_results' %}?q={{ query|urlencode }}{% if active_category %}&categoria={{ active_category|urlencode }}{% endif %}&lat={{ user_lat }}&lng={{ user_lng }}{% if distance_value %}&distancia={{ distance_value }}{% endif %}"
+
+                                    class="category-pill distance-pill{% if active_distance == distance_value|stringformat:'s' or not active_distance and not distance_value %} active{% endif %}"
+
+                                >
+
+                                    {{ distance_label }}
+
+                                </a>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <div class="search-results-header">
+
+                        <p class="search-results-empty-hint">Introduza um termo para pesquisar produtos.</p>
+
+                    </div>
+
+                {% endif %}
+
+
+
+                {% if query and categories %}
+
+                    <div class="search-category-filters search-category-scroll">
+
+                        <a href="{% url 'search_results' %}?q={{ query|urlencode }}{% if has_location %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}{% if active_distance %}&distancia={{ active_distance }}{% endif %}" class="category-pill{% if not active_category %} active{% endif %}">Todas</a>
+
+                        {% for category in categories %}
+
+                            <a href="{% url 'search_results' %}?q={{ query|urlencode }}&categoria={{ category.slug }}{% if has_location %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}{% if active_distance %}&distancia={{ active_distance }}{% endif %}" class="category-pill{% if active_category == category.slug %} active{% endif %}">{{ category.name }}</a>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+
+                {% if query and products %}
+
+                    <div class="search-results-masonry">
+
+                        {% for product in products %}
+
+                            {% cycle 'violet' 'blue' 'amber' 'emerald' as card_theme silent %}
+
+                            <a href="{% url 'product_detail' pk=product.pk %}?q={{ query|urlencode }}{% if active_category %}&categoria={{ active_category|urlencode }}{% endif %}{% if has_location %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}{% if active_distance %}&distancia={{ active_distance }}{% endif %}" class="search-masonry-item search-card--{{ card_theme }}">
+
+                                <div class="search-masonry-image-wrap">
+
+                                    {% if product.image %}
+
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+
+                                    {% else %}
+
+                                        <div class="search-masonry-placeholder">
+
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+
+                                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+
+                                            </svg>
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="search-masonry-caption">
+
+                                    <div class="search-masonry-meta">
+                                        <span class="search-masonry-category">{{ product.category.name }}</span>
+                                        {% if product.is_available %}
+                                            <span class="search-masonry-badge search-masonry-badge-available">
+                                                <span class="search-masonry-badge-dot" aria-hidden="true"></span>
+                                                Disponível
+                                            </span>
+                                        {% else %}
+                                            <span class="search-masonry-badge search-masonry-badge-unavailable">
+                                                <span class="search-masonry-badge-dot" aria-hidden="true"></span>
+                                                Indisponível
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <h2>{{ product.name }}</h2>
+
+                                    <div class="search-masonry-source">
+
+                                        <span class="search-masonry-source-icon">{{ product.establishment.name|slice:":1"|upper }}</span>
+
+                                        <span class="search-masonry-source-name">{{ product.establishment.name }}</span>
+
+                                    </div>
+
+                                    <div class="search-masonry-location">
+
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+
+                                        <span class="search-masonry-location-text">{{ product.establishment.address|truncatechars:55 }}</span>
+
+                                        {% if product.distance_km is not None %}
+
+                                            <span class="search-masonry-distance">{{ product.distance_km|floatformat:1 }} km</span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </a>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% elif query %}
+
+                    <div class="search-results-empty">
+
+                        <div class="search-results-empty-icon" aria-hidden="true">
+
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+
+                                <circle cx="11" cy="11" r="8"/>
+
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+
+                            </svg>
+
+                        </div>
+
+                        <h3>Sem resultados</h3>
+
+                        <p>
+
+                            {% if has_location and active_distance %}
+
+                                Não há produtos num raio de {{ active_distance }} km. Tente aumentar a distância ou remover filtros.
+
+                            {% else %}
+
+                                Tente outro termo ou remova o filtro de categoria.
+
+                            {% endif %}
+
+                        </p>
+
+                        <a href="{% url 'home' %}" class="search-results-cta">Nova pesquisa</a>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        {% include 'main/partials/client_footer.html' %}
+
+    </div>
+
+
+
+    {% include 'main/partials/client_light_scripts.html' %}
+
+
+
+    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
+    <script src="{% static 'main/js/search-location.js' %}"></script>
+    <script src="{% static 'main/js/search-input.js' %}"></script>
+
+</body>
+
+</html>
+

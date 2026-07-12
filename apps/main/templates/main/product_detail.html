@@ -1,0 +1,339 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    <title>{{ product.name }} | Mob</title>
+</head>
+<body>
+    <div class="content product-detail-page">
+        {% include 'main/partials/client_nav.html' %}
+
+        <div class="product-detail-shell">
+            {% include 'main/partials/client_messages.html' with message_scope='product' %}
+
+            <div class="product-detail-breadcrumb">
+                {% if back_query %}
+                    <a href="{% url 'search_results' %}?q={{ back_query|urlencode }}{% if back_category %}&categoria={{ back_category|urlencode }}{% endif %}{% if request.GET.lat %}&lat={{ request.GET.lat }}{% endif %}{% if request.GET.lng %}&lng={{ request.GET.lng }}{% endif %}{% if request.GET.distancia %}&distancia={{ request.GET.distancia }}{% endif %}" class="product-detail-back">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        Voltar aos resultados
+                    </a>
+                {% else %}
+                    <a href="{% url 'home' %}" class="product-detail-back">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        Voltar ao início
+                    </a>
+                {% endif %}
+            </div>
+
+            <section class="product-detail-hero">
+                <div class="product-detail-hero-accent" aria-hidden="true"></div>
+                <div class="product-detail-hero-bg" aria-hidden="true">
+                    <span class="product-orb product-orb-1"></span>
+                    <span class="product-orb product-orb-2"></span>
+                </div>
+
+                <div class="product-detail-visual">
+                    <span class="product-detail-visual-tag">{{ product.category.name }}</span>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="product-detail-visual-placeholder">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    <div class="product-detail-visual-shine" aria-hidden="true"></div>
+                </div>
+
+                <div class="product-detail-hero-content">
+                    <div class="product-detail-badges">
+                        <span class="product-detail-badge product-detail-badge-category">{{ product.category.name }}</span>
+                        {% if product.is_available %}
+                            <span class="product-detail-badge product-detail-badge-available">
+                                <span class="badge-dot"></span> Disponível
+                            </span>
+                        {% else %}
+                            <span class="product-detail-badge product-detail-badge-unavailable">
+                                <span class="badge-dot"></span> Indisponível
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-detail-title-row">
+                        <h1>{{ product.name }}</h1>
+                        {% if user.is_authenticated %}
+                            {% if can_favorite %}
+                            <form method="post" action="{% url 'product_favorite_toggle' pk=product.pk %}" class="favorite-toggle-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                <button type="submit" class="favorite-btn{% if is_favorited %} is-active{% endif %}" aria-label="{% if is_favorited %}Remover dos favoritos{% else %}Adicionar aos favoritos{% endif %}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="{% if is_favorited %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    </svg>
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path|urlencode }}" class="favorite-btn" aria-label="Entrar para favoritar">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <p class="product-detail-lead">{{ product.description }}</p>
+
+                    <div class="product-detail-quick-info">
+                        <div class="product-detail-quick-item">
+                            <span class="quick-item-icon quick-item-icon-store">{{ establishment.name|slice:":1"|upper }}</span>
+                            <div>
+                                <span class="product-detail-quick-label">Vendido em</span>
+                                <strong>{{ establishment.name }}</strong>
+                            </div>
+                        </div>
+                        <div class="product-detail-quick-item">
+                            <span class="quick-item-icon quick-item-icon-map">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </span>
+                            <div>
+                                <span class="product-detail-quick-label">Localização</span>
+                                <strong>Beira, Sofala</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="product-detail-panels">
+                <article class="product-panel product-panel-establishment">
+                    <div class="product-panel-header">
+                        <div class="product-panel-icon product-panel-icon-store">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        </div>
+                        <div>
+                            <h2>Estabelecimento</h2>
+                            <p>{{ establishment.name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="product-panel-grid">
+                        <div class="product-panel-item">
+                            <span class="product-panel-item-label">Endereço</span>
+                            <span>{{ establishment.address }}</span>
+                        </div>
+                        <div class="product-panel-item">
+                            <span class="product-panel-item-label">Telefone</span>
+                            <a href="tel:{{ establishment.phone }}">{{ establishment.phone }}</a>
+                        </div>
+                        <div class="product-panel-item">
+                            <span class="product-panel-item-label">Horário</span>
+                            <span>{{ establishment.opening_hours }}</span>
+                        </div>
+                    </div>
+
+                    <a href="tel:{{ establishment.phone }}" class="product-detail-cta">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.58-1.11a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.92z"/></svg>
+                        Contactar estabelecimento
+                    </a>
+                </article>
+
+                <article class="product-panel product-panel-map">
+                    <div class="product-panel-header">
+                        <div class="product-panel-icon product-panel-icon-map">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        </div>
+                        <div>
+                            <h2>Onde encontrar</h2>
+                            <p>
+                                Mapa do estabelecimento na Beira
+                                <span id="product-distance-wrap"{% if not has_location or distance_km is None %} hidden{% endif %}>
+                                    · <strong id="product-distance-km">{% if distance_km is not None %}{{ distance_km|floatformat:1 }}{% endif %}</strong> km em linha recta da sua localização
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="product-map" class="product-detail-map"></div>
+                </article>
+            </section>
+
+            <section class="product-detail-reviews">
+                <div class="product-reviews-top">
+                    <div class="product-reviews-intro">
+                        <div class="product-panel-icon product-panel-icon-reviews">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <div>
+                            <span class="product-reviews-eyebrow">Avaliações</span>
+                            <h2>{{ establishment.name }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="product-reviews-score-card{% if not review_stats.total %} is-empty{% endif %}">
+                        {% if review_stats.total %}
+                            <span class="product-reviews-score-big">{{ review_stats.avg_rating|floatformat:1 }}</span>
+                            <div class="review-stars review-stars-lg" aria-label="{{ review_stats.avg_rating|floatformat:1 }} de 5">
+                                {% with avg=review_stats.avg_rating|floatformat:0 %}
+                                    {% for i in "12345" %}
+                                        <span class="review-star{% if forloop.counter > avg %} is-empty{% endif %}">★</span>
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                            <span class="product-reviews-score-meta">{{ review_stats.total }} avaliaç{{ review_stats.total|pluralize:"ão,ões" }}</span>
+                        {% else %}
+                            <span class="product-reviews-score-big">—</span>
+                            <span class="product-reviews-score-meta">Ainda sem avaliações</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if reviews %}
+                    <div class="product-reviews-grid">
+                        {% for review in reviews %}
+                            <article class="product-review-card">
+                                <div class="product-review-card-top">
+                                    <span class="product-review-avatar" aria-hidden="true">{{ review.user.first_name|slice:":1"|upper }}</span>
+                                    <div class="product-review-card-meta">
+                                        <strong>{{ review.user.first_name }}</strong>
+                                        <time datetime="{{ review.created_at|date:'c' }}">{{ review.created_at|date:"d M Y" }}</time>
+                                    </div>
+                                    {% if review.rating %}
+                                        <div class="review-stars review-stars-sm" aria-label="{{ review.rating }} de 5">
+                                            {% for i in "12345" %}
+                                                <span class="review-star{% if forloop.counter > review.rating %} is-empty{% endif %}">★</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if review.comment %}
+                                    <blockquote class="product-review-quote">{{ review.comment }}</blockquote>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="product-reviews-empty-state">
+                        <p>Sem avaliações publicadas ainda.</p>
+                    </div>
+                {% endif %}
+
+                {% if can_review %}
+                    <div class="product-review-compose">
+                        <div class="product-review-compose-header">
+                            <h3>{% if user_review %}Atualizar a sua avaliação{% else %}Deixar a sua avaliação{% endif %}</h3>
+                            <p class="product-review-compose-hint">Pode enviar só estrelas, só comentário, ou os dois.</p>
+                        </div>
+
+                        <form method="post" action="{% url 'establishment_review_submit' pk=establishment.pk %}" class="product-review-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_pk" value="{{ product.pk }}">
+
+                            <fieldset class="review-rating-field">
+                                <legend>A sua avaliação <span class="review-field-optional">(opcional)</span></legend>
+                                <div class="star-rating" role="radiogroup" aria-label="Selecione de 1 a 5 estrelas" data-rating="{{ review_form.rating.value|default:'' }}">
+                                    {% for value in "12345" %}
+                                        <input
+                                            type="radio"
+                                            id="review-star-{{ value }}"
+                                            name="rating"
+                                            value="{{ value }}"
+                                            {% if review_form.rating.value == value %}checked{% endif %}
+                                        >
+                                        <label for="review-star-{{ value }}" title="{{ value }} estrela{{ value|pluralize:"s" }}">★</label>
+                                    {% endfor %}
+                                </div>
+                                <span class="star-rating-value"{% if not review_form.rating.value %} hidden{% endif %}>
+                                    {% if review_form.rating.value %}{{ review_form.rating.value }} estrela{{ review_form.rating.value|pluralize:"s" }}{% endif %}
+                                </span>
+                            </fieldset>
+
+                            <label class="review-comment-label" for="id_comment">
+                                {{ review_form.comment.label }} <span class="review-field-optional">(opcional)</span>
+                            </label>
+                            {{ review_form.comment }}
+                            <div class="product-review-form-footer">
+                                <button type="submit" class="product-review-submit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                    Enviar avaliação
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% elif not user.is_authenticated %}
+                    <div class="product-reviews-login-card">
+                        <p>Entre na sua conta para avaliar este estabelecimento e ajudar outros clientes.</p>
+                        <a href="{% url 'auth' %}?next={{ request.get_full_path|urlencode }}" class="product-reviews-login-btn">Entrar ou criar conta</a>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+
+        {% include 'main/partials/client_footer.html' %}
+    </div>
+
+    {% include 'main/partials/client_light_scripts.html' %}
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="{% static 'main/js/map-tiles.js' %}"></script>
+    <script src="{% static 'main/js/coordinates.js' %}"></script>
+    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
+    <script src="{% static 'main/js/location-map.js' %}"></script>
+    <script src="{% static 'main/js/star-rating.js' %}"></script>
+    <script>
+        const establishmentLat = {{ establishment_lat }};
+        const establishmentLng = {{ establishment_lng }};
+        const establishmentName = "{{ establishment.name|escapejs }}";
+        const hasLocation = {% if has_location %}true{% else %}false{% endif %};
+
+        const storeIcon = L.divIcon({
+            className: 'product-map-marker product-map-marker-store',
+            html: '<span>Loja</span>',
+            iconSize: [52, 28],
+            iconAnchor: [26, 14],
+        });
+
+        function getUserCoords() {
+            {% if has_location %}
+            return MobCoordinates.fixSwappedCoordinates({{ user_lat }}, {{ user_lng }});
+            {% else %}
+            return { lat: null, lng: null };
+            {% endif %}
+        }
+
+        function renderProductMap() {
+            const userCoords = getUserCoords();
+            MobLocationMap.init('product-map', {
+                userLat: userCoords.lat,
+                userLng: userCoords.lng,
+                markers: [{
+                    lat: establishmentLat,
+                    lng: establishmentLng,
+                    icon: storeIcon,
+                    popup: establishmentName,
+                }],
+                defaultZoom: 15,
+            });
+        }
+
+        renderProductMap();
+
+        if (!hasLocation && navigator.geolocation) {
+            MobGeolocation.request({ maximumAge: 0 })
+                .then((coords) => {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('lat', coords.lat.toFixed(6));
+                    params.set('lng', coords.lng.toFixed(6));
+                    window.location.replace(`${window.location.pathname}?${params.toString()}`);
+                })
+                .catch(() => {});
+        }
+    </script>
+</body>
+</html>

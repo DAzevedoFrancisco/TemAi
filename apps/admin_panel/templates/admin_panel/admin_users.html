@@ -1,0 +1,148 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Administradores do sistema{% endblock %}
+
+{% block content %}
+<div class="admin-page admin-users-page">
+    <header class="admin-users-hero">
+        <div class="admin-users-hero-main">
+            <div class="admin-users-hero-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+            </div>
+            <div>
+                <p class="dashboard-eyebrow">Acesso ao painel</p>
+                <h1>Administradores</h1>
+                <p class="admin-page-subtitle">Gira quem tem acesso ao painel de gestão. Ao despromover, a conta volta a ser apenas cliente.</p>
+            </div>
+        </div>
+        <div class="admin-users-hero-stats">
+            <article class="admin-users-stat">
+                <span class="admin-users-stat-value">{{ admins_total }}</span>
+                <span class="admin-users-stat-label">Total</span>
+            </article>
+            <article class="admin-users-stat admin-users-stat-active">
+                <span class="admin-users-stat-value">{{ admins_active_count }}</span>
+                <span class="admin-users-stat-label">Ativos</span>
+            </article>
+            <article class="admin-users-stat admin-users-stat-blocked">
+                <span class="admin-users-stat-value">{{ admins_blocked_count }}</span>
+                <span class="admin-users-stat-label">Bloqueados</span>
+            </article>
+        </div>
+    </header>
+
+    <div class="admin-users-layout">
+        <aside class="admin-users-aside">
+            <article class="admin-users-promote-card">
+                <div class="admin-users-promote-head">
+                    <span class="admin-users-promote-icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <line x1="20" y1="8" x2="20" y2="14"/>
+                            <line x1="23" y1="11" x2="17" y2="11"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <h2>Novo administrador</h2>
+                        <p>Promova uma conta existente pelo email.</p>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'admin_panel:promote_admin' %}" class="admin-promote-form admin-users-promote-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <div class="admin-promote-field">
+                        <label for="{{ promote_form.email.id_for_label }}">{{ promote_form.email.label }}</label>
+                        {{ promote_form.email }}
+                    </div>
+                    <button type="submit" class="admin-users-promote-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Promover a administrador
+                    </button>
+                </form>
+
+                <ul class="admin-users-tips">
+                    <li>O utilizador deve já ter conta na plataforma.</li>
+                    <li>Perfis de cliente ou vendedor são removidos automaticamente.</li>
+                    <li>Não é possível despromover o último administrador ativo.</li>
+                </ul>
+            </article>
+        </aside>
+
+        <section class="admin-users-main">
+            <div class="admin-users-list-head">
+                <div>
+                    <h2>Equipa de administração</h2>
+                    <p>{{ admins_total }} conta{{ admins_total|pluralize:"s" }} com acesso ao painel</p>
+                </div>
+            </div>
+
+            {% if system_admins %}
+                <ul class="admin-users-list">
+                    {% for admin_user in system_admins %}
+                        <li class="admin-user-card{% if not admin_user.is_active %} admin-user-card-blocked{% endif %}{% if admin_user.pk == user.pk %} admin-user-card-self{% endif %}">
+                            <div class="admin-user-card-avatar" aria-hidden="true">
+                                {{ admin_user.name|slice:":1"|upper }}
+                            </div>
+                            <div class="admin-user-card-body">
+                                <div class="admin-user-card-top">
+                                    <div>
+                                        <strong class="admin-user-card-name">{{ admin_user.name }}</strong>
+                                        {% if admin_user.pk == user.pk %}
+                                            <span class="admin-user-you-badge">Você</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if admin_user.is_active %}
+                                        <span class="admin-badge admin-badge-active">Ativo</span>
+                                    {% else %}
+                                        <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                    {% endif %}
+                                </div>
+                                <span class="admin-user-card-email">{{ admin_user.email }}</span>
+                                <div class="admin-user-card-meta">
+                                    <span class="admin-role-pill admin-role-pill-admin">Administrador</span>
+                                    <span class="admin-user-card-since">Desde {{ admin_user.date_joined|date:"d M Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="admin-user-card-action">
+                                {% if admin_user.pk != user.pk %}
+                                    <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="admin-user-demotion-btn" title="Despromover {{ admin_user.name }}">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                <circle cx="8.5" cy="7" r="4"/>
+                                                <line x1="18" y1="8" x2="23" y2="13"/>
+                                                <line x1="23" y1="8" x2="18" y2="13"/>
+                                            </svg>
+                                            Despromover
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="admin-self-note">A sua conta</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="admin-users-empty">
+                    <div class="admin-users-empty-icon" aria-hidden="true">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h3>Ainda não há administradores</h3>
+                    <p>Promova o primeiro administrador usando o formulário ao lado.</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

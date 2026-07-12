@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    <title>Favoritos | Mob</title>
+</head>
+<body>
+    <div class="content favorites-page">
+        {% include 'main/partials/client_nav.html' %}
+
+        <div class="favorites-shell">
+            {% include 'main/partials/client_messages.html' with message_scope='product' %}
+
+            <header class="favorites-hero">
+                <div class="favorites-hero-bg" aria-hidden="true">
+                    <span class="favorites-orb favorites-orb-1"></span>
+                    <span class="favorites-orb favorites-orb-2"></span>
+                </div>
+                <div class="favorites-hero-content">
+                    <span class="favorites-eyebrow">Coleção pessoal</span>
+                    <h1>Os seus favoritos</h1>
+                    <p>Produtos que guardou para consultar mais tarde.</p>
+                </div>
+                {% if favorites %}
+                    <div class="favorites-stats">
+                        <div class="favorites-stat-pill">
+                            <span class="favorites-stat-value">{{ favorites|length }}</span>
+                            <span class="favorites-stat-label">{% if favorites|length == 1 %}produto guardado{% else %}produtos guardados{% endif %}</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </header>
+
+            {% if favorites %}
+                <div class="favorites-list">
+                    {% for favorite in favorites %}
+                        {% with product=favorite.product %}
+                            {% cycle 'violet' 'blue' 'amber' 'emerald' as card_theme silent %}
+                            <article class="favorite-card favorite-card--{{ card_theme }}">
+                                <a href="{% url 'product_detail' pk=product.pk %}" class="favorite-card-link">
+                                    <div class="favorite-card-image">
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+                                        {% else %}
+                                            <div class="favorite-card-placeholder">
+                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="favorite-card-body">
+                                        <span class="favorite-card-category">{{ product.category.name }}</span>
+                                        <h2>{{ product.name }}</h2>
+                                        <p class="favorite-card-establishment">{{ product.establishment.name }}</p>
+                                        <div class="favorite-card-badges">
+                                            {% if product.is_available %}
+                                                <span class="favorite-badge favorite-badge-available">Disponível</span>
+                                            {% else %}
+                                                <span class="favorite-badge favorite-badge-unavailable">Indisponível</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
+                                <form method="post" action="{% url 'product_favorite_toggle' pk=product.pk %}" class="favorite-remove-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <button type="submit" class="favorite-remove-btn" aria-label="Remover {{ product.name }} dos favoritos">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                        </svg>
+                                        Remover
+                                    </button>
+                                </form>
+                            </article>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="favorites-empty">
+                    <div class="favorites-empty-icon" aria-hidden="true">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </div>
+                    <h2>Ainda não tem favoritos</h2>
+                    <p>Explore produtos e toque no coração para guardá-los aqui.</p>
+                    <a href="{% url 'home' %}" class="favorites-empty-cta">Explorar produtos</a>
+                </div>
+            {% endif %}
+        </div>
+
+        {% include 'main/partials/client_footer.html' %}
+    </div>
+
+    {% include 'main/partials/client_light_scripts.html' %}
+</body>
+</html>

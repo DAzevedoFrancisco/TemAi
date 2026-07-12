@@ -1,0 +1,196 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    <div class="content">
+        <div class="content-primary">
+            {% include 'main/partials/client_nav.html' with use_seller_modal=True %}
+
+            <div class="home-flash-wrap">
+                {% include 'main/partials/client_messages.html' %}
+            </div>
+
+            <div class="container">
+                <div class="search-box">
+                    {% if not user.is_authenticated or active_profile == 'cliente' %}
+                        <div class="text">O Que Procura?</div>
+
+                        <form method="get" action="{% url 'search_results' %}" class="search-form">
+                            <input type="hidden" name="lat" id="search-lat" value="">
+                            <input type="hidden" name="lng" id="search-lng" value="">
+                            <div class="search">
+                                <div class="search-input-row">
+                                    <input
+                                        type="search"
+                                        name="q"
+                                        placeholder="Encontre o que precisas perto de ti"
+                                        autocomplete="off"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="box-img">
+                                    <button type="submit" class="search-submit" aria-label="Pesquisar">
+                                        <div class="border-img">
+                                            <img src="{% static 'main/img/arrow-up.png' %}" alt="" width="25">
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="profile-notice">
+                            <div class="text">Perfil Vendedor ativo</div>
+                            <p>Como vendedor, pode gerir estabelecimentos e produtos. Para pesquisar na plataforma, mude para o perfil de Cliente.</p>
+                            <div class="profile-notice-actions">
+                                <a href="{% url 'switch_profile' %}?profile=cliente" class="profile-switch-btn">Mudar para Cliente</a>
+                                <a href="{% url 'vendor:dashboard' %}" class="profile-switch-btn secondary">Ir para o painel</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+       <div class="box-about" id="about">
+            <div class="about">
+
+                <h2 class="about-title">
+                    Sobre
+                </h2>
+
+                <div class="about-text">
+                    
+                    
+                    <p>
+                        A plataforma é um sistema web desenvolvido para facilitar a divulgação e a localização de estabelecimentos, produtos e serviços, proporcionando uma experiência simples, rápida e intuitiva aos seus utilizadores. O sistema reúne informações de diferentes estabelecimentos num único ambiente, permitindo que os visitantes encontrem facilmente os produtos ou serviços de que necessitam.
+                    </p>
+
+                    <h4>Para os visitantes</h4>
+                    <p>
+                        Os visitantes podem pesquisar estabelecimentos pelo nome, navegar pelas categorias disponíveis, visualizar informações detalhadas sobre cada estabelecimento e consultar a sua localização através de um mapa integrado. Dessa forma, a plataforma torna a procura por estabelecimentos mais eficiente e acessível.
+                    </p>
+
+                    <h4>Para os proprietários</h4>
+                    <p>
+                        Os proprietários de estabelecimentos podem criar uma conta para cadastrar e gerir os seus negócios de forma autónoma. Através do painel de gestão, é possível atualizar informações como nome, descrição, contactos, horário de funcionamento, localização geográfica, produtos, serviços e imagens, garantindo que os dados disponibilizados aos clientes estejam sempre atualizados.
+                    </p>
+
+                    <h4>Objetivo</h4>
+                    <p>
+                        No geral, a plataforma atua como um catálogo digital de estabelecimentos, promovendo maior visibilidade para os negócios e facilitando o acesso dos utilizadores a informações relevantes sobre produtos, serviços e localização, contribuindo para uma comunicação mais eficiente entre clientes e proprietários.
+                    </p>
+
+                </div>
+
+            </div>
+        </div>
+
+        {% include 'main/partials/client_footer.html' %}
+    </div>
+
+    <div class="logout-modal" id="seller-modal" hidden>
+        <div class="logout-modal-overlay" id="seller-modal-overlay"></div>
+        <div class="logout-modal-content" role="dialog" aria-labelledby="seller-modal-title" aria-modal="true">
+            <h3 id="seller-modal-title">Tornar-me vendedor</h3>
+            {% if can_become_seller %}
+                <p>Tem a certeza de que deseja ativar o perfil de vendedor?</p>
+                <p class="seller-modal-note">Requisito: ter pelo menos 18 anos.</p>
+                <div class="logout-modal-actions">
+                    <button type="button" class="logout-modal-cancel" id="seller-cancel">Cancelar</button>
+                    <a href="{% url 'vendor:become_seller' %}" class="logout-modal-confirm seller-confirm" id="seller-confirm">Continuar</a>
+                </div>
+            {% else %}
+                <p class="seller-modal-warning">Precisa de ter pelo menos 18 anos para se tornar vendedor. A data de nascimento da sua conta não cumpre este requisito.</p>
+                <div class="logout-modal-actions">
+                    <button type="button" class="logout-modal-cancel" id="seller-cancel">Fechar</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="logout-modal" id="logout-modal" hidden>
+        <div class="logout-modal-overlay" id="logout-modal-overlay"></div>
+        <div class="logout-modal-content" role="dialog" aria-labelledby="logout-modal-title" aria-modal="true">
+            <h3 id="logout-modal-title">Confirmar saída</h3>
+            <p>Tem a certeza de que deseja terminar a sessão?</p>
+            <div class="logout-modal-actions">
+                <button type="button" class="logout-modal-cancel" id="logout-cancel">Cancelar</button>
+                <button type="button" class="logout-modal-confirm" id="logout-confirm">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logoutModal = document.getElementById("logout-modal");
+        const logoutBtn = document.getElementById("logout-btn");
+        const logoutForm = document.getElementById("logout-form");
+        const logoutCancel = document.getElementById("logout-cancel");
+        const logoutConfirm = document.getElementById("logout-confirm");
+        const logoutOverlay = document.getElementById("logout-modal-overlay");
+
+        function openLogoutModal() {
+            logoutModal.hidden = false;
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeLogoutModal() {
+            logoutModal.hidden = true;
+            if (!document.body.classList.contains('mobile-nav-open')) {
+                document.body.style.overflow = "";
+            }
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", openLogoutModal);
+        }
+
+        logoutCancel.addEventListener("click", closeLogoutModal);
+        logoutOverlay.addEventListener("click", closeLogoutModal);
+
+        logoutConfirm.addEventListener("click", () => {
+            logoutForm.submit();
+        });
+
+        const sellerModal = document.getElementById("seller-modal");
+        const sellerBtn = document.getElementById("become-seller-btn");
+        const sellerCancel = document.getElementById("seller-cancel");
+        const sellerOverlay = document.getElementById("seller-modal-overlay");
+
+        function openSellerModal() {
+            sellerModal.hidden = false;
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeSellerModal() {
+            sellerModal.hidden = true;
+            document.body.style.overflow = "";
+        }
+
+        if (sellerBtn) {
+            sellerBtn.addEventListener("click", openSellerModal);
+        }
+
+        sellerCancel.addEventListener("click", closeSellerModal);
+        sellerOverlay.addEventListener("click", closeSellerModal);
+
+    </script>
+    <script src="{% static 'main/js/mobile-nav.js' %}"></script>
+    <script src="{% static 'main/js/coordinates.js' %}"></script>
+    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
+    <script src="{% static 'main/js/home-search-location.js' %}"></script>
+    <script src="{% static 'main/js/search-input.js' %}"></script>
+    <script src="{% static 'main/js/about-scroll-reveal.js' %}"></script>
+    <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
+</body>
+</html>
