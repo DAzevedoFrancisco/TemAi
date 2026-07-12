@@ -4,17 +4,94 @@
 
 {% block content %}
 <div class="dashboard-home admin-dashboard-home">
-    <header class="admin-dashboard-hero admin-mobile-surface">
-        <div class="admin-dashboard-hero-main">
-            <p class="dashboard-eyebrow">Administração do sistema</p>
-            <h1>Visão geral</h1>
+    <header class="admin-dashboard-hero">
+        <div class="admin-dashboard-hero-bg" aria-hidden="true"></div>
+        <div class="admin-dashboard-hero-inner">
+            <div class="admin-dashboard-hero-main">
+                <div class="admin-dashboard-hero-badge" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <p class="admin-dashboard-eyebrow">Painel Mob Admin</p>
+                    <h1>Olá, {{ user.first_name|default:"Administrador" }}</h1>
+                    <p class="admin-dashboard-hero-lead">Acompanhe contas, negócios e catálogo da plataforma num só lugar.</p>
+                </div>
+            </div>
+            <div class="admin-dashboard-hero-metrics" aria-label="Resumo rápido">
+                <article class="admin-dashboard-hero-metric">
+                    <strong>{{ users_active }}</strong>
+                    <span>Utilizadores activos</span>
+                </article>
+                <article class="admin-dashboard-hero-metric">
+                    <strong>{{ establishments_active }}</strong>
+                    <span>Lojas activas</span>
+                </article>
+                <article class="admin-dashboard-hero-metric">
+                    <strong>{{ products_count }}</strong>
+                    <span>Produtos</span>
+                </article>
+            </div>
         </div>
         <nav class="admin-dashboard-quick-nav" aria-label="Acesso rápido">
-            <a href="{% url 'admin_panel:user_list' %}" class="admin-dashboard-quick-link">Utilizadores</a>
-            <a href="{% url 'admin_panel:establishment_list' %}" class="admin-dashboard-quick-link">Estabelecimentos</a>
-            <a href="{% url 'admin_panel:admin_users' %}" class="admin-dashboard-quick-link">Administradores</a>
+            <a href="{% url 'admin_panel:user_list' %}" class="admin-dashboard-action">
+                <span class="admin-dashboard-action-icon is-users" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </span>
+                <span class="admin-dashboard-action-copy">
+                    <strong>Utilizadores</strong>
+                    <small>{{ users_total }} contas</small>
+                </span>
+            </a>
+            <a href="{% url 'admin_panel:establishment_list' %}" class="admin-dashboard-action">
+                <span class="admin-dashboard-action-icon is-establishments" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </span>
+                <span class="admin-dashboard-action-copy">
+                    <strong>Estabelecimentos</strong>
+                    <small>{{ establishments_total }} negócios</small>
+                </span>
+            </a>
+            <a href="{% url 'admin_panel:admin_users' %}" class="admin-dashboard-action">
+                <span class="admin-dashboard-action-icon is-admins" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="admin-dashboard-action-copy">
+                    <strong>Administradores</strong>
+                    <small>{{ admins_count }} perfis</small>
+                </span>
+            </a>
         </nav>
     </header>
+
+    <section class="admin-dashboard-pulse" aria-label="Saúde da plataforma">
+        <article class="admin-dashboard-pulse-item">
+            <div class="admin-dashboard-pulse-head">
+                <span>Taxa de utilizadores activos</span>
+                <strong>{% if users_total %}{% widthratio users_active users_total 100 %}{% else %}0{% endif %}%</strong>
+            </div>
+            <div class="admin-dashboard-pulse-bar" role="presentation">
+                <span style="width: {% if users_total %}{% widthratio users_active users_total 100 %}{% else %}0{% endif %}%;"></span>
+            </div>
+        </article>
+        <article class="admin-dashboard-pulse-item">
+            <div class="admin-dashboard-pulse-head">
+                <span>Lojas activas</span>
+                <strong>{% if establishments_total %}{% widthratio establishments_active establishments_total 100 %}{% else %}0{% endif %}%</strong>
+            </div>
+            <div class="admin-dashboard-pulse-bar is-violet" role="presentation">
+                <span style="width: {% if establishments_total %}{% widthratio establishments_active establishments_total 100 %}{% else %}0{% endif %}%;"></span>
+            </div>
+        </article>
+        <article class="admin-dashboard-pulse-item">
+            <div class="admin-dashboard-pulse-head">
+                <span>Produtos no catálogo</span>
+                <strong>{{ products_count }}</strong>
+            </div>
+            <div class="admin-dashboard-pulse-bar is-amber" role="presentation">
+                <span style="width: {% if products_count %}100{% else %}8{% endif %}%;"></span>
+            </div>
+        </article>
+    </section>
 
     <section class="admin-stats-strip" aria-label="Estatísticas da plataforma">
         <article class="admin-stat-chip admin-stat-chip-users">
@@ -24,8 +101,8 @@
             <span class="admin-stat-chip-body">
                 <strong class="admin-stat-chip-value">{{ users_total }}</strong>
                 <span class="admin-stat-chip-label">Utilizadores</span>
-                <span class="admin-stat-chip-meta">{{ users_active }} activos</span>
             </span>
+            <span class="admin-stat-chip-trend is-up">{{ users_active }} activos</span>
         </article>
 
         <article class="admin-stat-chip admin-stat-chip-establishments">
@@ -35,8 +112,8 @@
             <span class="admin-stat-chip-body">
                 <strong class="admin-stat-chip-value">{{ establishments_total }}</strong>
                 <span class="admin-stat-chip-label">Estabelecimentos</span>
-                <span class="admin-stat-chip-meta">{{ establishments_active }} activos</span>
             </span>
+            <span class="admin-stat-chip-trend is-up">{{ establishments_active }} activos</span>
         </article>
 
         <article class="admin-stat-chip admin-stat-chip-products">
@@ -46,8 +123,8 @@
             <span class="admin-stat-chip-body">
                 <strong class="admin-stat-chip-value">{{ products_count }}</strong>
                 <span class="admin-stat-chip-label">Produtos</span>
-                <span class="admin-stat-chip-meta">Catálogo</span>
             </span>
+            <span class="admin-stat-chip-trend is-neutral">Catálogo</span>
         </article>
 
         <article class="admin-stat-chip admin-stat-chip-client">
@@ -82,11 +159,16 @@
     </section>
 
     <section class="dashboard-panels admin-dashboard-panels">
-        <article class="dash-panel dash-panel-table admin-dashboard-panel admin-mobile-surface">
+        <article class="dash-panel dash-panel-table admin-dashboard-panel admin-dashboard-panel-users admin-mobile-surface">
             <div class="dash-panel-head">
-                <div>
-                    <h2>Utilizadores recentes</h2>
-                    <p class="admin-dashboard-panel-subtitle">5 registos mais recentes</p>
+                <div class="admin-dashboard-panel-title">
+                    <span class="admin-dashboard-panel-icon admin-dashboard-panel-icon-users" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </span>
+                    <div>
+                        <h2>Utilizadores recentes</h2>
+                        <p class="admin-dashboard-panel-subtitle">5 registos mais recentes</p>
+                    </div>
                 </div>
                 <a href="{% url 'admin_panel:user_list' %}" class="dash-panel-link">Ver todos</a>
             </div>
@@ -163,11 +245,16 @@
             </div>
         </article>
 
-        <article class="dash-panel dash-panel-table admin-dashboard-panel admin-mobile-surface">
+        <article class="dash-panel dash-panel-table admin-dashboard-panel admin-dashboard-panel-establishments admin-mobile-surface">
             <div class="dash-panel-head">
-                <div>
-                    <h2>Estabelecimentos recentes</h2>
-                    <p class="admin-dashboard-panel-subtitle">5 negócios mais recentes</p>
+                <div class="admin-dashboard-panel-title">
+                    <span class="admin-dashboard-panel-icon admin-dashboard-panel-icon-establishments" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </span>
+                    <div>
+                        <h2>Estabelecimentos recentes</h2>
+                        <p class="admin-dashboard-panel-subtitle">5 negócios mais recentes</p>
+                    </div>
                 </div>
                 <a href="{% url 'admin_panel:establishment_list' %}" class="dash-panel-link">Ver todos</a>
             </div>
