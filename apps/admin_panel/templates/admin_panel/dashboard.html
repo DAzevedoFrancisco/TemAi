@@ -4,45 +4,147 @@
 
 {% block content %}
 <div class="dashboard-home admin-dashboard-home">
-    <header class="dashboard-welcome admin-dashboard-welcome">
-        <div>
+    <header class="admin-dashboard-hero">
+        <div class="admin-dashboard-hero-main">
             <p class="dashboard-eyebrow">Administração do sistema</p>
             <h1>Visão geral</h1>
+            <p class="admin-dashboard-subtitle">Monitorize utilizadores, negócios e o estado da plataforma num só lugar.</p>
         </div>
+        <nav class="admin-dashboard-quick-nav" aria-label="Acesso rápido">
+            <a href="{% url 'admin_panel:user_list' %}" class="admin-dashboard-quick-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Utilizadores
+            </a>
+            <a href="{% url 'admin_panel:establishment_list' %}" class="admin-dashboard-quick-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Estabelecimentos
+            </a>
+            <a href="{% url 'admin_panel:admin_users' %}" class="admin-dashboard-quick-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Administradores
+            </a>
+        </nav>
     </header>
 
-    <section class="admin-stats-board" aria-label="Estatísticas da plataforma">
-        <article class="admin-stat-tile admin-stat-tile-users">
-            <span class="admin-stat-tile-value">{{ users_total }}</span>
-            <span class="admin-stat-tile-label">Utilizadores</span>
-            <span class="admin-stat-tile-meta">{{ users_active }} ativos · {{ users_blocked }} bloqueados</span>
+    <section class="kpi-row admin-kpi-row" aria-label="Indicadores principais">
+        <article class="kpi-card admin-kpi-card">
+            <div class="kpi-icon kpi-icon-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="kpi-body">
+                <span class="kpi-value">{{ users_total }}</span>
+                <span class="kpi-label">Utilizadores</span>
+            </div>
+            <span class="kpi-trend kpi-trend-up">{{ users_active }} activos</span>
         </article>
-        <article class="admin-stat-tile admin-stat-tile-establishments">
-            <span class="admin-stat-tile-value">{{ establishments_total }}</span>
-            <span class="admin-stat-tile-label">Estabelecimentos</span>
-            <span class="admin-stat-tile-meta">{{ establishments_active }} ativos · {{ establishments_blocked }} bloqueados</span>
+
+        <article class="kpi-card admin-kpi-card">
+            <div class="kpi-icon kpi-icon-indigo">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="kpi-body">
+                <span class="kpi-value">{{ establishments_total }}</span>
+                <span class="kpi-label">Estabelecimentos</span>
+            </div>
+            <span class="kpi-trend kpi-trend-up">{{ establishments_active }} activos</span>
         </article>
-        <article class="admin-stat-tile admin-stat-tile-products">
-            <span class="admin-stat-tile-value">{{ products_count }}</span>
-            <span class="admin-stat-tile-label">Produtos</span>
-            <span class="admin-stat-tile-meta">No catálogo</span>
+
+        <article class="kpi-card admin-kpi-card">
+            <div class="kpi-icon kpi-icon-violet">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="kpi-body">
+                <span class="kpi-value">{{ products_count }}</span>
+                <span class="kpi-label">Produtos</span>
+            </div>
+            <span class="kpi-trend kpi-trend-neutral">No catálogo</span>
         </article>
-        <article class="admin-stat-tile admin-stat-tile-roles">
-            <span class="admin-stat-tile-value">{{ clients_count }}</span>
-            <span class="admin-stat-tile-label">Clientes</span>
-            <span class="admin-stat-tile-meta">{{ vendors_count }} vendedores</span>
+    </section>
+
+    <section class="admin-insights-grid" aria-label="Detalhes da plataforma">
+        <article class="admin-insight-card">
+            <div class="admin-insight-card-head">
+                <div class="admin-insight-card-icon admin-insight-card-icon-roles" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+                </div>
+                <div>
+                    <h2>Perfis de utilizador</h2>
+                    <p>Distribuição por tipo de conta</p>
+                </div>
+            </div>
+            <ul class="admin-insight-breakdown">
+                <li>
+                    <span class="admin-insight-breakdown-label">
+                        <span class="admin-insight-dot admin-insight-dot-client"></span>
+                        Clientes
+                    </span>
+                    <strong>{{ clients_count }}</strong>
+                </li>
+                <li>
+                    <span class="admin-insight-breakdown-label">
+                        <span class="admin-insight-dot admin-insight-dot-vendor"></span>
+                        Vendedores
+                    </span>
+                    <strong>{{ vendors_count }}</strong>
+                </li>
+                <li>
+                    <span class="admin-insight-breakdown-label">
+                        <span class="admin-insight-dot admin-insight-dot-admin"></span>
+                        Administradores
+                    </span>
+                    <strong>{{ admins_count }}</strong>
+                </li>
+            </ul>
         </article>
-        <article class="admin-stat-tile admin-stat-tile-admins">
-            <span class="admin-stat-tile-value">{{ admins_count }}</span>
-            <span class="admin-stat-tile-label">Administradores</span>
-            <span class="admin-stat-tile-meta">{{ users_blocked|add:establishments_blocked }} bloqueios totais</span>
+
+        <article class="admin-insight-card">
+            <div class="admin-insight-card-head">
+                <div class="admin-insight-card-icon admin-insight-card-icon-health" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <div>
+                    <h2>Estado da plataforma</h2>
+                    <p>Contas e negócios activos vs bloqueados</p>
+                </div>
+            </div>
+
+            <div class="admin-health-meters">
+                <div class="admin-health-meter">
+                    <div class="admin-health-meter-head">
+                        <span>Utilizadores activos</span>
+                        <strong>{{ users_active }}<span class="admin-health-meter-total"> / {{ users_total }}</span></strong>
+                    </div>
+                    <div class="admin-health-meter-track" role="presentation">
+                        <div class="admin-health-meter-fill admin-health-meter-fill-users" style="width: {% if users_total %}{% widthratio users_active users_total 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                    {% if users_blocked %}
+                        <span class="admin-health-meter-note">{{ users_blocked }} bloqueado{{ users_blocked|pluralize:"s" }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="admin-health-meter">
+                    <div class="admin-health-meter-head">
+                        <span>Estabelecimentos activos</span>
+                        <strong>{{ establishments_active }}<span class="admin-health-meter-total"> / {{ establishments_total }}</span></strong>
+                    </div>
+                    <div class="admin-health-meter-track" role="presentation">
+                        <div class="admin-health-meter-fill admin-health-meter-fill-establishments" style="width: {% if establishments_total %}{% widthratio establishments_active establishments_total 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                    {% if establishments_blocked %}
+                        <span class="admin-health-meter-note">{{ establishments_blocked }} bloqueado{{ establishments_blocked|pluralize:"s" }}</span>
+                    {% endif %}
+                </div>
+            </div>
         </article>
     </section>
 
     <section class="dashboard-panels admin-dashboard-panels">
-        <article class="dash-panel dash-panel-table admin-compact-panel">
+        <article class="dash-panel dash-panel-table admin-compact-panel admin-dashboard-panel">
             <div class="dash-panel-head">
-                <h2>Utilizadores recentes</h2>
+                <div>
+                    <h2>Utilizadores recentes</h2>
+                    <p class="admin-dashboard-panel-subtitle">Últimos registos na plataforma</p>
+                </div>
                 <a href="{% url 'admin_panel:user_list' %}" class="dash-panel-link">Ver todos</a>
             </div>
             {% if recent_users %}
@@ -59,8 +161,13 @@
                         <tbody>
                             {% for item in recent_users %}
                                 <tr>
-                                    <td>{{ item.name }}</td>
-                                    <td>{{ item.email }}</td>
+                                    <td>
+                                        <div class="admin-dashboard-person">
+                                            <span class="admin-dashboard-avatar" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
+                                            <span>{{ item.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="admin-table-cell-email" title="{{ item.email }}">{{ item.email }}</td>
                                     <td>
                                         <div class="admin-directory-roles admin-directory-roles-inline">
                                             {% for user_role in item.user_roles.all %}
@@ -84,14 +191,45 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="admin-dashboard-mobile-list">
+                    {% for item in recent_users %}
+                        <article class="admin-dashboard-mobile-card">
+                            <div class="admin-dashboard-mobile-card-head">
+                                <span class="admin-dashboard-avatar" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
+                                <div class="admin-dashboard-mobile-card-info">
+                                    <strong>{{ item.name }}</strong>
+                                    <span>{{ item.email }}</span>
+                                </div>
+                                {% if item.is_active %}
+                                    <span class="admin-badge admin-badge-active">Ativo</span>
+                                {% else %}
+                                    <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                {% endif %}
+                            </div>
+                            <div class="admin-directory-roles admin-directory-roles-inline">
+                                {% for user_role in item.user_roles.all %}
+                                    <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
+                                        {{ user_role.get_role_display }}
+                                    </span>
+                                {% empty %}
+                                    <span class="admin-directory-no-role">—</span>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
             {% else %}
                 <div class="dash-panel-empty"><p>Sem utilizadores registados.</p></div>
             {% endif %}
         </article>
 
-        <article class="dash-panel dash-panel-table admin-compact-panel">
+        <article class="dash-panel dash-panel-table admin-compact-panel admin-dashboard-panel">
             <div class="dash-panel-head">
-                <h2>Estabelecimentos recentes</h2>
+                <div>
+                    <h2>Estabelecimentos recentes</h2>
+                    <p class="admin-dashboard-panel-subtitle">Novos negócios adicionados</p>
+                </div>
                 <a href="{% url 'admin_panel:establishment_list' %}" class="dash-panel-link">Ver todos</a>
             </div>
             {% if recent_establishments %}
@@ -109,10 +247,13 @@
                             {% for establishment in recent_establishments %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-table-link">{{ establishment.name }}</a>
+                                        <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-dashboard-person admin-table-link">
+                                            <span class="admin-dashboard-avatar admin-dashboard-avatar-est" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
+                                            <span>{{ establishment.name }}</span>
+                                        </a>
                                     </td>
                                     <td>{{ establishment.owner.name }}</td>
-                                    <td>{{ establishment.products_count }}</td>
+                                    <td><span class="table-badge">{{ establishment.products_count }}</span></td>
                                     <td>
                                         {% if establishment.is_active %}
                                             <span class="admin-badge admin-badge-active">Ativo</span>
@@ -124,6 +265,32 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+
+                <div class="admin-dashboard-mobile-list">
+                    {% for establishment in recent_establishments %}
+                        <article class="admin-dashboard-mobile-card">
+                            <div class="admin-dashboard-mobile-card-head">
+                                <span class="admin-dashboard-avatar admin-dashboard-avatar-est" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
+                                <div class="admin-dashboard-mobile-card-info">
+                                    <strong>{{ establishment.name }}</strong>
+                                    <span>{{ establishment.owner.name }}</span>
+                                </div>
+                                <span class="table-badge">{{ establishment.products_count }}</span>
+                            </div>
+                            <div class="admin-dashboard-mobile-card-foot">
+                                {% if establishment.is_active %}
+                                    <span class="admin-badge admin-badge-active">Ativo</span>
+                                {% else %}
+                                    <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                {% endif %}
+                                <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-dashboard-mobile-link">
+                                    Ver detalhes
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                </a>
+                            </div>
+                        </article>
+                    {% endfor %}
                 </div>
             {% else %}
                 <div class="dash-panel-empty"><p>Sem estabelecimentos registados.</p></div>

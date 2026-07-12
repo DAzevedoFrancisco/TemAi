@@ -114,14 +114,14 @@
                                     <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                        <button type="submit" class="admin-user-demotion-btn" title="Despromover {{ admin_user.name }}">
+                                        <button type="submit" class="admin-user-demotion-btn" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
                                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                                 <circle cx="8.5" cy="7" r="4"/>
                                                 <line x1="18" y1="8" x2="23" y2="13"/>
                                                 <line x1="23" y1="8" x2="18" y2="13"/>
                                             </svg>
-                                            Despromover
+                                            <span class="admin-user-demotion-btn-text">Despromover</span>
                                         </button>
                                     </form>
                                 {% else %}

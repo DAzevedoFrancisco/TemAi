@@ -89,7 +89,7 @@
 
                         <div class="input-field">
                             <label for="login-password">Senha</label>
-                            <div class="input-wrap">
+                            <div class="input-wrap input-wrap-password">
                                 <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                 {{ login_form.password }}
                             </div>
@@ -155,7 +155,7 @@
 
                         <div class="input-field">
                             <label for="register-password">Senha</label>
-                            <div class="input-wrap">
+                            <div class="input-wrap input-wrap-password">
                                 <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                 {{ register_form.password }}
                             </div>
@@ -190,6 +190,7 @@
             tab.addEventListener('click', () => showPanel(tab.dataset.target));
         });
     </script>
+    <script src="{% static 'main/js/auth-password-toggle.js' %}"></script>
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
 </body>
 </html>
