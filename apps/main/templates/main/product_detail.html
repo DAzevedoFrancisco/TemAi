@@ -40,10 +40,10 @@
                     <span class="product-orb product-orb-2"></span>
                 </div>
 
-                <div class="product-detail-visual">
+                <div class="product-detail-visual{% if not product.image %} product-detail-visual--empty{% endif %}">
                     <span class="product-detail-visual-tag">{{ product.category.name }}</span>
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail-image" loading="eager" decoding="async">
                     {% else %}
                         <div class="product-detail-visual-placeholder">
                             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
