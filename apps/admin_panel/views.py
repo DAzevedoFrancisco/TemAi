@@ -5,7 +5,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.main.models import UserRole
-from apps.main.services import demote_from_admin, promote_to_admin
+from apps.main.services import (
+    delete_user_account,
+    demote_from_admin,
+    get_admin_account_deletion_block_reason,
+    promote_to_admin,
+)
 from apps.main.search import get_establishment_coordinates
 from apps.vendor.models import Establishment
 
@@ -191,20 +196,13 @@ def user_toggle_active(request, pk):
 def user_delete(request, pk):
     target = get_object_or_404(User, pk=pk)
 
-    if target.pk == request.user.pk:
-        messages.error(request, 'Não pode apagar a sua própria conta.', extra_tags='admin')
-        return redirect(request.POST.get('next') or 'admin_panel:user_list')
-
-    if target.has_role(UserRole.Role.ADMINISTRADOR) and _admin_role_count() <= 1:
-        messages.error(
-            request,
-            'Não pode apagar o último administrador do sistema.',
-            extra_tags='admin',
-        )
+    block_reason = get_admin_account_deletion_block_reason(target, request.user)
+    if block_reason:
+        messages.error(request, block_reason, extra_tags='admin')
         return redirect(request.POST.get('next') or 'admin_panel:user_list')
 
     name = target.name
-    target.delete()
+    delete_user_account(target)
     messages.success(request, f'Utilizador "{name}" foi apagado.', extra_tags='admin')
     return redirect(request.POST.get('next') or 'admin_panel:user_list')
 

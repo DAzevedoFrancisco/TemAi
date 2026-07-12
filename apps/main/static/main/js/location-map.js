@@ -57,6 +57,10 @@
 
         destroyMap(container);
 
+        if (window.MobMapTiles && typeof MobMapTiles.applyLeafletReferrerPolicy === 'function') {
+            MobMapTiles.applyLeafletReferrerPolicy();
+        }
+
         const map = L.map(containerId, {
             scrollWheelZoom: false,
             preferCanvas,

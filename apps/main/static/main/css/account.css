@@ -434,6 +434,82 @@ body:has(.account-page) {
     background: #f5f3ff;
 }
 
+.account-card-danger {
+    margin-top: 0.65rem;
+    border-color: #fecaca;
+    background: linear-gradient(180deg, #fff 0%, #fffbfb 100%);
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.05);
+}
+
+.account-card-icon-danger {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.account-card-danger .account-card-head p {
+    display: block;
+    margin: 0.15rem 0 0;
+    font-size: 0.72rem;
+    color: #64748b;
+    line-height: 1.35;
+}
+
+.account-delete-warning {
+    margin-bottom: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.65rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #7f1d1d;
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+
+.account-delete-warning p {
+    margin: 0 0 0.35rem;
+}
+
+.account-delete-warning p:last-child {
+    margin-bottom: 0;
+}
+
+.account-delete-impact {
+    margin: 0.35rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.account-delete-impact li {
+    margin: 0.15rem 0;
+}
+
+.account-delete-blocked {
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.65rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+
+.account-delete-blocked p {
+    margin: 0;
+}
+
+.account-delete-form {
+    max-width: 24rem;
+}
+
+.account-btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.22);
+}
+
+.account-btn-danger:hover {
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.28);
+}
+
 /* Nav link activo na página de conta */
 .content.account-page .menu .client-nav-item-account.active {
     background: rgba(97, 92, 237, 0.35);

@@ -1,9 +1,15 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
 
-from apps.main.forms import AccountPasswordForm, AccountProfileForm
+from apps.main.forms import AccountDeleteForm, AccountPasswordForm, AccountProfileForm
 from apps.main.jwt_utils import get_tokens_for_user, set_jwt_cookies
 from apps.main.profile import Profile, set_active_profile
+from apps.main.services import (
+    complete_session_after_account_deletion,
+    delete_user_account,
+    get_account_deletion_summary,
+    get_self_account_deletion_block_reason,
+)
 from apps.vendor.decorators import login_required_view
 
 
@@ -23,6 +29,13 @@ def account_settings(request):
         user=request.user,
     )
     password_form = AccountPasswordForm(user=request.user)
+    delete_form = AccountDeleteForm(user=request.user)
+    delete_block_reason = get_self_account_deletion_block_reason(request.user)
+    delete_summary = (
+        get_account_deletion_summary(request.user)
+        if delete_block_reason is None
+        else None
+    )
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -62,10 +75,25 @@ def account_settings(request):
                 )
                 response = redirect('account_settings')
                 return set_jwt_cookies(response, tokens)
+        elif form_type == 'delete':
+            if delete_block_reason:
+                messages.error(request, delete_block_reason, extra_tags='account')
+                return redirect('account_settings')
+
+            delete_form = AccountDeleteForm(request.POST, user=request.user)
+            if delete_form.is_valid():
+                delete_user_account(request.user)
+                return complete_session_after_account_deletion(
+                    request,
+                    success_message='A sua conta foi eliminada permanentemente.',
+                )
 
     return render(request, 'main/account_settings.html', {
         'profile_form': profile_form,
         'password_form': password_form,
+        'delete_form': delete_form,
+        'delete_block_reason': delete_block_reason,
+        'delete_summary': delete_summary,
         'user_roles': request.user.get_roles_display(),
     })
 

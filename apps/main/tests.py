@@ -469,6 +469,84 @@ class AccountSettingsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.user.check_password('SenhaSegura123!'))
 
+    def test_account_settings_deletes_account(self):
+        self.client.login(username='conta@example.com', password='SenhaSegura123!')
+        response = self.client.post(self.url, {
+            'form_type': 'delete',
+            'password': 'SenhaSegura123!',
+            'confirmation': 'APAGAR',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('auth'))
+        self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_account_settings_rejects_delete_with_wrong_password(self):
+        self.client.login(username='conta@example.com', password='SenhaSegura123!')
+        response = self.client.post(self.url, {
+            'form_type': 'delete',
+            'password': 'senha-errada',
+            'confirmation': 'APAGAR',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_account_settings_rejects_delete_without_confirmation(self):
+        self.client.login(username='conta@example.com', password='SenhaSegura123!')
+        response = self.client.post(self.url, {
+            'form_type': 'delete',
+            'password': 'SenhaSegura123!',
+            'confirmation': 'apagar',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_admin_cannot_delete_own_account_from_settings(self):
+        assign_admin_role(self.user)
+        self.client.force_login(self.user)
+
+        response = self.client.post(self.url, {
+            'form_type': 'delete',
+            'password': 'SenhaSegura123!',
+            'confirmation': 'APAGAR',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+
+@override_settings(SECURE_SSL_REDIRECT=False)
+class AccountDeletionVendorTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email='vendedor-delete@example.com',
+            password='SenhaSegura123!',
+            name='Vendedor Delete',
+            date_of_birth=date(1990, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(self.user)
+        assign_vendedor_role(self.user)
+        self.establishment = _create_establishment(self.user, name='Loja a Apagar')
+        self.url = reverse('account_settings')
+
+    def test_vendor_account_deletion_removes_establishments(self):
+        from apps.vendor.models import Establishment
+
+        self.client.login(username='vendedor-delete@example.com', password='SenhaSegura123!')
+        response = self.client.post(self.url, {
+            'form_type': 'delete',
+            'password': 'SenhaSegura123!',
+            'confirmation': 'APAGAR',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+        self.assertFalse(Establishment.objects.filter(pk=self.establishment.pk).exists())
+
 
 @override_settings(SECURE_SSL_REDIRECT=False)
 class VendorProfileNavigationTests(TestCase):
