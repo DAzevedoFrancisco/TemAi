@@ -30,7 +30,7 @@
         backdrop.addEventListener('click', () => setMenuOpen(false));
     }
 
-    menu.querySelectorAll('a, button.vendor-link, button.client-sidebar-logout').forEach((element) => {
+    menu.querySelectorAll('a, button.vendor-link, button.client-nav-item-logout').forEach((element) => {
         element.addEventListener('click', () => setMenuOpen(false));
     });
 

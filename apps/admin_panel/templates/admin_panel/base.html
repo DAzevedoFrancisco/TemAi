@@ -14,7 +14,7 @@
 </head>
 <body class="admin-panel-body">
     <div class="dash-layout admin-dash-layout">
-        <aside class="dash-sidebar admin-sidebar">
+        <aside class="dash-sidebar admin-sidebar" id="dash-sidebar">
             <a href="{% url 'admin_panel:dashboard' %}" class="dash-brand">
                 <img src="{% static 'main/img/lg.jpeg' %}" width="36" height="36" alt="Logo" class="dash-brand-img">
                 <span class="dash-brand-text">Mob Admin</span>
@@ -61,6 +61,9 @@
 
         <div class="dash-body">
             <header class="dash-topbar">
+                <button type="button" class="dash-menu-toggle" id="dash-menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="dash-sidebar">
+                    <span class="dash-menu-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+                </button>
                 <a href="{% url 'admin_panel:dashboard' %}" class="dash-mobile-brand">
                     <img src="{% static 'main/img/lg.jpeg' %}" width="32" height="32" alt="Logo" class="dash-brand-img">
                     <span class="dash-brand-text">Mob Admin</span>
@@ -69,13 +72,6 @@
                     <span>Painel de administração do sistema</span>
                 </div>
                 <div class="dash-topbar-actions">
-                    <button type="button" class="dash-mobile-logout" id="dash-logout-btn-mobile" aria-label="Sair">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                            <polyline points="16 17 21 12 16 7"/>
-                            <line x1="21" y1="12" x2="9" y2="12"/>
-                        </svg>
-                    </button>
                     <div class="dash-user-block">
                         <div class="dash-user-info">
                             <a href="{% url 'account_settings' %}" class="dash-name dash-name-link">{{ user.first_name|upper }}</a>
@@ -103,6 +99,8 @@
             </main>
         </div>
     </div>
+
+    <div class="dash-nav-backdrop" id="dash-nav-backdrop" hidden aria-hidden="true"></div>
 
     <div class="dash-modal" id="dash-logout-modal" hidden>
         <div class="dash-modal-overlay" id="dash-logout-overlay"></div>
@@ -135,15 +133,55 @@
 
         function closeDashLogoutModal() {
             dashLogoutModal.hidden = true;
-            document.body.style.overflow = window.innerWidth <= 900 ? 'auto' : '';
+            if (!document.body.classList.contains('dash-nav-open')) {
+                document.body.style.overflow = window.innerWidth <= 900 ? 'auto' : '';
+            }
         }
 
         if (dashLogoutBtn) dashLogoutBtn.addEventListener('click', openDashLogoutModal);
-        const dashLogoutBtnMobile = document.getElementById('dash-logout-btn-mobile');
-        if (dashLogoutBtnMobile) dashLogoutBtnMobile.addEventListener('click', openDashLogoutModal);
         dashLogoutCancel.addEventListener('click', closeDashLogoutModal);
         dashLogoutOverlay.addEventListener('click', closeDashLogoutModal);
         dashLogoutConfirm.addEventListener('click', () => dashLogoutForm.submit());
+
+        const dashSidebar = document.querySelector('.dash-sidebar');
+        const dashMenuToggle = document.getElementById('dash-menu-toggle');
+        const dashNavBackdrop = document.getElementById('dash-nav-backdrop');
+
+        function setDashMenuOpen(isOpen) {
+            if (!dashSidebar || !dashMenuToggle) {
+                return;
+            }
+            dashSidebar.classList.toggle('is-open', isOpen);
+            dashMenuToggle.classList.toggle('is-open', isOpen);
+            dashMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            dashMenuToggle.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
+            if (dashNavBackdrop) {
+                dashNavBackdrop.classList.toggle('is-visible', isOpen);
+                dashNavBackdrop.hidden = !isOpen;
+                dashNavBackdrop.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+            }
+            document.body.classList.toggle('dash-nav-open', isOpen);
+        }
+
+        if (dashMenuToggle && dashSidebar) {
+            dashMenuToggle.addEventListener('click', () => {
+                setDashMenuOpen(!dashSidebar.classList.contains('is-open'));
+            });
+        }
+
+        if (dashNavBackdrop) {
+            dashNavBackdrop.addEventListener('click', () => setDashMenuOpen(false));
+        }
+
+        dashSidebar?.querySelectorAll('.dash-nav-item, .dash-sidebar-logout').forEach((element) => {
+            element.addEventListener('click', () => setDashMenuOpen(false));
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && dashSidebar?.classList.contains('is-open')) {
+                setDashMenuOpen(false);
+            }
+        });
     </script>
     <script src="{% static 'main/js/flash-messages.js' %}"></script>
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>

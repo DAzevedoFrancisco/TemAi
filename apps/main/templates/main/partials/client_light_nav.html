@@ -66,14 +66,6 @@
 
                     {% include 'main/partials/nav_user_chip.html' %}
 
-                    <form method="post" action="{% url 'logout' %}" class="logout-form" id="logout-form">
-
-                        {% csrf_token %}
-
-                        <button type="button" class="logout client-nav-btn client-nav-btn-outline" id="logout-btn">Sair</button>
-
-                    </form>
-
                 {% else %}
 
                     <a href="{% url 'auth' %}" class="login client-nav-btn client-nav-btn-primary">Entrar</a>
@@ -81,6 +73,8 @@
                 {% endif %}
 
             </div>
+
+            {% include 'main/partials/nav_logout_item.html' %}
 
         </div>
 

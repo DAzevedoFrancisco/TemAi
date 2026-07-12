@@ -123,18 +123,20 @@ a {
 }
 
 .nav-icon {
-    width: auto;
-    height: auto;
+    width: 18px;
+    height: 18px;
     border-radius: 0;
     flex-shrink: 0;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     opacity: 0.9;
 }
 
-.nav-label-short {
-    display: none;
+.dash-nav-label {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.3;
 }
 
 .dash-sidebar-footer {
@@ -2081,21 +2083,10 @@ body.dash-nav-open {
         min-width: 0;
     }
 
-    .dash-nav-item span:not(.nav-icon) {
-        display: block;
+    .dash-nav-item > span:not(.nav-icon):not(.dash-nav-badge) {
+        flex: 1;
+        min-width: 0;
         line-height: 1.3;
-        max-width: none;
-        overflow: visible;
-        text-overflow: unset;
-        white-space: normal;
-    }
-
-    .nav-label-short {
-        display: none;
-    }
-
-    .nav-label-long {
-        display: block;
     }
 
     .dash-nav-item .nav-icon svg {
@@ -3187,8 +3178,8 @@ body.dash-nav-open {
         display: inline;
     }
 
-    .dash-nav-item span:not(.nav-icon) {
-        font-size: 0.58rem;
+    .dash-nav-item > span:not(.nav-icon):not(.dash-nav-badge) {
+        font-size: 0.82rem;
     }
 
     .dash-content:has(.establishments-page) {
