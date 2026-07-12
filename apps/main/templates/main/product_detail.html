@@ -40,10 +40,16 @@
                     <span class="product-orb product-orb-2"></span>
                 </div>
 
-                <div class="product-detail-visual{% if not product.image %} product-detail-visual--empty{% endif %}">
+                <div class="product-detail-visual">
                     <span class="product-detail-visual-tag">{{ product.category.name }}</span>
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail-image" loading="eager" decoding="async">
+                        <button type="button" class="product-detail-visual-button" id="product-image-open" aria-label="Ver imagem completa de {{ product.name }}">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        </button>
+                        <span class="product-detail-visual-hint" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                            Ampliar
+                        </span>
                     {% else %}
                         <div class="product-detail-visual-placeholder">
                             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -279,6 +285,19 @@
         {% include 'main/partials/client_footer.html' %}
     </div>
 
+    {% if product.image %}
+    <div class="product-image-modal" id="product-image-modal" hidden>
+        <button type="button" class="product-image-modal-close" id="product-image-close" aria-label="Fechar imagem">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="product-image-modal-overlay" id="product-image-modal-overlay"></div>
+        <div class="product-image-modal-content" role="dialog" aria-modal="true" aria-label="Imagem de {{ product.name }}">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image-modal-img">
+            <p class="product-image-modal-caption">{{ product.name }}</p>
+        </div>
+    </div>
+    {% endif %}
+
     {% include 'main/partials/client_light_scripts.html' %}
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -287,6 +306,42 @@
     <script src="{% static 'main/js/user-geolocation.js' %}"></script>
     <script src="{% static 'main/js/location-map.js' %}"></script>
     <script src="{% static 'main/js/star-rating.js' %}"></script>
+    {% if product.image %}
+    <script>
+        (function () {
+            const modal = document.getElementById('product-image-modal');
+            const openBtn = document.getElementById('product-image-open');
+            const closeBtn = document.getElementById('product-image-close');
+            const overlay = document.getElementById('product-image-modal-overlay');
+
+            if (!modal || !openBtn) {
+                return;
+            }
+
+            function openModal() {
+                modal.hidden = false;
+                document.body.classList.add('product-image-modal-open');
+                closeBtn?.focus();
+            }
+
+            function closeModal() {
+                modal.hidden = true;
+                document.body.classList.remove('product-image-modal-open');
+                openBtn.focus();
+            }
+
+            openBtn.addEventListener('click', openModal);
+            closeBtn?.addEventListener('click', closeModal);
+            overlay?.addEventListener('click', closeModal);
+
+            document.addEventListener('keydown', (event) => {
+                if (!modal.hidden && event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        })();
+    </script>
+    {% endif %}
     <script>
         const establishmentLat = {{ establishment_lat }};
         const establishmentLng = {{ establishment_lng }};
