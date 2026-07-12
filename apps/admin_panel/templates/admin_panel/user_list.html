@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="admin-page admin-scroll-page admin-users-list-page">
-    <header class="admin-page-header admin-scroll-page-header">
+    <header class="admin-page-header admin-scroll-page-header admin-mobile-surface">
         <div>
             <p class="dashboard-eyebrow">Gestão de contas</p>
             <h1>Utilizadores</h1>
@@ -17,7 +17,18 @@
         </div>
     </header>
 
-    <form method="get" class="admin-filters admin-filters-compact admin-list-filters">
+    <div class="admin-filters-drawer{% if filters.role or filters.gender or filters.status %} is-open{% endif %}">
+        <button type="button" class="admin-filters-toggle admin-mobile-surface" aria-expanded="{% if filters.role or filters.gender or filters.status %}true{% else %}false{% endif %}" aria-controls="users-filters-panel">
+            <span class="admin-filters-toggle-main">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                <span>Filtros</span>
+            </span>
+            <span class="admin-filters-toggle-chevron" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+        </button>
+        <div class="admin-filters-panel" id="users-filters-panel">
+    <form method="get" class="admin-filters admin-filters-compact admin-list-filters admin-mobile-surface">
         <div class="admin-list-filters-body">
             <div class="admin-list-filters-row admin-list-filters-row-grid">
                 <div class="admin-filter-group admin-filter-group-compact">
@@ -70,8 +81,10 @@
             <a href="{% url 'admin_panel:user_list' %}" class="admin-filter-reset admin-filter-reset-compact">Limpar</a>
         </div>
     </form>
+        </div>
+    </div>
 
-    <article class="dash-panel dash-panel-table admin-scroll-table-panel admin-users-table-panel">
+    <article class="dash-panel dash-panel-table admin-scroll-table-panel admin-users-table-panel admin-mobile-surface">
         {% if users %}
             <div class="dash-table-wrap admin-scroll-table-wrap">
                 <table class="dash-table admin-table admin-data-table">
@@ -136,7 +149,7 @@
 
             <div class="admin-list-mobile">
                 {% for item in users %}
-                    <article class="admin-list-mobile-card{% if not item.is_active %} is-blocked{% endif %}{% if item.pk == user.pk %} is-self{% endif %}">
+                    <article class="admin-list-mobile-card{% if not item.is_active %} is-blocked{% endif %}{% if item.pk == user.pk %} is-self{% endif %} admin-mobile-surface">
                         <div class="admin-list-mobile-card-head">
                             <span class="admin-dashboard-avatar" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
                             <div class="admin-list-mobile-card-info">

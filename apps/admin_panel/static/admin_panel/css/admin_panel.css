@@ -40,7 +40,7 @@
 }
 
 .admin-panel-body .dash-content:has(.admin-est-detail-page) {
-    overflow-x: clip;
+    overflow-x: hidden;
     overflow-y: auto;
     display: block;
     min-height: 0;
@@ -69,6 +69,111 @@
     gap: 1rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
+}
+
+.admin-stats-columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+
+.admin-stat-column-card {
+    background: #fff;
+    border: 1px solid #e8ebf2;
+    border-radius: 1rem;
+    padding: 1rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.admin-stat-column-card-role {
+    padding: 0.85rem 0.75rem;
+}
+
+.admin-stat-column-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.15rem;
+}
+
+.admin-stat-column-icon-blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.admin-stat-column-icon-indigo {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.admin-stat-column-icon-violet {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.admin-stat-column-icon-client {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.admin-stat-column-icon-vendor {
+    background: #f5f3ff;
+    color: #8b5cf6;
+}
+
+.admin-stat-column-icon-admin {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.admin-stat-column-value {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.admin-stat-column-card-role .admin-stat-column-value {
+    font-size: 1.35rem;
+}
+
+.admin-stat-column-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-stat-column-meta {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    line-height: 1.35;
+    max-width: 12rem;
+}
+
+.admin-filters-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex-shrink: 0;
+}
+
+.admin-filters-toggle {
+    display: none;
+}
+
+.admin-filters-panel {
+    display: block;
 }
 
 .admin-dashboard-hero-main h1 {
@@ -115,178 +220,17 @@
     transform: translateY(-1px);
 }
 
-.admin-panel-body .admin-kpi-row {
-    margin-bottom: 0.85rem;
-}
-
-.admin-panel-body .admin-kpi-card {
-    padding: 1rem 1.1rem;
-    border-radius: 1rem;
-}
-
-.admin-panel-body .admin-kpi-card .kpi-value {
-    font-size: 1.45rem;
-}
-
-.admin-panel-body .admin-kpi-card .kpi-label {
-    font-size: 0.78rem;
-}
-
-.admin-panel-body .admin-kpi-card .kpi-trend {
-    font-size: 0.68rem;
-    padding: 0.28rem 0.55rem;
-}
-
-.admin-insights-grid {
+.admin-panel-body .admin-dashboard-panels {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0;
+    flex: 1;
+    min-height: 0;
 }
 
-.admin-insight-card {
-    background: #fff;
+.admin-panel-body .dash-panel.admin-mobile-surface {
     border: 1px solid #e8ebf2;
-    border-radius: 1rem;
-    padding: 1rem 1.05rem;
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
-}
-
-.admin-insight-card-head {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-    margin-bottom: 0.9rem;
-}
-
-.admin-insight-card-head h2 {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 0.1rem;
-}
-
-.admin-insight-card-head p {
-    font-size: 0.74rem;
-    color: #94a3b8;
-}
-
-.admin-insight-card-icon {
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 0.7rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.admin-insight-card-icon-roles {
-    background: #ecfdf5;
-    color: #059669;
-}
-
-.admin-insight-card-icon-health {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.admin-insight-breakdown {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    margin: 0;
-    padding: 0;
-}
-
-.admin-insight-breakdown li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.55rem 0.65rem;
-    border-radius: 0.7rem;
-    background: #f8fafc;
-}
-
-.admin-insight-breakdown-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.8rem;
-    color: #475569;
-    font-weight: 500;
-}
-
-.admin-insight-breakdown strong {
-    font-size: 0.95rem;
-    color: #0f172a;
-}
-
-.admin-insight-dot {
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.admin-insight-dot-client { background: #3b82f6; }
-.admin-insight-dot-vendor { background: #8b5cf6; }
-.admin-insight-dot-admin { background: #dc2626; }
-
-.admin-health-meters {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-}
-
-.admin-health-meter-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.4rem;
-    font-size: 0.78rem;
-    color: #64748b;
-}
-
-.admin-health-meter-head strong {
-    font-size: 0.86rem;
-    color: #0f172a;
-}
-
-.admin-health-meter-total {
-    font-weight: 500;
-    color: #94a3b8;
-}
-
-.admin-health-meter-track {
-    height: 0.45rem;
-    border-radius: 999px;
-    background: #eef2f7;
-    overflow: hidden;
-}
-
-.admin-health-meter-fill {
-    height: 100%;
-    border-radius: inherit;
-    transition: width 0.35s ease;
-}
-
-.admin-health-meter-fill-users {
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
-}
-
-.admin-health-meter-fill-establishments {
-    background: linear-gradient(90deg, #6366f1, #4f46e5);
-}
-
-.admin-health-meter-note {
-    display: block;
-    margin-top: 0.3rem;
-    font-size: 0.7rem;
-    color: #b45309;
 }
 
 .admin-dashboard-panel .dash-panel-head {
@@ -2046,10 +1990,33 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    padding-top: 0.15rem;
 }
 
 .admin-est-detail-nav {
     margin-bottom: -0.25rem;
+}
+
+.admin-est-detail-map {
+    height: 360px;
+    width: 100%;
+    min-height: 220px;
+    position: relative;
+    z-index: 1;
+    background: #eef2f7;
+    isolation: isolate;
+}
+
+.admin-est-detail-map .leaflet-container {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    font-family: inherit;
+}
+
+.admin-est-detail-card-map {
+    position: relative;
+    z-index: 0;
 }
 
 .admin-est-detail-back {
@@ -2348,11 +2315,6 @@
     font-size: 0.95rem;
 }
 
-.admin-est-detail-map {
-    height: 360px;
-    width: 100%;
-}
-
 .admin-est-detail-map .leaflet-control-attribution {
     font-size: 0.65rem;
 }
@@ -2533,8 +2495,8 @@
 }
 
 @media (max-width: 1200px) {
-    .admin-insights-grid {
-        grid-template-columns: 1fr;
+    .admin-stats-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .admin-est-detail-grid {
@@ -2555,8 +2517,135 @@
     .admin-panel-body .dash-content:has(.admin-dashboard-home),
     .admin-panel-body .dash-content:has(.admin-scroll-page),
     .admin-panel-body .dash-content:has(.admin-users-list-page),
+    .admin-panel-body .dash-content:has(.admin-establishments-list-page),
     .admin-panel-body .dash-content:has(.admin-est-detail-page) {
-        padding: 4.75rem 1rem 1rem;
+        padding: 5.5rem 1rem 1.25rem;
+    }
+
+    .admin-panel-body .admin-dashboard-home {
+        gap: 0.85rem;
+        padding-top: 0.35rem;
+    }
+
+    .admin-mobile-surface {
+        background: #fff;
+        border: 1px solid #e8ebf2;
+        border-radius: 1rem;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .admin-dashboard-hero.admin-mobile-surface {
+        padding: 1rem;
+        margin-top: 0.25rem;
+    }
+
+    .admin-stat-column-card.admin-mobile-surface {
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
+    }
+
+    .admin-scroll-page-header.admin-mobile-surface,
+    .admin-page-header.admin-mobile-surface {
+        padding: 0.85rem 0.95rem;
+        margin-top: 0.25rem;
+    }
+
+    .admin-filters-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.75rem;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid #e8ebf2;
+        border-radius: 1rem;
+        background: #fff;
+        color: #334155;
+        font-size: 0.86rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .admin-filters-toggle-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .admin-filters-toggle-chevron {
+        display: inline-flex;
+        color: #94a3b8;
+        transition: transform 0.25s ease;
+    }
+
+    .admin-filters-drawer.is-open .admin-filters-toggle {
+        border-color: #fecaca;
+        background: #fffbfb;
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.1);
+    }
+
+    .admin-filters-drawer.is-open .admin-filters-toggle-chevron {
+        transform: rotate(180deg);
+        color: #dc2626;
+    }
+
+    .admin-filters-panel {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.32s ease, opacity 0.24s ease;
+    }
+
+    .admin-filters-drawer.is-open .admin-filters-panel {
+        max-height: 720px;
+        opacity: 1;
+    }
+
+    .admin-list-filters.admin-mobile-surface {
+        margin-top: 0.45rem;
+        border-radius: 1rem;
+    }
+
+    .admin-list-mobile-card.admin-mobile-surface {
+        border: 1px solid #eef2f7;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .admin-dashboard-mobile-card.admin-mobile-surface {
+        margin: 0 0.65rem 0.55rem;
+        padding: 0.85rem 0.9rem;
+        border-radius: 0.8rem;
+        border: 1px solid #eef2f7;
+        border-top: 1px solid #eef2f7;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .admin-dashboard-mobile-list {
+        padding-top: 0.35rem;
+        padding-bottom: 0.35rem;
+    }
+
+    .admin-stats-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+    }
+
+    .admin-est-detail-nav.admin-mobile-surface {
+        display: flex;
+        padding: 0.65rem 0.85rem;
+        margin-top: 0.35rem;
+        margin-bottom: 0;
+    }
+
+    .admin-est-detail-hero.admin-mobile-surface {
+        margin-top: 0.35rem;
+        overflow: hidden;
+    }
+
+    .admin-est-detail-map {
+        min-height: 240px;
+        height: 260px;
     }
 
     .admin-panel-body .dash-sidebar {
@@ -2711,10 +2800,6 @@
 
     .admin-dashboard-quick-nav {
         width: 100%;
-    }
-
-    .admin-panel-body .admin-kpi-row {
-        grid-template-columns: 1fr;
     }
 
     .admin-dashboard-panel .dash-table-wrap {
@@ -3011,7 +3096,8 @@
     }
 
     .admin-est-detail-map {
-        height: 200px;
+        min-height: 240px;
+        height: 260px;
     }
 
     .admin-est-detail-facts-grid {
@@ -3046,7 +3132,8 @@
 
 @media (max-width: 768px) {
     .admin-est-detail-map {
-        height: 175px;
+        min-height: 220px;
+        height: 220px;
     }
 
     .admin-est-detail-metric-coords {
@@ -3171,8 +3258,23 @@
     .admin-panel-body .dash-content,
     .admin-panel-body .dash-content:has(.admin-dashboard-home),
     .admin-panel-body .dash-content:has(.admin-scroll-page),
-    .admin-panel-body .dash-content:has(.admin-users-list-page) {
-        padding: 4.5rem 0.8rem 0.9rem;
+    .admin-panel-body .dash-content:has(.admin-users-list-page),
+    .admin-panel-body .dash-content:has(.admin-establishments-list-page) {
+        padding: 5.75rem 0.85rem 1.1rem;
+    }
+
+    .admin-stats-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.55rem;
+    }
+
+    .admin-stat-column-value {
+        font-size: 1.35rem;
+    }
+
+    .admin-dashboard-hero.admin-mobile-surface {
+        padding: 0.9rem;
+        margin-top: 0.35rem;
     }
 
     .admin-page-header form {
@@ -3184,7 +3286,21 @@
     }
 
     .admin-panel-body .dash-content:has(.admin-est-detail-page) {
-        padding: 0.7rem 0.75rem 0.85rem;
+        padding: 5.75rem 0.85rem 1.1rem;
+    }
+
+    .admin-est-detail-page {
+        gap: 0.65rem;
+        padding-top: 0.25rem;
+    }
+
+    .admin-est-detail-nav.admin-mobile-surface {
+        margin-top: 0.45rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .admin-est-detail-hero.admin-mobile-surface {
+        margin-top: 0.45rem;
     }
 
     .admin-est-detail-back {
@@ -3268,7 +3384,8 @@
     }
 
     .admin-est-detail-map {
-        height: 140px;
+        min-height: 200px;
+        height: 200px;
     }
 
     .admin-est-detail-card-head {

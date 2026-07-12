@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="admin-page admin-est-detail-page">
-    <nav class="admin-est-detail-nav">
+    <nav class="admin-est-detail-nav admin-mobile-surface">
         <a href="{% url 'admin_panel:establishment_list' %}" class="admin-est-detail-back">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <polyline points="15 18 9 12 15 6"/>
@@ -19,7 +19,7 @@
         </a>
     </nav>
 
-    <section class="admin-est-detail-hero{% if not establishment.is_active %} is-blocked{% endif %}">
+    <section class="admin-est-detail-hero admin-mobile-surface{% if not establishment.is_active %} is-blocked{% endif %}">
         <div class="admin-est-detail-hero-bg" aria-hidden="true"></div>
         <div class="admin-est-detail-hero-main">
             <div class="admin-est-detail-identity">
@@ -76,7 +76,7 @@
     </section>
 
     <section class="admin-est-detail-grid">
-        <article class="admin-est-detail-card admin-est-detail-card-map">
+        <article class="admin-est-detail-card admin-est-detail-card-map admin-mobile-surface">
                 <div class="admin-est-detail-card-head admin-est-detail-card-head-compact">
                     <div class="admin-est-detail-card-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -187,24 +187,67 @@
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="{% static 'main/js/map-tiles.js' %}"></script>
+<script src="{% static 'main/js/location-map.js' %}"></script>
 <script>
-    const establishmentLat = {{ establishment_lat }};
-    const establishmentLng = {{ establishment_lng }};
+    (function () {
+        const establishmentLat = {{ establishment_lat }};
+        const establishmentLng = {{ establishment_lng }};
+        const establishmentName = "{{ establishment.name|escapejs }}";
 
-    const map = L.map('admin-est-detail-map', {
-        scrollWheelZoom: false,
-        zoomControl: true,
-    }).setView([establishmentLat, establishmentLng], 15);
+        function refreshAdminEstablishmentMap(map) {
+            if (!map) {
+                return;
+            }
+            map.invalidateSize({ animate: false });
+        }
 
-    L.tileLayer(MobMapTiles.url, MobMapTiles.options).addTo(map);
+        function initAdminEstablishmentMap() {
+            const mapEl = document.getElementById('admin-est-detail-map');
+            if (!mapEl || typeof MobLocationMap === 'undefined') {
+                return;
+            }
 
-    const marker = L.marker([establishmentLat, establishmentLng]).addTo(map);
-    marker.bindPopup("{{ establishment.name|escapejs }}").openPopup();
+            const map = MobLocationMap.init('admin-est-detail-map', {
+                markers: [{
+                    lat: establishmentLat,
+                    lng: establishmentLng,
+                    popup: establishmentName,
+                }],
+                defaultZoom: 15,
+                openFirstPopup: true,
+            });
 
-    setTimeout(() => map.invalidateSize({ animate: false }), 200);
-    window.addEventListener('resize', () => map.invalidateSize({ animate: false }));
-    window.addEventListener('orientationchange', () => {
-        setTimeout(() => map.invalidateSize({ animate: false }), 300);
-    });
+            if (!map) {
+                return;
+            }
+
+            requestAnimationFrame(() => refreshAdminEstablishmentMap(map));
+            setTimeout(() => refreshAdminEstablishmentMap(map), 250);
+            setTimeout(() => refreshAdminEstablishmentMap(map), 700);
+
+            window.addEventListener('resize', () => refreshAdminEstablishmentMap(map));
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => refreshAdminEstablishmentMap(map), 350);
+            });
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            refreshAdminEstablishmentMap(map);
+                        }
+                    });
+                }, { threshold: 0.15 });
+
+                observer.observe(mapEl);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAdminEstablishmentMap);
+        } else {
+            initAdminEstablishmentMap();
+        }
+    })();
 </script>
 {% endblock %}
