@@ -1416,6 +1416,23 @@ body:has(.product-detail-page) {
     color: #1e1e2a;
 }
 
+.client-light-modal .logout-modal-cancel {
+    color: #4b5563;
+    border-color: #d1d5db;
+    background: #fff;
+}
+
+.client-light-modal .logout-modal-cancel:hover,
+.client-light-modal .logout-modal-cancel:focus-visible {
+    color: #1e1e2a;
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.client-light-modal .logout-modal-confirm {
+    color: #fff;
+}
+
 .client-light-modal h3 {
     color: #1e1e2a;
 }

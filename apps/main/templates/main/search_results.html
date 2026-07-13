@@ -315,9 +315,33 @@
 
 
 
+    <script src="{% static 'main/js/coordinates.js' %}"></script>
     <script src="{% static 'main/js/user-geolocation.js' %}"></script>
     <script src="{% static 'main/js/search-location.js' %}"></script>
     <script src="{% static 'main/js/search-input.js' %}"></script>
+    {% if has_location %}
+    <script>
+        (function () {
+            if (!navigator.geolocation) {
+                return;
+            }
+
+            const fixed = MobCoordinates.fixSwappedCoordinates({{ user_lat }}, {{ user_lng }});
+            if (!MobCoordinates.isNearBeiraCenter(fixed.lat, fixed.lng)) {
+                return;
+            }
+
+            MobGeolocation.request({ maximumAge: 0 })
+                .then((coords) => {
+                    if (MobCoordinates.isNearBeiraCenter(coords.lat, coords.lng)) {
+                        return;
+                    }
+                    window.location.search = MobGeolocation.appendToUrl(coords).toString();
+                })
+                .catch(() => {});
+        })();
+    </script>
+    {% endif %}
 
 </body>
 

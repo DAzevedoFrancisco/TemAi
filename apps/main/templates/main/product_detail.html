@@ -389,6 +389,21 @@
                     window.location.replace(`${window.location.pathname}?${params.toString()}`);
                 })
                 .catch(() => {});
+        } else if (hasLocation && navigator.geolocation) {
+            const userCoords = getUserCoords();
+            if (MobCoordinates.isNearBeiraCenter(userCoords.lat, userCoords.lng)) {
+                MobGeolocation.request({ maximumAge: 0 })
+                    .then((coords) => {
+                        if (MobCoordinates.isNearBeiraCenter(coords.lat, coords.lng)) {
+                            return;
+                        }
+                        const params = new URLSearchParams(window.location.search);
+                        params.set('lat', coords.lat.toFixed(6));
+                        params.set('lng', coords.lng.toFixed(6));
+                        window.location.replace(`${window.location.pathname}?${params.toString()}`);
+                    })
+                    .catch(() => {});
+            }
         }
     </script>
 </body>
