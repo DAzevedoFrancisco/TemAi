@@ -14,6 +14,7 @@
     <title>{% block title %}Administração{% endblock %} | Mob</title>
 </head>
 <body class="admin-panel-body">
+    {% include 'main/partials/page_loader.html' %}
     <div class="dash-layout admin-dash-layout">
         <aside class="dash-sidebar admin-sidebar" id="dash-sidebar">
             <a href="{% url 'admin_panel:dashboard' %}" class="dash-brand">

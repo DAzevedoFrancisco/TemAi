@@ -1,0 +1,10 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'main/css/page-loader.css' %}">
+<div id="mob-page-loader" class="mob-page-loader is-active" role="status" aria-live="polite" aria-label="Carregando">
+    <div class="mob-page-loader-card">
+        <div class="mob-page-loader-spinner" aria-hidden="true"></div>
+        <p class="mob-page-loader-text">Carregando...</p>
+    </div>
+</div>
+<script>document.documentElement.classList.add('mob-page-loading');</script>
+<script src="{% static 'main/js/page-loader.js' %}" defer></script>

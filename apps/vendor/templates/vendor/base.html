@@ -13,6 +13,7 @@
     <title>{% block title %}Painel Vendedor{% endblock %} | Mob</title>
 </head>
 <body>
+    {% include 'main/partials/page_loader.html' %}
     <div class="dash-layout">
         <aside class="dash-sidebar" id="dash-sidebar">
             <a href="{% url 'vendor:dashboard' %}" class="dash-brand">

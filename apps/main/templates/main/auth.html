@@ -11,6 +11,7 @@
     <title>{% if active_panel == 'register' %}Cadastro{% else %}Entrar{% endif %} | Mob</title>
 </head>
 <body>
+    {% include 'main/partials/page_loader.html' %}
     <div class="auth-layout">
         <aside class="auth-hero">
             <a href="{% url 'home' %}" class="auth-hero-brand">
