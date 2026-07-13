@@ -25,15 +25,15 @@ def build_sections() -> list[tuple[str, int, str]]:
             "Olá! Bem-vindo à Mob",
             1,
             "Imagina que estou ao teu lado a mostrar-te a plataforma. A Mob é um site feito para a cidade da "
-            "Beira: de um lado estão as pessoas que procuram produtos e lojas; do outro, quem tem negócio e "
+            "Beira: de um lado estão as pessoas que procuram produtos; do outro, quem tem negócio e "
             "quer divulgar o que vende.\n\n"
-            "Não precisas de perceber termos técnicos. Pensa só nisto: entras no site, pesquisas o que "
-            "queras — perfume, comida, o que for — e o sistema mostra-te quem vende isso perto de ti. "
-            "Se fores dono de loja, também podes registar o teu estabelecimento e pôr os teus produtos online.\n\n"
+            "Pensa assim: entras no site, pesquisas o que queras — perfume, comida, o que for — e o sistema "
+            "mostra-te quem vende isso perto de ti. Se fores dono de loja, também podes registar o teu "
+            "estabelecimento e pôr os teus produtos online.\n\n"
             "Há três formas de usar a Mob:\n\n"
             "Como cliente, só procuras e descobres.\n"
-            "Como vendedor, geres a tua loja e o teu catálogo.\n"
-            "Como administrador, cuidas de toda a plataforma — mas isso só quem a equipa autorizar é que tem.",
+            "Como vendedor, geres a tua loja.\n"
+            "Como administrador, cuidas de toda a plataforma — mas isso só quem a equipa autorizar.",
         ),
         (
             "Primeiro passo: criar conta",
@@ -53,14 +53,32 @@ def build_sections() -> list[tuple[str, int, str]]:
         (
             "Já tens conta? Então faz login",
             1,
-            "Na mesma página (/auth/), fica no separador «Entrar». Mete o email e a senha que usaste no "
+            "Na mesma página, fica no separador «Entrar». Mete o email e a senha que usaste no "
             "cadastro e confirma.\n\n"
             "Se estiver tudo certo, entras logo. Para onde vais depende do teu papel:\n\n"
             "Se és cliente ou vendedor, vais para a página inicial — aquela com «O Que Procura?» no meio.\n"
             "Se és administrador, vais directo para o painel de gestão em /gestao/.\n\n"
-            "Se te enganares na senha, o site avisa-te. Não há mistério.\n\n"
             "Para sair, clica em «Sair» no menu. Aparece uma confirmação — é de propósito, para não "
             "fechares a sessão sem querer. Depois de confirmar, voltas à página de login.",
+        ),
+        (
+            "Minha conta — gerir o teu perfil",
+            1,
+            "Com sessão iniciada, podes abrir Minha conta em /conta/. Há três formas habituais de chegar "
+            "lá: pelo item «Minha conta» no menu da parte pública, clicando no teu nome no topo do painel "
+            "vendedor, ou clicando no teu nome no painel de administração.\n\n"
+            "Esta página mostra um resumo da tua conta — nome, email, papéis que tens e data de registo — "
+            "e permite alterar dois blocos de informação:\n\n"
+            "Dados pessoais: nome completo, data de nascimento, sexo e email. Quando guardas, as alterações "
+            "ficam activas de imediato.\n\n"
+            "Segurança: alteração de senha. Tens de indicar a senha actual e depois a nova (duas vezes, "
+            "para confirmar).\n\n"
+            "Se estiveres no painel vendedor ou de administração, há também um atalho no topo da página "
+            "para voltares ao painel onde estavas.\n\n"
+            "Eliminar a conta: a página Minha conta não permite apagar a conta por ti próprio. Se quiseres "
+            "eliminar a tua conta ou pedir uma cópia dos teus dados, envia email para privacidade@mob.pt "
+            "com o assunto «Proteção de Dados / Mob». A equipa trata do pedido conforme a política de "
+            "privacidade do site.",
         ),
         (
             "Usar a Mob como cliente",
@@ -82,14 +100,18 @@ def build_sections() -> list[tuple[str, int, str]]:
             "O detalhe do produto — o que vais ver",
             2,
             "Esta página é onde decides se vale a pena ir à loja.\n\n"
-            "Vês a imagem grande, o nome, a descrição, e badges a dizer a categoria e se o produto está "
-            "disponível ou não. Há um bloco com o nome do estabelecimento — tipo «Aroma da Rosch» — e a "
-            "indicação de que fica na Beira.\n\n"
-            "Mais abaixo tens os dados práticos: morada exacta, telefone (podes clicar para ligar) e "
-            "horário de funcionamento. Há um botão para contactar directamente.\n\n"
-            "Do lado direito (ou em baixo no telemóvel) tens um mapa com um pin na localização da loja. "
-            "Se vieste da pesquisa com GPS activo, também aparece quantos quilómetros estás, em linha recta.\n\n"
-            "Há ainda uma secção de avaliações — comentários e estrelas de outros clientes. Podes ler o "
+            "No topo, a imagem e a informação principal ficam lado a lado — no telemóvel, a imagem aparece "
+            "primeiro e o texto a seguir. Vês o nome do produto, a descrição, a categoria e se está "
+            "disponível ou não. Há também um resumo rápido com o nome da loja e a indicação de que fica "
+            "na Beira.\n\n"
+            "Ampliar a imagem: se o produto tiver foto, podes clicar nela (ou no indicador «Ampliar») "
+            "para abrir um modal em ecrã inteiro com a imagem em tamanho grande. Fechas com o botão de "
+            "fechar, clicando fora da imagem ou com a tecla Escape.\n\n"
+            "Mais abaixo há painéis organizados com os dados práticos: morada exacta, telefone (podes "
+            "clicar para ligar), horário de funcionamento e um botão para contactar directamente. Há um "
+            "mapa com um pin na localização da loja. Se vieste da pesquisa com GPS activo, também aparece "
+            "quantos quilómetros estás, em linha recta.\n\n"
+            "Por fim, uma secção de avaliações — comentários e estrelas de outros clientes. Podes ler o "
             "que dizem sobre a loja antes de ir.",
         ),
         (
@@ -112,6 +134,7 @@ def build_sections() -> list[tuple[str, int, str]]:
             "— Pesquisar à vontade, com ou sem localização.\n"
             "— Ver tudo o que está público: produtos activos de lojas activas.\n"
             "— Guardar favoritos e deixar comentários (excepto nos teus próprios negócios).\n"
+            "— Actualizar o teu perfil e senha em Minha conta (/conta/).\n"
             "— Ler os termos e a política de privacidade no site.\n"
             "— Pedir para te tornares vendedor, se tiveres 18 anos ou mais.\n\n"
             "Não podes:\n"
@@ -119,6 +142,7 @@ def build_sections() -> list[tuple[str, int, str]]:
             "— Entrar em /gestao/ — isso é só para administradores.\n"
             "— Criar ou apagar lojas e produtos.\n"
             "— Bloquear outras contas.\n"
+            "— Eliminar a tua conta directamente no site — tens de contactar privacidade@mob.pt.\n"
             "— Pesquisar com o campo vazio — não devolve nada, tens de escrever alguma coisa.\n"
             "— Ver lojas ou produtos que foram bloqueados pela administração.",
         ),
@@ -140,8 +164,9 @@ def build_sections() -> list[tuple[str, int, str]]:
             "Depois de seres vendedor, no menu aparece «Painel vendedor» em vez de «Tornar-me vendedor». "
             "Clicas e entras no dashboard em /vendedor/dashboard/.\n\n"
             "É uma área diferente da parte pública do site. Tens menu lateral com Dashboard, "
-            "Estabelecimentos, e acesso aos comentários. No topo vês o teu nome e um sino — quando "
-            "alguém deixa avaliação nas tuas lojas, aparece ali para não perderes nada.\n\n"
+            "Estabelecimentos, e acesso aos comentários. No topo vês o teu nome — que também leva a "
+            "Minha conta — e um sino: quando alguém deixa avaliação nas tuas lojas, aparece ali para "
+            "não perderes nada.\n\n"
             "Uma coisa a notar: quando estás em «modo vendedor», a pesquisa da página inicial fica "
             "escondida. Não é bug — é para não misturares gerir loja com procurar produtos. Se quiseres "
             "voltar a pesquisar como cliente, mudas para o perfil Cliente (há um botão na home ou podes "
@@ -185,7 +210,8 @@ def build_sections() -> list[tuple[str, int, str]]:
             "— Criar e editar os teus estabelecimentos.\n"
             "— Gerir produtos: criar, editar, apagar, mudar disponibilidade.\n"
             "— Ver e responder a comentários dos teus negócios.\n"
-            "— Alternar entre modo cliente e modo vendedor.\n\n"
+            "— Alternar entre modo cliente e modo vendedor.\n"
+            "— Actualizar o teu perfil e senha em Minha conta.\n\n"
             "Não podes:\n"
             "— Mexer nas lojas ou produtos de outra pessoa.\n"
             "— Registar estabelecimento fora da Beira.\n"
@@ -200,26 +226,34 @@ def build_sections() -> list[tuple[str, int, str]]:
             "Este papel não se pede no site. Alguém que já é administrador é que te promove, ou então "
             "crias a conta via comando técnico no servidor (createsuperuser) — isso é coisa de quem "
             "instala o sistema.\n\n"
-            "Quando és administrador, o login leva-te directo para /gestao/. O menu público mostra "
-            "«Administração» em vez de favoritos ou painel vendedor.\n\n"
-            "Importante: quando te tornam administrador, perdes os papéis de cliente e vendedor na "
-            "base de dados. Ficas só administrador. Ainda podes abrir as páginas públicas manualmente, "
-            "mas o teu trabalho principal é o painel de gestão.",
+            "Quando és administrador, o login leva-te directo para /gestao/. No menu público vês "
+            "«Administração» em vez de favoritos ou painel vendedor — o teu foco é o painel de gestão, "
+            "não o catálogo de compras.\n\n"
+            "Importante: quando te promovem a administrador, perdes os papéis de cliente e vendedor. "
+            "Ficas só administrador. Se tinhas lojas activas como vendedor, ficam temporariamente "
+            "suspensas enquanto fores admin — quando te despromovem, voltam a ficar activas. Ainda podes "
+            "abrir páginas públicas manualmente, mas o trabalho principal é em /gestao/.",
         ),
         (
             "O que fazes no painel de gestão",
             2,
-            "No dashboard vês números gerais: quantos utilizadores, lojas, produtos, quantos activos, "
-            "quantos bloqueados. É a fotografia da plataforma.\n\n"
-            "Em Utilizadores listas toda a gente registada. Podes filtrar por tipo (cliente, vendedor, "
-            "admin), sexo, estado activo ou bloqueado, e ordenar por nome ou data. Se alguém fizer "
-            "malícia, bloqueias a conta — mas não podes bloquear a tua própria.\n\n"
-            "Em Estabelecimentos vês todas as lojas da plataforma, não só as tuas. Abres o detalhe e "
-            "tens mapa, dados completos, quem é o dono, quantos produtos tem. Podes bloquear a loja ou "
-            "bloquear o dono ali mesmo, se for preciso.\n\n"
+            "O dashboard abre com um cartão de boas-vindas, três métricas rápidas (utilizadores activos, "
+            "lojas activas, produtos) e atalhos para as secções principais. Abaixo, dois painéis mostram "
+            "os 5 utilizadores e 5 estabelecimentos mais recentes, com ligação para ver a lista completa.\n\n"
+            "Em Utilizadores, no topo há um cartão-resumo com totais (contas, activos, bloqueados, admins). "
+            "A lista permite filtrar por tipo (cliente, vendedor, admin), sexo, estado activo ou bloqueado, "
+            "e ordenar por nome ou data. Para cada conta podes bloquear ou desbloquear — mas não a tua "
+            "própria. Também podes apagar uma conta de forma definitiva; o sistema pede confirmação e "
+            "não permite apagar a ti próprio nem o último administrador.\n\n"
+            "Em Estabelecimentos, o cartão-resumo no topo mostra totais semelhantes. Vês todas as lojas "
+            "da plataforma, não só as tuas. Abres o detalhe e tens mapa, dados completos, quem é o dono e "
+            "quantos produtos tem. Podes bloquear a loja, bloquear o dono, ou apagar o estabelecimento — "
+            "o que remove também os produtos associados, com confirmação prévia.\n\n"
             "Em Administradores geres quem tem o mesmo poder que tu: promoves alguém pelo email (tem de "
             "já ter conta registada) ou despromoves. Não te podes despromover a ti próprio, nem podes "
-            "tirar o último administrador activo — senão ficava ninguém a gerir o sistema.",
+            "tirar o último administrador activo — senão ficava ninguém a gerir o sistema.\n\n"
+            "Clicar no teu nome no topo do painel leva a Minha conta, onde podes actualizar perfil e "
+            "senha como qualquer utilizador.",
         ),
         (
             "O que podes e o que não podes fazer como administrador",
@@ -227,26 +261,33 @@ def build_sections() -> list[tuple[str, int, str]]:
             "Podes:\n"
             "— Ver estatísticas e listas de toda a plataforma.\n"
             "— Bloquear e desbloquear utilizadores e estabelecimentos.\n"
+            "— Apagar definitivamente utilizadores e estabelecimentos (com confirmação).\n"
             "— Promover e despromover outros administradores.\n"
-            "— Consultar o detalhe completo de qualquer loja, com mapa.\n\n"
+            "— Consultar o detalhe completo de qualquer loja, com mapa.\n"
+            "— Actualizar o teu perfil e senha em Minha conta.\n\n"
             "Não podes:\n"
             "— Criar contas por aqui — a pessoa tem de se registar primeiro.\n"
-            "— Apagar definitivamente utilizadores ou lojas — só bloquear.\n"
+            "— Apagar a tua própria conta nem o último administrador.\n"
             "— Bloquear-te a ti próprio ou ficar sem administradores.\n"
             "— Gerir produtos no lugar dos vendedores — isso é no painel /vendedor/.\n"
-            "— Usar o Django Admin clássico (/admin/) — nem está activo neste projecto.",
+            "— Usar o Django Admin clássico (/admin/) — nem está activo neste projecto.\n"
+            "— Usar favoritos ou o fluxo normal de compra no menu — o teu papel é gestão, não catálogo.",
         ),
         (
             "Um resumo antes de ires embora",
             1,
-            "Cliente: entras, pesquisas, vês lojas, guardas favoritos, comentas. Simples.\n\n"
+            "Cliente: entras, pesquisas, vês lojas, guardas favoritos, comentas e geres o perfil em "
+            "Minha conta. Simples.\n\n"
             "Vendedor: tudo isso mais o teu painel para registar loja na Beira, pôr produtos e ler "
             "comentários. Precisas de 18 anos.\n\n"
-            "Administrador: não é para o público — geres contas, lojas e outros admins em /gestao/.\n\n"
+            "Administrador: não é para o público — geres contas, lojas e outros admins em /gestao/, "
+            "com bloqueio e eliminação quando necessário.\n\n"
             "Se tiveres os dois papéis de cliente e vendedor, alternas entre eles conforme o que queres "
             "fazer naquele momento. A Mob foi feita para isso — procurar de manhã, gerir a loja à tarde.\n\n"
             "Qualquer dúvida, pensa sempre: «estou a procurar algo?» → parte pública. «estou a gerir o "
-            "meu negócio?» → painel vendedor. «estou a cuidar da plataforma?» → /gestao/.\n\n"
+            "meu perfil?» → Minha conta (/conta/). «estou a gerir o meu negócio?» → painel vendedor. "
+            "«estou a cuidar da plataforma?» → /gestao/.\n\n"
+            "Para eliminar conta ou pedir dados pessoais, escreve a privacidade@mob.pt.\n\n"
             "Boa sorte — e boas vendas, ou boas compras, conforme o teu lado.",
         ),
     ]

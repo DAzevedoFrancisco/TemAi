@@ -33,10 +33,23 @@ Na mesma página, fica no separador «Entrar». Mete o email e a senha que usast
 Se estiver tudo certo, entras logo. Para onde vais depende do teu papel:
 
 Se és cliente ou vendedor, vais para a página inicial — aquela com «O Que Procura?» no meio.
-Se és administrador, vais directo para o painel de gestão.
-
+Se és administrador, vais directo para o painel de gestão em /gestao/.
 
 Para sair, clica em «Sair» no menu. Aparece uma confirmação — é de propósito, para não fechares a sessão sem querer. Depois de confirmar, voltas à página de login.
+
+## Minha conta — gerir o teu perfil
+
+Com sessão iniciada, podes abrir **Minha conta** em /conta/. Há três formas habituais de chegar lá: pelo item «Minha conta» no menu da parte pública, clicando no teu nome no topo do painel vendedor, ou clicando no teu nome no painel de administração.
+
+Esta página mostra um resumo da tua conta — nome, email, papéis que tens e data de registo — e permite alterar dois blocos de informação:
+
+**Dados pessoais:** nome completo, data de nascimento, sexo e email. Quando guardas, as alterações ficam activas de imediato.
+
+**Segurança:** alteração de senha. Tens de indicar a senha actual e depois a nova (duas vezes, para confirmar).
+
+Se estiveres no painel vendedor ou de administração, há também um atalho no topo da página para voltares ao painel onde estavas.
+
+**Eliminar a conta:** a página Minha conta **não** permite apagar a conta por ti próprio. Se quiseres eliminar a tua conta ou pedir uma cópia dos teus dados, envia email para **privacidade@mob.pt** com o assunto «Proteção de Dados / Mob». A equipa trata do pedido conforme a política de privacidade do site.
 
 ## Usar a Mob como cliente
 
@@ -54,13 +67,13 @@ Cada cartão de produto mostra a foto, a categoria, se está disponível, o nome
 
 Esta página é onde decides se vale a pena ir à loja.
 
-Vês a imagem grande, o nome, a descrição, e badges a dizer a categoria e se o produto está disponível ou não. Há um bloco com o nome do estabelecimento — tipo «Aroma da Rosch» — e a indicação de que fica na Beira.
+No topo, a imagem e a informação principal ficam lado a lado — no telemóvel, a imagem aparece primeiro e o texto a seguir. Vês o nome do produto, a descrição, a categoria e se está disponível ou não. Há também um resumo rápido com o nome da loja e a indicação de que fica na Beira.
 
-Mais abaixo tens os dados práticos: morada exacta, telefone (podes clicar para ligar) e horário de funcionamento. Há um botão para contactar directamente.
+**Ampliar a imagem:** se o produto tiver foto, podes clicar nela (ou no indicador «Ampliar») para abrir um modal em ecrã inteiro com a imagem em tamanho grande. Fechas com o botão de fechar, clicando fora da imagem ou com a tecla Escape.
 
-Do lado direito (ou em baixo no telemóvel) tens um mapa com um pin na localização da loja. Se vieste da pesquisa com GPS activo, também aparece quantos quilómetros estás, em linha recta.
+Mais abaixo há painéis organizados com os dados práticos: morada exacta, telefone (podes clicar para ligar), horário de funcionamento e um botão para contactar directamente. Há um mapa com um pin na localização da loja. Se vieste da pesquisa com GPS activo, também aparece quantos quilómetros estás, em linha recta.
 
-Há ainda uma secção de avaliações — comentários e estrelas de outros clientes. Podes ler o que dizem sobre a loja antes de ir.
+Por fim, uma secção de avaliações — comentários e estrelas de outros clientes. Podes ler o que dizem sobre a loja antes de ir.
 
 ### Favoritos e avaliações — mas tens de estar logado
 
@@ -70,8 +83,7 @@ Favoritos: no detalhe do produto há um coração. Clicas e o produto fica guard
 
 Avaliações: na mesma página de detalhe, mais em baixo, podes dar estrelas e/ou escrever um comentário sobre o estabelecimento. Podes enviar só estrelas, só texto, ou os dois. E podes actualizar a tua avaliação mais tarde se mudares de opinião.
 
-Nao falar na defesa: 
-    Há uma regra justa: não podes favoritar nem avaliar os teus próprios produtos. Se fores vendedor e tiveres loja na plataforma, isso aplica-se aos teus negócios. Faz sentido — não avalias o teu próprio serviço.
+Há uma regra justa: não podes favoritar nem avaliar os teus próprios produtos. Se fores vendedor e tiveres loja na plataforma, isso aplica-se aos teus negócios. Faz sentido — não avalias o teu próprio serviço.
 
 ### O que podes e o que não podes fazer como cliente
 
@@ -79,6 +91,7 @@ Podes:
 — Pesquisar à vontade, com ou sem localização.
 — Ver tudo o que está público: produtos activos de lojas activas.
 — Guardar favoritos e deixar comentários (excepto nos teus próprios negócios).
+— Actualizar o teu perfil e senha em Minha conta (/conta/).
 — Ler os termos e a política de privacidade no site.
 — Pedir para te tornares vendedor, se tiveres 18 anos ou mais.
 
@@ -87,6 +100,7 @@ Não podes:
 — Entrar em /gestao/ — isso é só para administradores.
 — Criar ou apagar lojas e produtos.
 — Bloquear outras contas.
+— Eliminar a tua conta directamente no site — tens de contactar privacidade@mob.pt.
 — Pesquisar com o campo vazio — não devolve nada, tens de escrever alguma coisa.
 — Ver lojas ou produtos que foram bloqueados pela administração.
 
@@ -104,7 +118,7 @@ Na primeira vez, o site leva-te a criar o teu primeiro estabelecimento. Faz sent
 
 Depois de seres vendedor, no menu aparece «Painel vendedor» em vez de «Tornar-me vendedor». Clicas e entras no dashboard em /vendedor/dashboard/.
 
-É uma área diferente da parte pública do site. Tens menu lateral com Dashboard, Estabelecimentos, e acesso aos comentários. No topo vês o teu nome e um sino — quando alguém deixa avaliação nas tuas lojas, aparece ali para não perderes nada.
+É uma área diferente da parte pública do site. Tens menu lateral com Dashboard, Estabelecimentos, e acesso aos comentários. No topo vês o teu nome — que também leva a Minha conta — e um sino: quando alguém deixa avaliação nas tuas lojas, aparece ali para não perderes nada.
 
 Uma coisa a notar: quando estás em «modo vendedor», a pesquisa da página inicial fica escondida. Não é bug — é para não misturares gerir loja com procurar produtos. Se quiseres voltar a pesquisar como cliente, mudas para o perfil Cliente (há um botão na home ou podes usar o link de mudança de perfil).
 
@@ -141,6 +155,7 @@ Podes tudo o que um cliente pode — pesquisar, ver detalhes, etc. — mais:
 — Gerir produtos: criar, editar, apagar, mudar disponibilidade.
 — Ver e responder a comentários dos teus negócios.
 — Alternar entre modo cliente e modo vendedor.
+— Actualizar o teu perfil e senha em Minha conta.
 
 Não podes:
 — Mexer nas lojas ou produtos de outra pessoa.
@@ -154,45 +169,52 @@ Não podes:
 
 Este papel não se pede no site. Alguém que já é administrador é que te promove, ou então crias a conta via comando técnico no servidor (createsuperuser) — isso é coisa de quem instala o sistema.
 
-Quando és administrador, o login leva-te directo para /gestao/. O menu público mostra «Administração» em vez de favoritos ou painel vendedor.
+Quando és administrador, o login leva-te directo para /gestao/. No menu público vês «Administração» em vez de favoritos ou painel vendedor — o teu foco é o painel de gestão, não o catálogo de compras.
 
-Importante: quando te tornam administrador, perdes os papéis de cliente e vendedor na base de dados. Ficas só administrador. Ainda podes abrir as páginas públicas manualmente, mas o teu trabalho principal é o painel de gestão.
+Importante: quando te promovem a administrador, perdes os papéis de cliente e vendedor. Ficas só administrador. Se tinhas lojas activas como vendedor, ficam temporariamente suspensas enquanto fores admin — quando te despromovem, voltam a ficar activas. Ainda podes abrir páginas públicas manualmente, mas o trabalho principal é em /gestao/.
 
 ### O que fazes no painel de gestão
 
-No dashboard vês números gerais: quantos utilizadores, lojas, produtos, quantos activos, quantos bloqueados. É a fotografia da plataforma.
+O **dashboard** abre com um cartão de boas-vindas, três métricas rápidas (utilizadores activos, lojas activas, produtos) e atalhos para as secções principais. Abaixo, dois painéis mostram os **5 utilizadores** e **5 estabelecimentos** mais recentes, com ligação para ver a lista completa.
 
-Em Utilizadores listas toda a gente registada. Podes filtrar por tipo (cliente, vendedor, admin), sexo, estado activo ou bloqueado, e ordenar por nome ou data. Se alguém fizer malícia, bloqueias a conta — mas não podes bloquear a tua própria.
+Em **Utilizadores**, no topo há um cartão-resumo com totais (contas, activos, bloqueados, admins). A lista permite filtrar por tipo (cliente, vendedor, admin), sexo, estado activo ou bloqueado, e ordenar por nome ou data. Para cada conta podes bloquear ou desbloquear — mas não a tua própria. Também podes **apagar** uma conta de forma definitiva; o sistema pede confirmação e não permite apagar a ti próprio nem o último administrador.
 
-Em Estabelecimentos vês todas as lojas da plataforma, não só as tuas. Abres o detalhe e tens mapa, dados completos, quem é o dono, quantos produtos tem. Podes bloquear a loja ou bloquear o dono ali mesmo, se for preciso.
+Em **Estabelecimentos**, o cartão-resumo no topo mostra totais semelhantes. Vês todas as lojas da plataforma, não só as tuas. Abres o detalhe e tens mapa, dados completos, quem é o dono e quantos produtos tem. Podes bloquear a loja, bloquear o dono, ou **apagar** o estabelecimento — o que remove também os produtos associados, com confirmação prévia.
 
-Em Administradores geres quem tem o mesmo poder que tu: promoves alguém pelo email (tem de já ter conta registada) ou despromoves. Não te podes despromover a ti próprio, nem podes tirar o último administrador activo — senão ficava ninguém a gerir o sistema.
+Em **Administradores** geres quem tem o mesmo poder que tu: promoves alguém pelo email (tem de já ter conta registada) ou despromoves. Não te podes despromover a ti próprio, nem podes tirar o último administrador activo — senão ficava ninguém a gerir o sistema.
+
+Clicar no teu nome no topo do painel leva a Minha conta, onde podes actualizar perfil e senha como qualquer utilizador.
 
 ### O que podes e o que não podes fazer como administrador
 
 Podes:
 — Ver estatísticas e listas de toda a plataforma.
 — Bloquear e desbloquear utilizadores e estabelecimentos.
+— Apagar definitivamente utilizadores e estabelecimentos (com confirmação).
 — Promover e despromover outros administradores.
 — Consultar o detalhe completo de qualquer loja, com mapa.
+— Actualizar o teu perfil e senha em Minha conta.
 
 Não podes:
 — Criar contas por aqui — a pessoa tem de se registar primeiro.
-— Apagar definitivamente utilizadores ou lojas — só bloquear.
+— Apagar a tua própria conta nem o último administrador.
 — Bloquear-te a ti próprio ou ficar sem administradores.
 — Gerir produtos no lugar dos vendedores — isso é no painel /vendedor/.
 — Usar o Django Admin clássico (/admin/) — nem está activo neste projecto.
+— Usar favoritos ou o fluxo normal de compra no menu — o teu papel é gestão, não catálogo.
 
 ## Um resumo antes de ires embora
 
-Cliente: entras, pesquisas, vês lojas, guardas favoritos, comentas. Simples.
+Cliente: entras, pesquisas, vês lojas, guardas favoritos, comentas e geres o perfil em Minha conta. Simples.
 
 Vendedor: tudo isso mais o teu painel para registar loja na Beira, pôr produtos e ler comentários. Precisas de 18 anos.
 
-Administrador: não é para o público — geres contas, lojas e outros admins em /gestao/.
+Administrador: não é para o público — geres contas, lojas e outros admins em /gestao/, com bloqueio e eliminação quando necessário.
 
 Se tiveres os dois papéis de cliente e vendedor, alternas entre eles conforme o que queres fazer naquele momento. A Mob foi feita para isso — procurar de manhã, gerir a loja à tarde.
 
-Qualquer dúvida, pensa sempre: «estou a procurar algo?» → parte pública. «estou a gerir o meu negócio?» → painel vendedor. «estou a cuidar da plataforma?» → /gestao/.
+Qualquer dúvida, pensa sempre: «estou a procurar algo?» → parte pública. «estou a gerir o meu perfil?» → Minha conta (/conta/). «estou a gerir o meu negócio?» → painel vendedor. «estou a cuidar da plataforma?» → /gestao/.
+
+Para eliminar conta ou pedir dados pessoais, escreve a privacidade@mob.pt.
 
 Boa sorte — e boas vendas, ou boas compras, conforme o teu lado.

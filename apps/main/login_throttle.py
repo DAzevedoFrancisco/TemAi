@@ -3,7 +3,7 @@ import time
 from django.core.cache import cache
 
 LOGIN_ATTEMPT_LIMIT = 4
-LOGIN_LOCKOUT_SECONDS = 5 * 60
+LOGIN_LOCKOUT_SECONDS = 60
 
 
 def _attempts_key(email: str) -> str:
