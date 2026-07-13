@@ -25,6 +25,13 @@ from .engagement import (
     is_product_favorited,
 )
 from .forms import EstablishmentReviewForm
+from .login_throttle import (
+    clear_login_attempts,
+    failed_login_error_message,
+    is_login_locked,
+    lockout_error_message,
+    register_failed_login,
+)
 from .services import ensure_system_admin, get_post_login_redirect_name, register_user_with_default_role
 from .validators import can_become_seller
 
@@ -158,18 +165,24 @@ def auth_view(request):
             if login_form.is_valid():
                 email = login_form.cleaned_data['email'].lower()
                 password = login_form.cleaned_data['password']
-                user = authenticate(request, username=email, password=password)
 
-                if user is not None:
-                    ensure_system_admin()
-                    user.refresh_from_db()
-                    if not user.is_administrador:
-                        set_active_profile(request, Profile.CLIENTE)
-                    tokens = get_tokens_for_user(user)
-                    response = redirect(get_post_login_redirect_name(user))
-                    return set_jwt_cookies(response, tokens)
+                if is_login_locked(email):
+                    login_form.add_error(None, lockout_error_message(email))
+                else:
+                    user = authenticate(request, username=email, password=password)
 
-                login_form.add_error(None, 'Email ou senha inválidos.')
+                    if user is not None:
+                        clear_login_attempts(email)
+                        ensure_system_admin()
+                        user.refresh_from_db()
+                        if not user.is_administrador:
+                            set_active_profile(request, Profile.CLIENTE)
+                        tokens = get_tokens_for_user(user)
+                        response = redirect(get_post_login_redirect_name(user))
+                        return set_jwt_cookies(response, tokens)
+
+                    attempts, _locked = register_failed_login(email)
+                    login_form.add_error(None, failed_login_error_message(email, attempts))
 
         elif form_type == 'register':
             register_form = RegisterForm(request.POST)

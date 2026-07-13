@@ -8,6 +8,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .forms import LoginForm, RegisterForm
 from .jwt_utils import clear_jwt_cookies, get_tokens_for_user, set_jwt_cookies
+from .login_throttle import (
+    clear_login_attempts,
+    failed_login_error_message,
+    is_login_locked,
+    lockout_error_message,
+    register_failed_login,
+)
 from .services import ensure_system_admin, get_post_login_redirect_name, register_user_with_default_role
 
 
@@ -53,14 +60,28 @@ class LoginAPIView(APIView):
 
         email = form.cleaned_data['email'].lower()
         password = form.cleaned_data['password']
+
+        if is_login_locked(email):
+            return Response(
+                {'detail': lockout_error_message(email)},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
         user = authenticate(request, username=email, password=password)
 
         if user is None:
+            attempts, locked = register_failed_login(email)
+            if locked:
+                return Response(
+                    {'detail': lockout_error_message(email)},
+                    status=status.HTTP_429_TOO_MANY_REQUESTS,
+                )
             return Response(
-                {'detail': 'Email ou senha inválidos.'},
+                {'detail': failed_login_error_message(email, attempts)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
+        clear_login_attempts(email)
         ensure_system_admin()
         user.refresh_from_db()
 

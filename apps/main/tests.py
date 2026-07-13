@@ -1,9 +1,16 @@
 from datetime import date, timedelta
 
 from django.core.exceptions import ValidationError
-from django.test import Client, TestCase, override_settings
+from django.test import Client, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
+from apps.main.login_throttle import (
+    LOGIN_ATTEMPT_LIMIT,
+    clear_login_attempts,
+    failed_login_error_message,
+    is_login_locked,
+    register_failed_login,
+)
 from apps.main.search import (
     haversine_km,
     normalize_establishment_coordinates,
@@ -602,3 +609,114 @@ class AdminClientCatalogTests(TestCase):
         self.assertContains(response, reverse('admin_panel:dashboard'))
         self.assertContains(response, 'Voltar ao painel de administração')
         self.assertNotContains(response, 'Favoritos')
+
+
+class LoginThrottleServiceTests(SimpleTestCase):
+    def setUp(self):
+        clear_login_attempts('login@example.com')
+
+    def tearDown(self):
+        clear_login_attempts('login@example.com')
+
+    def test_locks_after_limit(self):
+        for index in range(LOGIN_ATTEMPT_LIMIT):
+            attempts, locked = register_failed_login('login@example.com')
+            if index < LOGIN_ATTEMPT_LIMIT - 1:
+                self.assertFalse(locked)
+            else:
+                self.assertTrue(locked)
+                self.assertEqual(attempts, LOGIN_ATTEMPT_LIMIT)
+
+        self.assertTrue(is_login_locked('login@example.com'))
+
+    def test_success_clears_attempts(self):
+        register_failed_login('login@example.com')
+        register_failed_login('login@example.com')
+        clear_login_attempts('login@example.com')
+
+        attempts, locked = register_failed_login('login@example.com')
+        self.assertEqual(attempts, 1)
+        self.assertFalse(locked)
+        self.assertIn('Restam 3 tentativas', failed_login_error_message('login@example.com', attempts))
+
+
+@override_settings(SECURE_SSL_REDIRECT=False)
+class LoginThrottleTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        register_user_with_default_role(
+            email='segundo@example.com',
+            password='SenhaSegura123!',
+            name='Utilizador Login',
+            date_of_birth=date(2000, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        User.objects.create_user(
+            email='login@example.com',
+            password='SenhaSegura123!',
+            name='Utilizador Login',
+            date_of_birth=date(2000, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(User.objects.get(email='login@example.com'))
+        self.login_url = reverse('auth')
+        self.api_login_url = reverse('api_login')
+        self.payload = {
+            'email': 'login@example.com',
+            'password': 'errada',
+        }
+
+    def _post_login(self):
+        return self.client.post(self.login_url, {
+            'form_type': 'login',
+            'email': self.payload['email'],
+            'password': self.payload['password'],
+        })
+
+    def test_web_login_shows_remaining_attempts(self):
+        response = self._post_login()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Restam 3 tentativas')
+
+    def test_web_login_locks_after_four_failed_attempts(self):
+        for _ in range(4):
+            self._post_login()
+
+        response = self._post_login()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Excedeu o limite de 4 tentativas')
+
+    def test_web_login_clears_attempts_after_success(self):
+        for _ in range(3):
+            self._post_login()
+
+        response = self.client.post(self.login_url, {
+            'form_type': 'login',
+            'email': 'login@example.com',
+            'password': 'SenhaSegura123!',
+        })
+
+        self.assertEqual(response.status_code, 302)
+
+        response = self._post_login()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Restam 3 tentativas')
+
+    def test_api_login_locks_after_four_failed_attempts(self):
+        for index in range(3):
+            response = self.client.post(
+                self.api_login_url,
+                data=self.payload,
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 401, msg=f'attempt {index + 1}')
+
+        response = self.client.post(
+            self.api_login_url,
+            data=self.payload,
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 429)
+        self.assertIn('Excedeu o limite de 4 tentativas', response.json()['detail'])
