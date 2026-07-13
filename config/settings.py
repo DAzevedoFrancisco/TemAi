@@ -137,6 +137,10 @@ if DATABASE_URL:
             ssl_require=True,
         )
     }
+    DATABASES['default'].setdefault('OPTIONS', {})
+    DATABASES['default']['OPTIONS']['connect_timeout'] = int(
+        os.environ.get('DB_CONNECT_TIMEOUT', '10')
+    )
 else:
     DATABASES = {
         'default': {

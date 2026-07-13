@@ -16,9 +16,16 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
 from django.urls import path, include
 
+
+def health_check(_request):
+    return HttpResponse('ok', content_type='text/plain')
+
+
 urlpatterns = [
+    path('health/', health_check, name='health_check'),
     path('gestao/', include('apps.admin_panel.urls')),
     path('vendedor/', include('apps.vendor.urls')),
     path('', include('apps.main.urls')),

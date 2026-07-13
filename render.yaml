@@ -10,7 +10,8 @@ services:
     runtime: python
     plan: free
     buildCommand: "bash build.sh"
-    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --graceful-timeout 30 --log-file -"
+    healthCheckPath: /health/
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -23,7 +24,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.8
       - key: WEB_CONCURRENCY
-        value: 2
+        value: 1
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
