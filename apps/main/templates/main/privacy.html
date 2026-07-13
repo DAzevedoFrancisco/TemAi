@@ -41,10 +41,12 @@
         <li><strong>nome</strong>;</li>
         <li><strong>email</strong> (usado para iniciar sessão);</li>
         <li><strong>data de nascimento</strong>;</li>
+        <li><strong>sexo</strong>;</li>
         <li><strong>palavra-passe</strong> (armazenada de forma encriptada, nunca em texto simples);</li>
         <li><strong>data de registo</strong> e <strong>último acesso</strong>.</li>
     </ul>
     <p>Também registamos os <strong>papéis</strong> associados à conta: <strong>Cliente</strong> e/ou <strong>Vendedor</strong>, bem como o <strong>perfil ativo</strong> selecionado (Cliente ou Vendedor) na sessão.</p>
+    <p>Pode consultar e actualizar estes dados em <strong><a href="{% url 'account_settings' %}">Minha conta</a></strong> (<code>/conta/</code>), incluindo a alteração da palavra-passe.</p>
 
     <h3>2. Dados publicados por vendedores</h3>
     <p>Se ativar o perfil de Vendedor e gerir estabelecimentos em <strong>/vendedor/</strong>, guardamos:</p>
@@ -55,12 +57,20 @@
     <p>Estes dados tornam-se <strong>públicos</strong> nas páginas de pesquisa e detalhe de produto. O telefone do estabelecimento é apresentado a todos os visitantes e pode ser utilizado para contacto direto.</p>
 
     <h3>3. Imagens carregadas</h3>
-    <p>As imagens de produtos são armazenadas no servidor em <strong>/media/products/</strong>, organizadas por estabelecimento. São públicas quando o produto está ativo.</p>
+    <p>As imagens de produtos são armazenadas de forma segura no servidor da aplicação ou, em produção, através do serviço <strong>Cloudinary</strong>, organizadas por estabelecimento. São públicas quando o produto está ativo.</p>
 
-    <h3>4. Tokens de autenticação</h3>
+    <h3>4. Favoritos e avaliações</h3>
+    <p>Se utilizar a plataforma como Cliente, podemos guardar:</p>
+    <ul>
+        <li><strong>favoritos</strong> — produtos que marcou em <strong>/favoritos/</strong>;</li>
+        <li><strong>comentários e avaliações</strong> — feedback que publica sobre estabelecimentos nas páginas de produto.</li>
+    </ul>
+    <p>Estes dados estão associados à sua conta e deixam de estar disponíveis quando a conta é removida.</p>
+
+    <h3>5. Tokens de autenticação</h3>
     <p>Após login, gerimos tokens JWT (<code>access_token</code> e <code>refresh_token</code>) em cookies. No logout, o token de renovação é invalidado (blacklist). Podemos manter registos de tokens emitidos até à respetiva expiração.</p>
 
-    <h3>5. API de autenticação</h3>
+    <h3>6. API de autenticação</h3>
     <p>A API em <strong>/api/auth/</strong> permite registo, login, logout, renovação de token e consulta do perfil (<strong>/api/auth/me/</strong>). O endpoint <code>/me</code> devolve: nome, email, data de nascimento, papéis e se é vendedor. <strong>Não existe API pública</strong> para produtos, estabelecimentos ou pesquisa — esses dados são acedidos apenas pelas páginas web.</p>
 </section>
 
@@ -83,6 +93,8 @@
     <ol type="a">
         <li><strong>criar e autenticar a sua conta</strong> e manter a sessão iniciada;</li>
         <li><strong>gerir perfis</strong> de Cliente e Vendedor e a alternância entre eles;</li>
+        <li><strong>permitir a gestão da conta</strong> em Minha conta (dados de perfil e palavra-passe);</li>
+        <li><strong>guardar favoritos</strong> e <strong>publicar avaliações</strong> de estabelecimentos;</li>
         <li><strong>apresentar resultados de pesquisa</strong> de produtos (processamento em tempo real, sem gravação do termo);</li>
         <li><strong>calcular distâncias</strong> quando fornece coordenadas na URL (processamento em tempo real, sem gravação);</li>
         <li><strong>publicar e gerir</strong> estabelecimentos e produtos no painel de vendedor;</li>
@@ -160,8 +172,8 @@
     <p>Ao utilizar a Mob, o seu browser pode comunicar com serviços externos:</p>
     <ul>
         <li><strong>Google Fonts</strong> (<code>fonts.googleapis.com</code>, <code>fonts.gstatic.com</code>) — carregamento de tipografia. O Google pode receber o seu endereço IP.</li>
-        <li><strong>Leaflet</strong> (<code>unpkg.com</code>) — biblioteca de mapas na página de detalhe do produto.</li>
-        <li><strong>OpenStreetMap</strong> (<code>tile.openstreetmap.org</code>) — tiles do mapa. O OpenStreetMap pode receber pedidos do seu browser, incluindo IP e área geográfica aproximada.</li>
+        <li><strong>Leaflet</strong> — biblioteca de mapas nas páginas com localização de estabelecimentos;</li>
+        <li><strong>OpenStreetMap</strong> (<code>tile.openstreetmap.org</code>) — tiles do mapa. O OpenStreetMap pode receber pedidos do seu browser, incluindo IP e área geográfica aproximada;</li>
         <li><strong>Geolocalização do browser</strong> — ao clicar "Usar minha localização", o pedido é processado pelo seu dispositivo/sistema operativo, não pela Mob diretamente.</li>
     </ul>
     <p>Recomendamos que consulte as políticas de privacidade desses fornecedores. A Mob não controla o tratamento de dados por esses serviços.</p>
@@ -170,12 +182,28 @@
 <section id="retencao" class="legal-section">
     <h2>VII. Retenção e eliminação</h2>
     <p>Conservamos os dados da sua conta e os conteúdos publicados enquanto a conta existir e forem necessários para prestar os Serviços.</p>
+
+    <h3>1. O que pode gerir em Minha conta</h3>
+    <p>Em <strong><a href="{% url 'account_settings' %}">Minha conta</a></strong> (<code>/conta/</code>), pode actualizar o seu <strong>nome</strong>, <strong>email</strong>, <strong>data de nascimento</strong>, <strong>sexo</strong> e <strong>palavra-passe</strong>.</p>
+    <p>Esta página <strong>não permite eliminar a conta de forma autónoma</strong>. Para pedir eliminação ou exportação dos seus dados, utilize o contacto indicado abaixo.</p>
+
+    <h3>2. O que é removido na plataforma</h3>
     <ul>
         <li>Ao <strong>eliminar um produto</strong>, a respetiva imagem e dados são removidos.</li>
-        <li>Ao <strong>eliminar um estabelecimento</strong>, os produtos associados são também removidos.</li>
+        <li>Ao <strong>eliminar um estabelecimento</strong>, os produtos associados e respetivas imagens são também removidos.</li>
+        <li>Ao <strong>terminar sessão</strong>, o token de renovação JWT é invalidado.</li>
         <li>Os <strong>tokens JWT</strong> expirados podem ser limpos periodicamente do sistema de blacklist.</li>
     </ul>
-    <p>Atualmente <strong>não existe</strong> uma opção na plataforma para o utilizador eliminar a própria conta de forma autónoma. Para solicitar eliminação ou exportação dos seus dados, contacte <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a>.</p>
+
+    <h3>3. Eliminação de conta</h3>
+    <p>Para solicitar a <strong>eliminação da sua conta</strong> ou a <strong>exportação dos seus dados</strong>, envie email para <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a> com o assunto <strong>"Proteção de Dados / Mob"</strong>, indicando o email associado à conta.</p>
+    <p>Após confirmação da identidade, removemos os dados pessoais da conta e, quando aplicável:</p>
+    <ul>
+        <li>favoritos guardados;</li>
+        <li>comentários e avaliações publicados;</li>
+        <li>estabelecimentos e produtos, se for vendedor.</li>
+    </ul>
+    <p>Um administrador da plataforma também pode remover contas através do painel de gestão, nos casos previstos pelos Termos de Serviço.</p>
 </section>
 
 <section id="seguranca" class="legal-section">
@@ -201,7 +229,7 @@
         <li>retirar o consentimento (por exemplo, para localização — pode revogar nas definições do browser);</li>
         <li>apresentar reclamação junto da autoridade de proteção de dados competente.</li>
     </ol>
-    <p>Para exercer estes direitos, envie pedido para <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a> com o assunto <strong>"Proteção de Dados / Mob"</strong>. Responderemos no prazo previsto pela lei aplicável.</p>
+    <p>Pode <strong>actualizar os seus dados de perfil</strong> em qualquer momento em <strong><a href="{% url 'account_settings' %}">Minha conta</a></strong>. Para eliminação, exportação, limitação, oposição ou outros pedidos relacionados com proteção de dados, envie email para <a href="mailto:privacidade@mob.pt">privacidade@mob.pt</a> com o assunto <strong>"Proteção de Dados / Mob"</strong>. Responderemos no prazo previsto pela lei aplicável.</p>
 </section>
 
 <section id="atualizacoes" class="legal-section">
