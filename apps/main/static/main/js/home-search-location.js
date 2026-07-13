@@ -28,12 +28,9 @@
         try {
             const coords = await MobGeolocation.request({ maximumAge: 0 });
             applyCoords(coords);
-        } catch (error) {
+        } catch (_) {
             latInput.value = '';
             lngInput.value = '';
-            if (error && error.message) {
-                console.warn(error.message);
-            }
         }
 
         if (!queryInput.value.trim()) {
