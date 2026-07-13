@@ -21,6 +21,10 @@ staticfiles/
 .env.*
 !.env.example
 
+# Documentos locais / académicos (não fazem parte da app)
+docs/*.docx
+docs/*.pdf
+
 # IDE
 .idea/
 .vscode/

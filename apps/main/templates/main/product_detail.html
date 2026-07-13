@@ -4,11 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="{% static 'main/vendor/leaflet/leaflet.css' %}">
     <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
     <title>{{ product.name }} | Mob</title>
 </head>
@@ -21,7 +20,7 @@
 
             <div class="product-detail-breadcrumb">
                 {% if back_query %}
-                    <a href="{% url 'search_results' %}?q={{ back_query|urlencode }}{% if back_category %}&categoria={{ back_category|urlencode }}{% endif %}{% if has_location %}&lat={{ user_lat }}&lng={{ user_lng }}{% if request.GET.distancia %}&distancia={{ request.GET.distancia }}{% endif %}{% endif %}" class="product-detail-back">
+                    <a href="{% url 'search_results' %}?q={{ back_query|urlencode }}{% if back_category %}&categoria={{ back_category|urlencode }}{% endif %}" class="product-detail-back">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                         Voltar aos resultados
                     </a>
@@ -159,15 +158,11 @@
                         </div>
                         <div>
                             <h2>Onde encontrar</h2>
-                            <p>
-                                Mapa do estabelecimento na Beira
-                                <span id="product-distance-wrap"{% if not has_location or distance_km is None %} hidden{% endif %}>
-                                    · <strong id="product-distance-km">{% if distance_km is not None %}{{ distance_km|floatformat:1 }}{% endif %}</strong> km em linha recta da sua localização
-                                </span>
-                            </p>
+                            <p>Mapa do estabelecimento na Beira</p>
                         </div>
                     </div>
                     <div id="product-map" class="product-detail-map"></div>
+                    {{ product_map_point|json_script:"product-map-data" }}
                 </article>
             </section>
 
@@ -300,13 +295,10 @@
 
     {% include 'main/partials/client_light_scripts.html' %}
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
     <script src="{% static 'main/js/map-tiles.js' %}"></script>
-    <script src="{% static 'main/js/coordinates.js' %}"></script>
-    {% if user.is_authenticated %}
-    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
-    {% endif %}
     <script src="{% static 'main/js/location-map.js' %}"></script>
+    <script src="{% static 'main/js/product-detail-map.js' %}"></script>
     <script src="{% static 'main/js/star-rating.js' %}"></script>
     {% if product.image %}
     <script>
@@ -344,56 +336,5 @@
         })();
     </script>
     {% endif %}
-    <script>
-        const establishmentLat = {{ establishment_lat }};
-        const establishmentLng = {{ establishment_lng }};
-        const establishmentName = "{{ establishment.name|escapejs }}";
-        const hasDistance = {% if has_location and distance_km is not None %}true{% else %}false{% endif %};
-
-        const storeIcon = L.divIcon({
-            className: 'product-map-marker product-map-marker-store',
-            html: '<span>Loja</span>',
-            iconSize: [52, 28],
-            iconAnchor: [26, 14],
-        });
-
-        function getUserCoords() {
-            {% if has_location and distance_km is not None %}
-            return MobCoordinates.fixSwappedCoordinates({{ user_lat }}, {{ user_lng }});
-            {% else %}
-            return { lat: null, lng: null };
-            {% endif %}
-        }
-
-        function renderProductMap() {
-            const userCoords = getUserCoords();
-            MobLocationMap.init('product-map', {
-                userLat: userCoords.lat,
-                userLng: userCoords.lng,
-                markers: [{
-                    lat: establishmentLat,
-                    lng: establishmentLng,
-                    icon: storeIcon,
-                    popup: establishmentName,
-                }],
-                defaultZoom: 15,
-            });
-        }
-
-        renderProductMap();
-
-        {% if user.is_authenticated %}
-        if (!hasDistance && navigator.geolocation) {
-            MobGeolocation.request({ maximumAge: 0 })
-                .then((coords) => {
-                    const params = new URLSearchParams(window.location.search);
-                    params.set('lat', coords.lat.toFixed(6));
-                    params.set('lng', coords.lng.toFixed(6));
-                    window.location.replace(`${window.location.pathname}?${params.toString()}`);
-                })
-                .catch(() => {});
-        }
-        {% endif %}
-    </script>
 </body>
 </html>

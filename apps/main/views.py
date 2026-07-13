@@ -8,15 +8,11 @@ from .forms import LoginForm, RegisterForm
 from .jwt_utils import REFRESH_COOKIE, clear_jwt_cookies, get_tokens_for_user, set_jwt_cookies
 from .profile import Profile, can_use_client_catalog, get_client_catalog_redirect_name, set_active_profile
 from .search import (
-    DISTANCE_FILTER_OPTIONS,
-    calculate_distance_km,
+    build_search_map_markers,
     get_establishment_coordinates,
     get_public_product,
     get_search_categories,
-    parse_distance_km,
-    parse_authenticated_distance_km,
-    parse_authenticated_user_coordinates,
-    search_products_with_distance,
+    search_products,
 )
 from .engagement import (
     can_client_engage_product,
@@ -55,43 +51,20 @@ def search_results(request):
 
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
-    user_lat, user_lng = parse_authenticated_user_coordinates(request)
-    max_distance_km = parse_authenticated_distance_km(request)
-    raw_has_coordinates = (
-        request.user.is_authenticated
-        and bool(request.GET.get('lat') and request.GET.get('lng'))
+    products = list(search_products(query, category_slug=category_slug or None))
+    map_markers = build_search_map_markers(
+        products,
+        query=query,
+        category_slug=category_slug,
     )
-
-    product_pairs = search_products_with_distance(
-        query,
-        category_slug=category_slug or None,
-        user_lat=user_lat,
-        user_lng=user_lng,
-        max_distance_km=max_distance_km,
-    )
-
-    for product, distance_km in product_pairs:
-        product.distance_km = distance_km
-
-    products = [product for product, _ in product_pairs]
 
     return render(request, 'main/search_results.html', {
         'query': query,
         'active_category': category_slug,
-        'active_distance': str(max_distance_km) if max_distance_km else '',
-        'categories': get_search_categories(
-            query,
-            user_lat=user_lat,
-            user_lng=user_lng,
-            max_distance_km=max_distance_km,
-        ),
+        'categories': get_search_categories(query),
         'products': products,
         'results_count': len(products),
-        'user_lat': user_lat,
-        'user_lng': user_lng,
-        'has_location': user_lat is not None and user_lng is not None,
-        'location_invalid': raw_has_coordinates and user_lat is None,
-        'distance_options': DISTANCE_FILTER_OPTIONS,
+        'map_markers': map_markers,
     })
 
 
@@ -100,11 +73,6 @@ def product_detail(request, pk):
     establishment = product.establishment
     back_query = request.GET.get('q', '').strip()
     back_category = request.GET.get('categoria', '').strip()
-    user_lat, user_lng = parse_authenticated_user_coordinates(request)
-    distance_km = None
-    if user_lat is not None and user_lng is not None:
-        distance_km = calculate_distance_km(user_lat, user_lng, establishment)
-
     establishment_lat, establishment_lng = get_establishment_coordinates(establishment)
 
     review_stats = get_establishment_review_stats(establishment)
@@ -121,12 +89,13 @@ def product_detail(request, pk):
         'establishment': establishment,
         'establishment_lat': establishment_lat,
         'establishment_lng': establishment_lng,
+        'product_map_point': {
+            'lat': establishment_lat,
+            'lng': establishment_lng,
+            'name': establishment.name,
+        },
         'back_query': back_query,
         'back_category': back_category,
-        'user_lat': user_lat,
-        'user_lng': user_lng,
-        'has_location': user_lat is not None and user_lng is not None,
-        'distance_km': distance_km,
         'is_favorited': is_product_favorited(request.user, product),
         'review_stats': review_stats,
         'reviews': get_approved_reviews(establishment, limit=8),

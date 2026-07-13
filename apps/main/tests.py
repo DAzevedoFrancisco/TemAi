@@ -12,10 +12,9 @@ from apps.main.login_throttle import (
     register_failed_login,
 )
 from apps.main.search import (
-    haversine_km,
+    build_search_map_markers,
+    get_establishment_coordinates,
     normalize_establishment_coordinates,
-    normalize_user_coordinates,
-    parse_search_coordinates,
 )
 from apps.main.models import User, UserRole
 from apps.main.services import (
@@ -236,47 +235,64 @@ class UserRoleTests(TestCase):
 
 
 class SearchCoordinateTests(TestCase):
-    def test_normalize_user_coordinates_accepts_beira_point(self):
-        lat, lng = normalize_user_coordinates(-19.8436, 34.8389)
-        self.assertAlmostEqual(lat, -19.8436)
-        self.assertAlmostEqual(lng, 34.8389)
-
-    def test_normalize_user_coordinates_fixes_swapped_values(self):
-        lat, lng = normalize_user_coordinates(34.8389, -19.8436)
-        self.assertAlmostEqual(lat, -19.8436)
-        self.assertAlmostEqual(lng, 34.8389)
-
-    def test_normalize_user_coordinates_accepts_point_outside_beira(self):
-        lat, lng = normalize_user_coordinates(-19.116, 33.483)
-        self.assertAlmostEqual(lat, -19.116)
-        self.assertAlmostEqual(lng, 33.483)
-
-    def test_normalize_user_coordinates_fixes_swapped_chota_point(self):
-        lat, lng = normalize_user_coordinates(34.8881, -19.8169)
-        self.assertAlmostEqual(lat, -19.8169)
-        self.assertAlmostEqual(lng, 34.8881)
-
-    def test_haversine_distance_chota_to_casa_dos_bicos(self):
-        chota = (-19.8169, 34.8881)
-        casa_dos_bicos = (-19.83490, 34.84038)
-        distance = haversine_km(*chota, *casa_dos_bicos)
-        self.assertGreater(distance, 4)
-        self.assertLess(distance, 7)
-
-    def test_haversine_distance_for_nearby_points(self):
-        distance = haversine_km(-19.8436, 34.8389, -19.8500, 34.8500)
-        self.assertGreater(distance, 0.5)
-        self.assertLess(distance, 3)
-
-    def test_parse_search_coordinates_from_strings(self):
-        lat, lng = parse_search_coordinates('-19.8436', '34.8389')
-        self.assertAlmostEqual(lat, -19.8436)
-        self.assertAlmostEqual(lng, 34.8389)
-
     def test_normalize_establishment_coordinates_fixes_swapped_values(self):
         lat, lng = normalize_establishment_coordinates(34.8389, -19.8436)
         self.assertAlmostEqual(lat, -19.8436)
         self.assertAlmostEqual(lng, 34.8389)
+
+    def test_get_establishment_coordinates_uses_normalized_values(self):
+        from apps.vendor.models import Establishment
+
+        establishment = Establishment(
+            latitude=34.8389,
+            longitude=-19.8436,
+        )
+        lat, lng = get_establishment_coordinates(establishment)
+        self.assertAlmostEqual(lat, -19.8436)
+        self.assertAlmostEqual(lng, 34.8389)
+
+    def test_build_search_map_markers_groups_by_store(self):
+        from apps.vendor.models import Category, Establishment, Product
+
+        category = Category.objects.create(name='Geral', slug='geral')
+        store = Establishment.objects.create(
+            name='Loja Teste',
+            address='Rua A',
+            phone='840000000',
+            opening_hours='08:00 - 18:00',
+            latitude=-19.8436,
+            longitude=34.8389,
+            is_active=True,
+            owner=User.objects.create_user(
+                email='mapa@example.com',
+                password='senha123',
+                name='Dono Mapa',
+                date_of_birth='1990-01-01',
+                gender=User.Gender.MASCULINO,
+            ),
+        )
+        p1 = Product.objects.create(
+            establishment=store,
+            category=category,
+            name='Produto 1',
+            description='Descricao 1',
+            is_active=True,
+            is_available=True,
+        )
+        p2 = Product.objects.create(
+            establishment=store,
+            category=category,
+            name='Produto 2',
+            description='Descricao 2',
+            is_active=True,
+            is_available=True,
+        )
+
+        markers = build_search_map_markers([p1, p2], query='produto')
+        self.assertEqual(len(markers), 1)
+        self.assertEqual(markers[0]['name'], 'Loja Teste')
+        self.assertEqual(len(markers[0]['products']), 2)
+        self.assertIn('q=produto', markers[0]['products'][0]['url'])
 
 
 class DateOfBirthValidationTests(TestCase):

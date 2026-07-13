@@ -106,6 +106,18 @@
         </div>
     </div>
 
+    <div class="dash-modal" id="admin-confirm-modal" hidden>
+        <div class="dash-modal-overlay" id="admin-confirm-overlay"></div>
+        <div class="dash-modal-box" role="dialog" aria-labelledby="admin-confirm-title" aria-modal="true">
+            <h3 id="admin-confirm-title">Confirmar ação</h3>
+            <p id="admin-confirm-message"></p>
+            <div class="dash-modal-actions">
+                <button type="button" class="btn-secondary" id="admin-confirm-cancel">Cancelar</button>
+                <button type="button" class="btn-danger" id="admin-confirm-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <form method="post" action="{% url 'logout' %}" id="dash-logout-form" hidden>
         {% csrf_token %}
     </form>
@@ -177,6 +189,7 @@
     </script>
     <script src="{% static 'main/js/flash-messages.js' %}"></script>
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
+    <script src="{% static 'admin_panel/js/admin-confirm-modal.js' %}"></script>
     <script src="{% static 'admin_panel/js/admin-filters-drawer.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

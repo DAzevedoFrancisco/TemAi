@@ -2,7 +2,7 @@
 Icon-only action button. Required: url, icon_type (block|unblock|delete), label, btn_class
 Optional: next, confirm
 {% endcomment %}
-<form method="post" action="{{ url }}" class="admin-table-action-form"{% if confirm %} onsubmit="return confirm('{{ confirm|escapejs }}')"{% endif %}>
+<form method="post" action="{{ url }}" class="admin-table-action-form"{% if confirm %} data-confirm-message="{{ confirm }}"{% if confirm_title %} data-confirm-title="{{ confirm_title }}"{% endif %}{% endif %}>
     {% csrf_token %}
     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
     <button type="submit" class="admin-icon-btn {{ btn_class }}" aria-label="{{ label }}" title="{{ label }}">

@@ -186,7 +186,7 @@
 
     function setMarker(lat, lng) {
         if (!isInsideBeira(lat, lng)) {
-            alert('Selecione um ponto dentro da cidade da Beira.');
+            setGeoStatus('Selecione um ponto dentro da cidade da Beira.', 'warning');
             return;
         }
 
@@ -197,7 +197,7 @@
             marker.on('dragend', (e) => {
                 const pos = e.target.getLatLng();
                 if (!isInsideBeira(pos.lat, pos.lng)) {
-                    alert('A localização deve permanecer dentro da cidade da Beira.');
+                    setGeoStatus('A localização deve permanecer dentro da cidade da Beira.', 'warning');
                     marker.setLatLng([parseFloat(latInput.value), parseFloat(lngInput.value)]);
                     return;
                 }
@@ -245,11 +245,11 @@
     function geoErrorMessage(error) {
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                return 'Permita o acesso à localização nas definições do dispositivo.';
+                return 'Permissão de localização recusada.';
             case error.POSITION_UNAVAILABLE:
-                return 'Não foi possível obter a localização atual.';
+                return 'Localização indisponível no momento.';
             case error.TIMEOUT:
-                return 'A deteção da localização demorou demasiado. Tente novamente.';
+                return 'A localização demorou demasiado. Tente novamente.';
             default:
                 return 'Não foi possível obter a localização.';
         }

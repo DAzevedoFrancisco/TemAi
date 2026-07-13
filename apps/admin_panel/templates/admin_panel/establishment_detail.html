@@ -1,5 +1,5 @@
 {% extends 'admin_panel/base.html' %}
-{% load static %}
+{% load static l10n %}
 
 {% block title %}{{ establishment.name }}{% endblock %}
 
@@ -91,8 +91,8 @@
                 class="admin-est-detail-map"
                 role="img"
                 aria-label="Mapa do estabelecimento"
-                data-lat="{{ establishment_lat }}"
-                data-lng="{{ establishment_lng }}"
+                data-lat="{{ establishment_lat|unlocalize }}"
+                data-lng="{{ establishment_lng|unlocalize }}"
                 data-name="{{ establishment.name|escapejs }}"
                 data-marker-icon="{% static 'main/vendor/leaflet/images/marker-icon.png' %}"
                 data-marker-icon2x="{% static 'main/vendor/leaflet/images/marker-icon-2x.png' %}"

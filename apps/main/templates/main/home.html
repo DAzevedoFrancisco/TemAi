@@ -26,10 +26,6 @@
                         <div class="text">O Que Procura?</div>
 
                         <form method="get" action="{% url 'search_results' %}" class="search-form">
-                            {% if user.is_authenticated %}
-                            <input type="hidden" name="lat" id="search-lat" value="">
-                            <input type="hidden" name="lng" id="search-lng" value="">
-                            {% endif %}
                             <div class="search">
                                 <div class="search-input-row">
                                     <input
@@ -196,11 +192,6 @@
 
     </script>
     <script src="{% static 'main/js/mobile-nav.js' %}"></script>
-    {% if user.is_authenticated %}
-    <script src="{% static 'main/js/coordinates.js' %}"></script>
-    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
-    <script src="{% static 'main/js/home-search-location.js' %}"></script>
-    {% endif %}
     <script src="{% static 'main/js/search-input.js' %}"></script>
     <script src="{% static 'main/js/about-scroll-reveal.js' %}"></script>
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>

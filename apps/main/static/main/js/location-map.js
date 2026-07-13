@@ -1,24 +1,4 @@
 (function () {
-    function haversineKm(lat1, lon1, lat2, lon2) {
-        const earthRadiusKm = 6371;
-        const phi1 = lat1 * Math.PI / 180;
-        const phi2 = lat2 * Math.PI / 180;
-        const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-        const deltaLambda = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(deltaPhi / 2) ** 2
-            + Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) ** 2;
-        return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    function userIcon() {
-        return L.divIcon({
-            className: 'product-map-marker product-map-marker-user',
-            html: '<span>Você</span>',
-            iconSize: [52, 28],
-            iconAnchor: [26, 14],
-        });
-    }
-
     function destroyMap(container) {
         if (container && container._mobMap) {
             container._mobMap.remove();
@@ -33,8 +13,6 @@
         }
 
         const {
-            userLat = null,
-            userLng = null,
             markers = [],
             fitPadding = 0.2,
             defaultZoom = 15,
@@ -47,26 +25,15 @@
             return null;
         }
 
-        let normalizedUserLat = userLat;
-        let normalizedUserLng = userLng;
-        if (normalizedUserLat != null && normalizedUserLng != null && window.MobCoordinates) {
-            const normalized = MobCoordinates.fixSwappedCoordinates(normalizedUserLat, normalizedUserLng);
-            normalizedUserLat = normalized.lat;
-            normalizedUserLng = normalized.lng;
-        }
-
         destroyMap(container);
-
-        if (window.MobMapTiles && typeof MobMapTiles.applyLeafletReferrerPolicy === 'function') {
-            MobMapTiles.applyLeafletReferrerPolicy();
-        }
 
         const map = L.map(containerId, {
             scrollWheelZoom: false,
             preferCanvas,
         });
-        L.tileLayer(MobMapTiles.url, MobMapTiles.options).addTo(map);
+        const tileLayer = MobMapTiles.addTileLayer(map);
         container._mobMap = map;
+        container._mobTileLayer = tileLayer;
 
         const allMarkers = [];
 
@@ -81,13 +48,6 @@
             allMarkers.push(marker);
         });
 
-        if (normalizedUserLat != null && normalizedUserLng != null) {
-            const userMarker = L.marker([normalizedUserLat, normalizedUserLng], { icon: userIcon() })
-                .addTo(map)
-                .bindPopup('A sua localização');
-            allMarkers.push(userMarker);
-        }
-
         if (allMarkers.length > 1) {
             map.fitBounds(L.featureGroup(allMarkers).getBounds().pad(fitPadding));
         } else if (allMarkers.length === 1) {
@@ -96,22 +56,28 @@
             if (openFirstPopup && allMarkers[0].getPopup()) {
                 allMarkers[0].openPopup();
             }
-        } else if (normalizedUserLat != null && normalizedUserLng != null) {
-            map.setView([normalizedUserLat, normalizedUserLng], defaultZoom);
         }
 
         const refresh = () => map.invalidateSize({ animate: false });
         map.whenReady(refresh);
         requestAnimationFrame(refresh);
-        setTimeout(refresh, 200);
-        setTimeout(refresh, 600);
+        [120, 350, 700, 1200, 2000].forEach((delay) => {
+            window.setTimeout(refresh, delay);
+        });
         window.addEventListener('resize', refresh);
+        window.addEventListener('orientationchange', () => {
+            window.setTimeout(refresh, 350);
+        });
+
+        if (typeof ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(refresh);
+            resizeObserver.observe(container);
+        }
 
         return map;
     }
 
     window.MobLocationMap = {
-        haversineKm,
         init,
         destroyMap,
     };
