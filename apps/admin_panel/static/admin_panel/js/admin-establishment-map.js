@@ -38,39 +38,6 @@
         return scrollable && allowsScroll ? scrollRoot : null;
     }
 
-    function showMapFallback(mapEl) {
-        const fallback = document.getElementById('admin-est-detail-map-fallback');
-        const frame = document.getElementById('admin-est-detail-map-fallback-frame');
-        const link = document.getElementById('admin-est-detail-map-fallback-link');
-        if (!fallback || !frame || !link) {
-            return;
-        }
-
-        const lat = parseNumber(mapEl.dataset.lat);
-        const lng = parseNumber(mapEl.dataset.lng);
-        if (lat == null || lng == null) {
-            return;
-        }
-
-        const delta = 0.012;
-        const bbox = [
-            lng - delta,
-            lat - delta,
-            lng + delta,
-            lat + delta,
-        ].join('%2C');
-
-        frame.src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`;
-        link.href = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`;
-
-        mapEl.classList.add('is-fallback-active');
-        fallback.hidden = false;
-    }
-
-    function hasLoadedTiles(mapEl) {
-        return Boolean(mapEl.querySelector('.leaflet-tile-loaded'));
-    }
-
     function bootAdminEstablishmentMap() {
         const mapEl = document.getElementById('admin-est-detail-map');
         if (!mapEl || mapEl.dataset.mapReady === 'true') {
@@ -125,12 +92,6 @@
             const resizeObserver = new ResizeObserver(refresh);
             resizeObserver.observe(mapEl);
         }
-
-        window.setTimeout(() => {
-            if (!hasLoadedTiles(mapEl)) {
-                showMapFallback(mapEl);
-            }
-        }, 4500);
     }
 
     function tryBootAdminEstablishmentMap() {
@@ -154,20 +115,11 @@
             attempts += 1;
             tryBootAdminEstablishmentMap();
 
-            if (mapEl.dataset.mapReady === 'true') {
+            if (mapEl.dataset.mapReady === 'true' || attempts >= maxAttempts) {
                 return;
             }
 
-            if (attempts < maxAttempts) {
-                window.setTimeout(attemptBoot, 250);
-                return;
-            }
-
-            showMapFallback(mapEl);
-        };
-
-        const onVisible = () => {
-            attemptBoot();
+            window.setTimeout(attemptBoot, 250);
         };
 
         if ('IntersectionObserver' in window) {
@@ -175,7 +127,7 @@
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        onVisible();
+                        attemptBoot();
                     }
                 });
             }, {
@@ -188,7 +140,7 @@
         }
 
         const scrollRoot = getScrollRoot();
-        const onScroll = () => onVisible();
+        const onScroll = () => attemptBoot();
         window.addEventListener('scroll', onScroll, { passive: true });
         scrollRoot?.addEventListener('scroll', onScroll, { passive: true });
 

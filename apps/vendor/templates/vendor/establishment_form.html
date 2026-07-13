@@ -108,16 +108,7 @@
 
                         <div class="establishment-map-panel">
                             <div class="establishment-map-toolbar">
-                                <p class="establishment-map-hint">Toque no mapa ou use a sua localização atual na Beira.</p>
-                                <button type="button" class="btn-geo-location" id="btn-geo-location">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="3"/>
-                                        <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
-                                        <path d="M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-                                    </svg>
-                                    <span class="btn-geo-label">Minha localização</span>
-                                    <span class="btn-geo-label-short">Localizar</span>
-                                </button>
+                                <p class="establishment-map-hint">Toque no mapa para marcar o ponto do estabelecimento na Beira.</p>
                             </div>
 
                             <p class="establishment-geo-status" id="geo-status" role="status" aria-live="polite" hidden></p>
@@ -214,7 +205,6 @@
 
     map.on('click', (e) => setMarker(e.latlng.lat, e.latlng.lng));
 
-    const geoBtn = document.getElementById('btn-geo-location');
     const geoStatus = document.getElementById('geo-status');
 
     function setGeoStatus(message, type = 'info') {
@@ -227,83 +217,6 @@
         geoStatus.hidden = false;
         geoStatus.textContent = message;
         geoStatus.className = `establishment-geo-status establishment-geo-status--${type}`;
-    }
-
-    function setGeoLoading(isLoading) {
-        geoBtn.disabled = isLoading;
-        geoBtn.classList.toggle('is-loading', isLoading);
-        const longLabel = geoBtn.querySelector('.btn-geo-label');
-        const shortLabel = geoBtn.querySelector('.btn-geo-label-short');
-        if (longLabel) {
-            longLabel.textContent = isLoading ? 'A localizar...' : 'Minha localização';
-        }
-        if (shortLabel) {
-            shortLabel.textContent = isLoading ? '...' : 'Localizar';
-        }
-    }
-
-    function geoErrorMessage(error) {
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                return 'Permissão de localização recusada.';
-            case error.POSITION_UNAVAILABLE:
-                return 'Localização indisponível no momento.';
-            case error.TIMEOUT:
-                return 'A localização demorou demasiado. Tente novamente.';
-            default:
-                return 'Não foi possível obter a localização.';
-        }
-    }
-
-    function applyCurrentLocation(position, { auto = false } = {}) {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-
-        map.setView([lat, lng], 16, { animate: true });
-
-        if (isInsideBeira(lat, lng)) {
-            setMarker(lat, lng);
-            setGeoStatus('Localização atual aplicada no mapa.', 'success');
-        } else {
-            setGeoStatus(
-                auto
-                    ? 'A sua localização está fora da Beira. Toque no mapa para marcar o local.'
-                    : 'A sua localização está fora da cidade da Beira. Selecione o ponto no mapa.',
-                'warning'
-            );
-        }
-    }
-
-    function requestCurrentLocation({ auto = false } = {}) {
-        if (!navigator.geolocation) {
-            setGeoStatus('O seu dispositivo não suporta geolocalização.', 'error');
-            return;
-        }
-
-        setGeoLoading(true);
-        if (!auto) setGeoStatus('A obter a sua localização...', 'info');
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setGeoLoading(false);
-                applyCurrentLocation(position, { auto });
-            },
-            (error) => {
-                setGeoLoading(false);
-                setGeoStatus(geoErrorMessage(error), 'error');
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 12000,
-                maximumAge: 60000,
-            }
-        );
-    }
-
-    geoBtn.addEventListener('click', () => requestCurrentLocation({ auto: false }));
-
-    if (!hasSavedLocation) {
-        requestCurrentLocation({ auto: true });
     }
 
     function refreshMapSize() {
