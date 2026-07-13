@@ -1902,13 +1902,14 @@ body:has(.product-detail-page) {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center;
     border-radius: 0;
     transition: transform 0.28s ease;
 }
 
 .search-masonry-item:hover .search-masonry-image-wrap img {
-    transform: scale(1.05);
+    transform: none;
 }
 
 .search-masonry-placeholder {
