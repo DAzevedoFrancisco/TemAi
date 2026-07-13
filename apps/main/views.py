@@ -14,7 +14,8 @@ from .search import (
     get_public_product,
     get_search_categories,
     parse_distance_km,
-    parse_search_coordinates,
+    parse_authenticated_distance_km,
+    parse_authenticated_user_coordinates,
     search_products_with_distance,
 )
 from .engagement import (
@@ -54,12 +55,12 @@ def search_results(request):
 
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
-    user_lat, user_lng = parse_search_coordinates(
-        request.GET.get('lat'),
-        request.GET.get('lng'),
+    user_lat, user_lng = parse_authenticated_user_coordinates(request)
+    max_distance_km = parse_authenticated_distance_km(request)
+    raw_has_coordinates = (
+        request.user.is_authenticated
+        and bool(request.GET.get('lat') and request.GET.get('lng'))
     )
-    max_distance_km = parse_distance_km(request.GET.get('distancia'))
-    raw_has_coordinates = bool(request.GET.get('lat') and request.GET.get('lng'))
 
     product_pairs = search_products_with_distance(
         query,
@@ -99,10 +100,7 @@ def product_detail(request, pk):
     establishment = product.establishment
     back_query = request.GET.get('q', '').strip()
     back_category = request.GET.get('categoria', '').strip()
-    user_lat, user_lng = parse_search_coordinates(
-        request.GET.get('lat'),
-        request.GET.get('lng'),
-    )
+    user_lat, user_lng = parse_authenticated_user_coordinates(request)
     distance_km = None
     if user_lat is not None and user_lng is not None:
         distance_km = calculate_distance_km(user_lat, user_lng, establishment)

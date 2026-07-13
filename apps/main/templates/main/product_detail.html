@@ -21,7 +21,7 @@
 
             <div class="product-detail-breadcrumb">
                 {% if back_query %}
-                    <a href="{% url 'search_results' %}?q={{ back_query|urlencode }}{% if back_category %}&categoria={{ back_category|urlencode }}{% endif %}{% if request.GET.lat %}&lat={{ request.GET.lat }}{% endif %}{% if request.GET.lng %}&lng={{ request.GET.lng }}{% endif %}{% if request.GET.distancia %}&distancia={{ request.GET.distancia }}{% endif %}" class="product-detail-back">
+                    <a href="{% url 'search_results' %}?q={{ back_query|urlencode }}{% if back_category %}&categoria={{ back_category|urlencode }}{% endif %}{% if has_location %}&lat={{ user_lat }}&lng={{ user_lng }}{% if request.GET.distancia %}&distancia={{ request.GET.distancia }}{% endif %}{% endif %}" class="product-detail-back">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                         Voltar aos resultados
                     </a>
@@ -303,7 +303,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="{% static 'main/js/map-tiles.js' %}"></script>
     <script src="{% static 'main/js/coordinates.js' %}"></script>
+    {% if user.is_authenticated %}
     <script src="{% static 'main/js/user-geolocation.js' %}"></script>
+    {% endif %}
     <script src="{% static 'main/js/location-map.js' %}"></script>
     <script src="{% static 'main/js/star-rating.js' %}"></script>
     {% if product.image %}
@@ -346,7 +348,7 @@
         const establishmentLat = {{ establishment_lat }};
         const establishmentLng = {{ establishment_lng }};
         const establishmentName = "{{ establishment.name|escapejs }}";
-        const hasLocation = {% if has_location %}true{% else %}false{% endif %};
+        const hasDistance = {% if has_location and distance_km is not None %}true{% else %}false{% endif %};
 
         const storeIcon = L.divIcon({
             className: 'product-map-marker product-map-marker-store',
@@ -356,7 +358,7 @@
         });
 
         function getUserCoords() {
-            {% if has_location %}
+            {% if has_location and distance_km is not None %}
             return MobCoordinates.fixSwappedCoordinates({{ user_lat }}, {{ user_lng }});
             {% else %}
             return { lat: null, lng: null };
@@ -380,7 +382,8 @@
 
         renderProductMap();
 
-        if (!hasLocation && navigator.geolocation) {
+        {% if user.is_authenticated %}
+        if (!hasDistance && navigator.geolocation) {
             MobGeolocation.request({ maximumAge: 0 })
                 .then((coords) => {
                     const params = new URLSearchParams(window.location.search);
@@ -390,6 +393,7 @@
                 })
                 .catch(() => {});
         }
+        {% endif %}
     </script>
 </body>
 </html>

@@ -55,6 +55,21 @@ def parse_search_coordinates(lat_value, lng_value):
     )
 
 
+def parse_authenticated_user_coordinates(request):
+    if not request.user.is_authenticated:
+        return None, None
+    return parse_search_coordinates(
+        request.GET.get('lat'),
+        request.GET.get('lng'),
+    )
+
+
+def parse_authenticated_distance_km(request):
+    if not request.user.is_authenticated:
+        return None
+    return parse_distance_km(request.GET.get('distancia'))
+
+
 def parse_distance_km(value):
     if value in (None, ''):
         return None

@@ -86,6 +86,8 @@
 
                     <div class="search-location-bar">
 
+                        {% if user.is_authenticated %}
+
                         {% if has_location %}
 
                             <span class="search-location-status">
@@ -122,11 +124,13 @@
 
                         {% endif %}
 
+                        {% endif %}
+
                     </div>
 
 
 
-                    {% if has_location %}
+                    {% if user.is_authenticated and has_location %}
 
                         <div class="search-distance-filters search-category-scroll">
 
@@ -245,12 +249,6 @@
 
                                         <span class="search-masonry-location-text">{{ product.establishment.address|truncatechars:55 }}</span>
 
-                                        {% if product.distance_km is not None %}
-
-                                            <span class="search-masonry-distance">{{ product.distance_km|floatformat:1 }} km</span>
-
-                                        {% endif %}
-
                                     </div>
 
                                 </div>
@@ -315,9 +313,11 @@
 
 
 
+    {% if user.is_authenticated %}
     <script src="{% static 'main/js/coordinates.js' %}"></script>
     <script src="{% static 'main/js/user-geolocation.js' %}"></script>
     <script src="{% static 'main/js/search-location.js' %}"></script>
+    {% endif %}
     <script src="{% static 'main/js/search-input.js' %}"></script>
 
 </body>
