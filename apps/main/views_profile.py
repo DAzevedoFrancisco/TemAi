@@ -1,9 +1,13 @@
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.shortcuts import redirect, render
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.main.forms import AccountPasswordForm, AccountProfileForm
-from apps.main.jwt_utils import get_tokens_for_user, set_jwt_cookies
+from apps.main.forms import AccountDeleteForm, AccountPasswordForm, AccountProfileForm
+from apps.main.jwt_utils import REFRESH_COOKIE, clear_jwt_cookies, get_tokens_for_user, set_jwt_cookies
 from apps.main.profile import Profile, set_active_profile
+from apps.main.services import delete_user_account, get_self_account_deletion_block_reason
 from apps.vendor.decorators import login_required_view
 
 
@@ -23,6 +27,8 @@ def account_settings(request):
         user=request.user,
     )
     password_form = AccountPasswordForm(user=request.user)
+    delete_form = AccountDeleteForm(user=request.user)
+    delete_block_reason = get_self_account_deletion_block_reason(request.user)
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -62,10 +68,37 @@ def account_settings(request):
                 )
                 response = redirect('account_settings')
                 return set_jwt_cookies(response, tokens)
+        elif form_type == 'delete':
+            delete_form = AccountDeleteForm(
+                request.POST,
+                user=request.user,
+            )
+            if delete_block_reason:
+                messages.error(request, delete_block_reason, extra_tags='account')
+                return redirect('account_settings')
+            if delete_form.is_valid():
+                user = request.user
+                refresh_token = request.COOKIES.get(REFRESH_COOKIE)
+                if refresh_token:
+                    try:
+                        RefreshToken(refresh_token).blacklist()
+                    except TokenError:
+                        pass
+                logout(request)
+                delete_user_account(user)
+                messages.success(
+                    request,
+                    'A sua conta foi eliminada definitivamente.',
+                    extra_tags='general',
+                )
+                response = redirect('auth')
+                return clear_jwt_cookies(response)
 
     return render(request, 'main/account_settings.html', {
         'profile_form': profile_form,
         'password_form': password_form,
+        'delete_form': delete_form,
+        'delete_block_reason': delete_block_reason,
         'user_roles': request.user.get_roles_display(),
     })
 

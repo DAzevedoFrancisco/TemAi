@@ -281,6 +281,44 @@ class AccountPasswordForm(forms.Form):
         return cleaned_data
 
 
+class AccountDeleteForm(forms.Form):
+    password = forms.CharField(
+        label='Senha actual',
+        error_messages={'required': 'Introduza a senha para confirmar a eliminação.'},
+        widget=forms.PasswordInput(attrs={
+            'id': 'account-delete-password',
+            'placeholder': '••••••••',
+            'autocomplete': 'current-password',
+        }),
+    )
+    confirm_text = forms.CharField(
+        label='Confirmação',
+        error_messages={'required': 'Escreva ELIMINAR para confirmar.'},
+        widget=forms.TextInput(attrs={
+            'id': 'account-delete-confirm',
+            'placeholder': 'Escreva ELIMINAR',
+            'autocomplete': 'off',
+        }),
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        apply_pt_field_errors(self)
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password', '')
+        if self.user is not None and not self.user.check_password(password):
+            raise forms.ValidationError('A senha está incorrecta.')
+        return password
+
+    def clean_confirm_text(self):
+        value = (self.cleaned_data.get('confirm_text') or '').strip()
+        if value.upper() != 'ELIMINAR':
+            raise forms.ValidationError('Escreva ELIMINAR para confirmar a eliminação.')
+        return value
+
+
 class EstablishmentReviewForm(forms.Form):
     rating = forms.ChoiceField(
         label='Avaliação',

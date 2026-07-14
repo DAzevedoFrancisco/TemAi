@@ -79,7 +79,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for establishment in establishments|slice:":5" %}
+                            {% for establishment in establishments|slice:":2" %}
                                 <tr>
                                     <td>
                                         <div class="table-est-name">
@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="dash-table-mobile">
-                    {% for establishment in establishments|slice:":5" %}
+                    {% for establishment in establishments|slice:":2" %}
                         <article class="dash-est-mobile">
                             <div class="dash-est-mobile-head">
                                 <span class="table-est-icon">{{ establishment.name|slice:":1"|upper }}</span>
@@ -157,17 +157,6 @@
                         <small>Explorar a cidade</small>
                     </span>
                 </a>
-            </div>
-
-            <div class="quick-stats">
-                <div class="quick-stat-row">
-                    <span>Taxa de preenchimento</span>
-                    <div class="quick-bar"><div class="quick-bar-fill" style="width: {% if establishments_count %}100{% else %}15{% endif %}%"></div></div>
-                </div>
-                <div class="quick-stat-row">
-                    <span>Produtos por estabelecimento</span>
-                    <div class="quick-bar"><div class="quick-bar-fill quick-bar-fill-2" style="width: {% if establishments_count and products_count %}{% widthratio products_count establishments_count 100 %}{% else %}0{% endif %}%"></div></div>
-                </div>
             </div>
         </article>
     </section>

@@ -434,6 +434,34 @@ body:has(.account-page) {
     background: #f5f3ff;
 }
 
+.account-card-danger {
+    grid-column: 1 / -1;
+    border-color: #fecaca;
+    background: linear-gradient(180deg, #fff 0%, #fff8f8 100%);
+}
+
+.account-card-icon-danger {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.account-danger-note {
+    margin: 0 0 0.35rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #7f1d1d;
+}
+
+.account-btn-danger {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(185, 28, 28, 0.22);
+}
+
+.account-btn-danger:hover {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
 /* Nav link activo na página de conta */
 .content.account-page .menu .client-nav-item-account.active {
     background: rgba(97, 92, 237, 0.35);

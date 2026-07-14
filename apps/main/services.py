@@ -117,6 +117,12 @@ def get_admin_account_deletion_block_reason(target, actor):
     return None
 
 
+def get_self_account_deletion_block_reason(user):
+    if user.is_administrador and administrator_count() <= 1:
+        return 'Não pode eliminar a conta: é o último administrador do sistema.'
+    return None
+
+
 def delete_user_account(user):
     with transaction.atomic():
         user.delete()

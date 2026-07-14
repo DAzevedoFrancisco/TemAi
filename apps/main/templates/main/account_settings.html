@@ -169,6 +169,66 @@
                         <button type="submit" class="account-btn account-btn-secondary">Alterar senha</button>
                     </form>
                 </section>
+
+                <section class="account-card account-card-danger">
+                    <div class="account-card-head">
+                        <div class="account-card-icon account-card-icon-danger">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </div>
+                        <div>
+                            <h2>Eliminar conta</h2>
+                            <p>Remove definitivamente a sua conta, estabelecimentos e dados associados.</p>
+                        </div>
+                    </div>
+
+                    {% if delete_block_reason %}
+                        <div class="account-alert account-alert-error">
+                            <p>{{ delete_block_reason }}</p>
+                        </div>
+                    {% else %}
+                        <form method="post" class="account-form" novalidate id="account-delete-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_type" value="delete">
+
+                            {% if delete_form.non_field_errors %}
+                                <div class="account-alert account-alert-error">
+                                    {% for error in delete_form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <p class="account-danger-note">
+                                Esta acção é irreversível. Os seus estabelecimentos, produtos, favoritos e avaliações serão removidos.
+                            </p>
+
+                            <div class="account-field">
+                                <label for="account-delete-password">Senha actual</label>
+                                <div class="account-input-wrap">
+                                    <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    {{ delete_form.password }}
+                                </div>
+                                {% for error in delete_form.password.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                            </div>
+
+                            <div class="account-field">
+                                <label for="account-delete-confirm">Escreva ELIMINAR para confirmar</label>
+                                <div class="account-input-wrap account-input-wrap-plain">
+                                    {{ delete_form.confirm_text }}
+                                </div>
+                                {% for error in delete_form.confirm_text.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="account-btn account-btn-danger"
+                                data-confirm="Tem a certeza de que deseja eliminar a sua conta? Esta acção não pode ser anulada."
+                            >
+                                Eliminar conta definitivamente
+                            </button>
+                        </form>
+                    {% endif %}
+                </section>
             </div>
         </main>
 
@@ -177,5 +237,20 @@
 
     {% include 'main/partials/client_scripts.html' %}
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
+    <script>
+        (function () {
+            const form = document.getElementById('account-delete-form');
+            if (!form) {
+                return;
+            }
+            form.addEventListener('submit', (event) => {
+                const message = form.querySelector('.account-btn-danger')?.dataset.confirm
+                    || 'Tem a certeza de que deseja eliminar a sua conta?';
+                if (!window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

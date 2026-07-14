@@ -151,6 +151,7 @@
                     </a>
                 </article>
 
+                {% if show_product_map %}
                 <article class="product-panel product-panel-map">
                     <div class="product-panel-header">
                         <div class="product-panel-icon product-panel-icon-map">
@@ -164,6 +165,7 @@
                     <div id="product-map" class="product-detail-map"></div>
                     {{ product_map_point|json_script:"product-map-data" }}
                 </article>
+                {% endif %}
             </section>
 
             <section class="product-detail-reviews">
@@ -295,10 +297,12 @@
 
     {% include 'main/partials/client_light_scripts.html' %}
 
+    {% if show_product_map %}
     <script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
     <script src="{% static 'main/js/map-tiles.js' %}"></script>
     <script src="{% static 'main/js/location-map.js' %}"></script>
     <script src="{% static 'main/js/product-detail-map.js' %}"></script>
+    {% endif %}
     <script src="{% static 'main/js/star-rating.js' %}"></script>
     {% if product.image %}
     <script>

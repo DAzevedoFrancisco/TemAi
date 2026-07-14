@@ -87,16 +87,23 @@ def product_detail(request, pk):
         }
     )
 
+    show_product_map = (
+        request.user.is_authenticated
+        and establishment_lat is not None
+        and establishment_lng is not None
+    )
+
     return render(request, 'main/product_detail.html', {
         'product': product,
         'establishment': establishment,
         'establishment_lat': establishment_lat,
         'establishment_lng': establishment_lng,
+        'show_product_map': show_product_map,
         'product_map_point': {
             'lat': establishment_lat,
             'lng': establishment_lng,
             'name': establishment.name,
-        },
+        } if show_product_map else None,
         'back_query': back_query,
         'back_category': back_category,
         'is_favorited': is_product_favorited(request.user, product),
