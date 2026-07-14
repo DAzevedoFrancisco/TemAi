@@ -98,7 +98,7 @@
                         {% endfor %}
                     </div>
 
-                    {% if map_markers %}
+                    {% if show_search_map %}
                     <section class="search-results-map-section" aria-label="Mapa das lojas">
                         <div class="search-results-map-header">
                             <h2>Onde encontrar</h2>
@@ -128,7 +128,7 @@
 
     {% include 'main/partials/client_light_scripts.html' %}
     <script src="{% static 'main/js/search-input.js' %}"></script>
-    {% if query and map_markers %}
+    {% if query and show_search_map %}
     {{ map_markers|json_script:"search-map-markers-data" }}
     <script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
     <script src="{% static 'main/js/map-tiles.js' %}"></script>

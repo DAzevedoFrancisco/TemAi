@@ -52,11 +52,13 @@ def search_results(request):
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
     products = list(search_products(query, category_slug=category_slug or None))
-    map_markers = build_search_map_markers(
-        products,
-        query=query,
-        category_slug=category_slug,
-    )
+    map_markers = []
+    if request.user.is_authenticated:
+        map_markers = build_search_map_markers(
+            products,
+            query=query,
+            category_slug=category_slug,
+        )
 
     return render(request, 'main/search_results.html', {
         'query': query,
@@ -65,6 +67,7 @@ def search_results(request):
         'products': products,
         'results_count': len(products),
         'map_markers': map_markers,
+        'show_search_map': request.user.is_authenticated and bool(map_markers),
     })
 
 
