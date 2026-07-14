@@ -2179,8 +2179,14 @@ body.dash-nav-open {
         display: flex;
     }
 
-    .dash-search {
+    .dash-topbar .dash-search {
         display: none;
+    }
+
+    .products-toolbar .products-search {
+        display: block;
+        width: 100%;
+        max-width: none;
     }
 
     .dash-notify-btn {

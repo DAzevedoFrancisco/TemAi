@@ -18,7 +18,7 @@ ESTABLISHMENT_SORT_FIELDS = {
     'owner': 'owner__name',
 }
 
-RECENT_DASHBOARD_LIMIT = 5
+RECENT_DASHBOARD_LIMIT = 4
 
 
 def get_dashboard_stats():
