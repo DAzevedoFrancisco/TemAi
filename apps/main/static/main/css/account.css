@@ -441,8 +441,13 @@ body:has(.account-page) {
 }
 
 .account-card-icon-danger {
-    background: #fef2f2;
-    color: #dc2626;
+    background: #dc2626;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+.account-card-icon-danger svg {
+    stroke: #fff;
 }
 
 .account-danger-note {
@@ -460,6 +465,25 @@ body:has(.account-page) {
 
 .account-btn-danger:hover {
     background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.account-delete-modal-content {
+    background-color: #1d1d20;
+}
+
+.logout-modal-confirm.account-delete-confirm {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #fff;
+}
+
+.logout-modal-confirm.account-delete-confirm:hover {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.logout-modal-confirm.account-delete-confirm:disabled,
+.logout-modal-cancel:disabled {
+    opacity: 0.65;
+    cursor: wait;
 }
 
 /* Nav link activo na página de conta */
