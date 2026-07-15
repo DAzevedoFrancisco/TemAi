@@ -102,7 +102,7 @@
                     <section class="search-results-map-section" aria-label="Mapa das lojas">
                         <div class="search-results-map-header">
                             <h2>Onde encontrar</h2>
-                            <p>{{ map_markers|length }} loja{{ map_markers|length|pluralize:"s" }} com resultados para "{{ query }}"</p>
+                            <p>{{ map_markers|length }} loja{{ map_markers|length|pluralize:"s" }} com resultados para "{{ query }}" — a sua localização aparece no mapa se autorizar o GPS</p>
                         </div>
                         <div id="search-results-map" class="search-results-map"></div>
                     </section>
@@ -133,6 +133,7 @@
     <script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
     <script src="{% static 'main/js/map-tiles.js' %}"></script>
     <script src="{% static 'main/js/location-map.js' %}"></script>
+    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
     <script src="{% static 'main/js/search-results-map.js' %}"></script>
     {% endif %}
 </body>

@@ -84,6 +84,11 @@
         }
 
         mapEl.dataset.mapReady = 'true';
+
+        if (typeof MobUserGeolocation !== 'undefined') {
+            MobUserGeolocation.attachToMap(map, mapEl, { fitPadding: 0.3 });
+        }
+
         return true;
     }
 

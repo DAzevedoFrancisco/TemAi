@@ -76,9 +76,15 @@
             window.setTimeout(refresh, delay);
         });
 
+        if (typeof MobUserGeolocation !== 'undefined' && mapEl.dataset.userGeoAttached !== 'true') {
+            mapEl.dataset.userGeoAttached = 'true';
+            MobUserGeolocation.attachToMap(map, mapEl);
+        }
+
         window.setTimeout(() => {
             if (!hasLoadedTiles(mapEl)) {
                 mapEl.dataset.mapReady = 'false';
+                mapEl.dataset.userGeoAttached = 'false';
                 bootProductDetailMap();
             }
         }, 2800);
