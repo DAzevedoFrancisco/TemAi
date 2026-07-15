@@ -3,10 +3,11 @@
     const LOADING_CLASS = 'mob-page-loading';
     const ACTIVE_CLASS = 'is-active';
     const HIDING_CLASS = 'is-hiding';
-    const MIN_VISIBLE_MS = 280;
+    const MIN_VISIBLE_MS = 80;
 
     let shownAt = Date.now();
     let hideTimer = null;
+    let hideScheduled = false;
 
     function getLoader() {
         return document.getElementById(LOADER_ID);
@@ -26,6 +27,7 @@
             window.clearTimeout(hideTimer);
             hideTimer = null;
         }
+        hideScheduled = false;
 
         loader.classList.remove(HIDING_CLASS);
         loader.classList.add(ACTIVE_CLASS);
@@ -41,6 +43,11 @@
             return;
         }
 
+        if (hideScheduled) {
+            return;
+        }
+        hideScheduled = true;
+
         const elapsed = Date.now() - shownAt;
         const delay = Math.max(0, MIN_VISIBLE_MS - elapsed);
 
@@ -49,10 +56,11 @@
             loader.classList.remove(ACTIVE_CLASS);
             loader.setAttribute('aria-hidden', 'true');
             setPageLoadingState(false);
+            hideScheduled = false;
 
             window.setTimeout(function () {
                 loader.classList.remove(HIDING_CLASS);
-            }, 220);
+            }, 180);
         }, delay);
     }
 
@@ -113,9 +121,14 @@
         }
     });
 
-    if (document.readyState === 'complete') {
+    // Hide as soon as the document is interactive; do not wait for
+    // fonts, images or map tiles (window.load).
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
         hideLoader();
     } else {
-        window.addEventListener('load', hideLoader, { once: true });
+        document.addEventListener('DOMContentLoaded', hideLoader, { once: true });
     }
+
+    // Safety net if a late navigation interrupted hide timing.
+    window.addEventListener('load', hideLoader, { once: true });
 })();

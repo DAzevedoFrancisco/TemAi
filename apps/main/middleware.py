@@ -36,7 +36,11 @@ class JWTCookieAuthenticationMiddleware:
             if token:
                 try:
                     validated = AccessToken(token)
-                    user = User.objects.get(pk=validated['user_id'])
+                    user = (
+                        User.objects
+                        .prefetch_related('user_roles')
+                        .get(pk=validated['user_id'])
+                    )
                     if user.is_active:
                         request.user = user
                 except (InvalidToken, TokenError, User.DoesNotExist, KeyError):

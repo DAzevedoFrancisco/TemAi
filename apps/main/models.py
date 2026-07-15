@@ -62,8 +62,22 @@ class User(AbstractBaseUser):
         word = cleaned.split()[0]
         return word[0].upper() + word[1:] if word else ''
 
+    def _cached_role_values(self):
+        cached = getattr(self, '_role_values_cache', None)
+        if cached is not None:
+            return cached
+
+        prefetched = getattr(self, '_prefetched_objects_cache', None) or {}
+        if 'user_roles' in prefetched:
+            cached = {user_role.role for user_role in self.user_roles.all()}
+        else:
+            cached = set(self.user_roles.values_list('role', flat=True))
+
+        self._role_values_cache = cached
+        return cached
+
     def has_role(self, role):
-        return self.user_roles.filter(role=role).exists()
+        return role in self._cached_role_values()
 
     @property
     def is_cliente(self):
@@ -79,6 +93,8 @@ class User(AbstractBaseUser):
 
     def add_role(self, role):
         UserRole.objects.get_or_create(user=self, role=role)
+        if hasattr(self, '_role_values_cache'):
+            del self._role_values_cache
 
     def get_roles_display(self):
         role_order = (
