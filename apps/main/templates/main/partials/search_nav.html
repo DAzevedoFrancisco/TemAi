@@ -43,12 +43,14 @@
         </a>
 
         <nav class="client-mobile-nav">
+            {% if can_use_client_catalog %}
             <a href="{% url 'home' %}#about" class="nav-menu-link client-nav-item">
                 <span class="client-nav-icon" aria-hidden="true">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 </span>
                 <span>Sobre</span>
             </a>
+            {% endif %}
             {% include 'main/partials/nav_auth_links.html' %}
             {% include 'main/partials/nav_account_link.html' %}
             {% include 'main/partials/nav_logout_item.html' %}

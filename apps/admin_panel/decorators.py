@@ -3,6 +3,8 @@ from functools import wraps
 from django.contrib import messages
 from django.shortcuts import redirect
 
+from apps.main.profile import Profile, set_active_profile
+
 
 def login_required_view(view_func):
     @wraps(view_func)
@@ -21,5 +23,6 @@ def administrador_required(view_func):
         if not request.user.is_administrador:
             messages.error(request, 'Precisa de ser administrador para aceder a esta área.', extra_tags='admin')
             return redirect('home')
+        set_active_profile(request, Profile.ADMINISTRADOR)
         return view_func(request, *args, **kwargs)
     return wrapper

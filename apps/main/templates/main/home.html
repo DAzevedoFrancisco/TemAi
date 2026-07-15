@@ -48,15 +48,27 @@
                         </form>
                     {% else %}
                         <div class="profile-notice">
-                            <div class="text">Perfil Vendedor ativo</div>
-                            <p>Como vendedor, pode gerir estabelecimentos e produtos. Para pesquisar na plataforma, mude para o perfil de Cliente.</p>
-                            <div class="profile-notice-actions">
-                                <a href="{% url 'switch_profile' %}?profile=cliente" class="profile-switch-btn">Mudar para Cliente</a>
-                                <a href="{% url 'vendor:dashboard' %}" class="profile-switch-btn secondary">Ir para o painel</a>
-                                {% if user.is_administrador %}
-                                    <a href="{% url 'admin_panel:dashboard' %}" class="profile-switch-btn secondary">Administração</a>
-                                {% endif %}
-                            </div>
+                            {% if active_profile == 'administrador' %}
+                                <div class="text">Perfil Administrador ativo</div>
+                                <p>Como administrador, gere contas e estabelecimentos. Para pesquisar na plataforma, mude para o perfil de Cliente.</p>
+                                <div class="profile-notice-actions">
+                                    <a href="{% url 'switch_profile' %}?profile=cliente" class="profile-switch-btn">Mudar para Cliente</a>
+                                    <a href="{% url 'admin_panel:dashboard' %}" class="profile-switch-btn secondary">Ir para a administração</a>
+                                    {% if user.is_vendedor %}
+                                        <a href="{% url 'switch_profile' %}?profile=vendedor" class="profile-switch-btn secondary">Painel vendedor</a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="text">Perfil Vendedor ativo</div>
+                                <p>Como vendedor, pode gerir estabelecimentos e produtos. Para pesquisar na plataforma, mude para o perfil de Cliente.</p>
+                                <div class="profile-notice-actions">
+                                    <a href="{% url 'switch_profile' %}?profile=cliente" class="profile-switch-btn">Mudar para Cliente</a>
+                                    <a href="{% url 'vendor:dashboard' %}" class="profile-switch-btn secondary">Ir para o painel</a>
+                                    {% if user.is_administrador %}
+                                        <a href="{% url 'switch_profile' %}?profile=administrador" class="profile-switch-btn secondary">Administração</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

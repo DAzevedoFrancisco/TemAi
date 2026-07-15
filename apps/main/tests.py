@@ -587,6 +587,7 @@ class VendorProfileNavigationTests(TestCase):
         self.assertContains(response, 'Voltar ao painel vendedor')
         self.assertContains(response, 'Voltar ao painel')
         self.assertNotContains(response, 'Favoritos')
+        self.assertNotContains(response, '>Sobre</span>')
         self.assertNotContains(response, 'Painel vendedor</a>')
 
     def test_favorites_redirects_when_vendor_profile_active(self):
@@ -695,9 +696,24 @@ class AdminClientCatalogTests(TestCase):
         response = self.client.get(reverse('account_settings'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, reverse('admin_panel:dashboard'))
-        self.assertContains(response, 'Voltar ao painel de administração')
+        self.assertContains(response, 'Administração')
         self.assertContains(response, 'Favoritos')
+        self.assertContains(response, 'Sobre')
+        self.assertNotContains(response, 'Voltar ao painel de administração')
+
+    def test_account_settings_hides_client_links_in_admin_profile(self):
+        self.client.force_login(self.user)
+        session = self.client.session
+        session['active_profile'] = 'administrador'
+        session.save()
+
+        response = self.client.get(reverse('account_settings'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Voltar ao painel de administração')
+        self.assertContains(response, 'Voltar à administração')
+        self.assertNotContains(response, 'Favoritos')
+        self.assertNotContains(response, '>Sobre</span>')
 
 
 class LoginThrottleServiceTests(SimpleTestCase):

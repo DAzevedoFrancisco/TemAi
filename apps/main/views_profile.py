@@ -116,6 +116,13 @@ def switch_profile(request):
         set_active_profile(request, Profile.VENDEDOR)
         return redirect('vendor:dashboard')
 
+    if profile == Profile.ADMINISTRADOR:
+        if not request.user.is_administrador:
+            messages.error(request, 'Precisa de ser administrador para aceder a essa área.', extra_tags='admin')
+            return redirect('home')
+        set_active_profile(request, Profile.ADMINISTRADOR)
+        return redirect('admin_panel:dashboard')
+
     set_active_profile(request, Profile.CLIENTE)
     messages.success(request, 'Perfil alterado para Cliente.', extra_tags='profile')
     return redirect('home')

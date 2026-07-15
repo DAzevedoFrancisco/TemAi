@@ -34,12 +34,12 @@
 
             <div class="client-nav-links">
 
+                {% if can_use_client_catalog %}
                 <a href="{% url 'home' %}#about" class="client-nav-link">Sobre</a>
 
                 {% if user.is_authenticated %}
-
                     <a href="{% url 'favorites' %}" class="client-nav-link">Favoritos</a>
-
+                {% endif %}
                 {% endif %}
 
             </div>
