@@ -1,4 +1,35 @@
 (function () {
+    /* Mesmos limites de apps/vendor/geo.py */
+    const BEIRA_BOUNDS = {
+        latMin: -19.902,
+        latMax: -19.768,
+        lngMin: 34.802,
+        lngMax: 34.928,
+    };
+
+    function beiraLatLngBounds() {
+        return L.latLngBounds(
+            [BEIRA_BOUNDS.latMin, BEIRA_BOUNDS.lngMin],
+            [BEIRA_BOUNDS.latMax, BEIRA_BOUNDS.lngMax]
+        );
+    }
+
+    function isWithinBeira(lat, lng) {
+        return (
+            lat >= BEIRA_BOUNDS.latMin
+            && lat <= BEIRA_BOUNDS.latMax
+            && lng >= BEIRA_BOUNDS.lngMin
+            && lng <= BEIRA_BOUNDS.lngMax
+        );
+    }
+
+    function limitMapToBeira(map) {
+        const bounds = beiraLatLngBounds();
+        map.setMaxBounds(bounds.pad(0.02));
+        map.options.maxBoundsViscosity = 1.0;
+        map.setMinZoom(12);
+    }
+
     function createStoreIcon() {
         return L.divIcon({
             className: 'product-map-marker product-map-marker-store',
@@ -53,19 +84,32 @@
             mapEl.style.minHeight = '240px';
         }
 
-        const map = MobLocationMap.init('product-map', {
-            markers: [{
+        const storeInBeira = isWithinBeira(config.lat, config.lng);
+        const markers = storeInBeira
+            ? [{
                 lat: config.lat,
                 lng: config.lng,
                 icon: createStoreIcon(),
                 popup: config.name,
-            }],
+            }]
+            : [];
+
+        const map = MobLocationMap.init('product-map', {
+            markers,
             defaultZoom: 15,
             openFirstPopup: false,
         });
 
         if (!map) {
             return false;
+        }
+
+        limitMapToBeira(map);
+
+        if (storeInBeira) {
+            map.setView([config.lat, config.lng], 15);
+        } else {
+            map.fitBounds(beiraLatLngBounds(), { padding: [18, 18], maxZoom: 14 });
         }
 
         mapEl.dataset.mapReady = 'true';
@@ -78,7 +122,28 @@
 
         if (typeof MobUserGeolocation !== 'undefined' && mapEl.dataset.userGeoAttached !== 'true') {
             mapEl.dataset.userGeoAttached = 'true';
-            MobUserGeolocation.attachToMap(map, mapEl, { quiet: false });
+
+            const params = new URLSearchParams(window.location.search);
+            const lat = Number(params.get('lat'));
+            const lng = Number(params.get('lng'));
+            const knownPosition = Number.isFinite(lat) && Number.isFinite(lng) && isWithinBeira(lat, lng)
+                ? { lat, lng }
+                : null;
+
+            MobUserGeolocation.attachToMap(map, mapEl, {
+                position: knownPosition,
+                quiet: Boolean(knownPosition),
+                skipFitBounds: true,
+            }).then((result) => {
+                if (!result || !result.position) {
+                    return;
+                }
+                if (!isWithinBeira(result.position.lat, result.position.lng)) {
+                    if (result.marker) {
+                        map.removeLayer(result.marker);
+                    }
+                }
+            });
         }
 
         window.setTimeout(() => {
