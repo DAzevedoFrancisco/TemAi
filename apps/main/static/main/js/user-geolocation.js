@@ -143,17 +143,19 @@
 
         userMarker.bindPopup(options.popup || 'A sua localização');
 
-        const layers = [];
-        map.eachLayer((layer) => {
-            if (layer instanceof L.Marker) {
-                layers.push(layer);
-            }
-        });
+        if (!options.skipFitBounds) {
+            const layers = [];
+            map.eachLayer((layer) => {
+                if (layer instanceof L.Marker) {
+                    layers.push(layer);
+                }
+            });
 
-        if (layers.length > 1) {
-            map.fitBounds(L.featureGroup(layers).getBounds().pad(options.fitPadding || 0.25));
-        } else {
-            map.setView([position.lat, position.lng], options.userZoom || 15);
+            if (layers.length > 1) {
+                map.fitBounds(L.featureGroup(layers).getBounds().pad(options.fitPadding || 0.25));
+            } else {
+                map.setView([position.lat, position.lng], options.userZoom || 15);
+            }
         }
 
         return userMarker;

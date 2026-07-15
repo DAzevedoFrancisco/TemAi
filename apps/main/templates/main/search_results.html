@@ -73,23 +73,23 @@
                                             </svg>
                                         </div>
                                     {% endif %}
-                                    {% if product.distance_label %}
-                                        <span class="search-masonry-distance-chip">{{ product.distance_label }}</span>
+                                    {% if product.is_available %}
+                                        <span class="search-masonry-status-chip search-masonry-status-chip--available">
+                                            <span class="search-masonry-status-dot" aria-hidden="true"></span>
+                                            Disponível
+                                        </span>
+                                    {% else %}
+                                        <span class="search-masonry-status-chip search-masonry-status-chip--unavailable">
+                                            <span class="search-masonry-status-dot" aria-hidden="true"></span>
+                                            Indisponível
+                                        </span>
                                     {% endif %}
                                 </div>
                                 <div class="search-masonry-caption">
                                     <div class="search-masonry-meta">
                                         <span class="search-masonry-category">{{ product.category.name }}</span>
-                                        {% if product.is_available %}
-                                            <span class="search-masonry-status search-masonry-status--available">
-                                                <span class="search-masonry-status-dot" aria-hidden="true"></span>
-                                                Disponível
-                                            </span>
-                                        {% else %}
-                                            <span class="search-masonry-status search-masonry-status--unavailable">
-                                                <span class="search-masonry-status-dot" aria-hidden="true"></span>
-                                                Indisponível
-                                            </span>
+                                        {% if product.distance_label %}
+                                            <span class="search-masonry-distance">{{ product.distance_label }}</span>
                                         {% endif %}
                                     </div>
                                     <h2>{{ product.name }}</h2>
