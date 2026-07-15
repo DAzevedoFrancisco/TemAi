@@ -154,6 +154,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
+DB_CONN_MAX_AGE = int(os.environ.get('DB_CONN_MAX_AGE', '60'))
 
 if DATABASE_URL:
     import dj_database_url
@@ -161,7 +162,7 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=DB_CONN_MAX_AGE,
             ssl_require=True,
         )
     }
@@ -178,7 +179,7 @@ else:
             'PASSWORD': os.environ.get('DB_PASSWORD', '0008'),
             'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
             'PORT': os.environ.get('DB_PORT', '3306'),
-            'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', '60')),
+            'CONN_MAX_AGE': DB_CONN_MAX_AGE,
             'OPTIONS': {
                 'charset': 'utf8mb4',
             },

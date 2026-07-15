@@ -21,6 +21,8 @@ services:
         generateValue: true
       - key: DEBUG
         value: "False"
+      - key: DB_CONN_MAX_AGE
+        value: "60"
       - key: PYTHON_VERSION
         value: 3.12.8
       - key: WEB_CONCURRENCY
