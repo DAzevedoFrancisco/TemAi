@@ -64,6 +64,14 @@
         }, delay);
     }
 
+    function isSameDocumentHashNavigation(url) {
+        return (
+            url.pathname === window.location.pathname
+            && url.search === window.location.search
+            && Boolean(url.hash)
+        );
+    }
+
     function isInternalNavigationLink(anchor) {
         if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) {
             return false;
@@ -76,7 +84,17 @@
 
         try {
             const url = new URL(anchor.href, window.location.href);
-            return url.origin === window.location.origin;
+            if (url.origin !== window.location.origin) {
+                return false;
+            }
+
+            // /#about (e âncoras na mesma página): o browser não recarrega —
+            // se mostrarmos o loader, ele nunca esconde.
+            if (isSameDocumentHashNavigation(url)) {
+                return false;
+            }
+
+            return true;
         } catch (_error) {
             return false;
         }
