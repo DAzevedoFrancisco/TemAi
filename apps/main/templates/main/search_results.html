@@ -62,7 +62,7 @@
                     <div class="search-results-masonry">
                         {% for product in products %}
                             {% cycle 'violet' 'blue' 'amber' 'emerald' as card_theme silent %}
-                            <a href="{% url 'product_detail' pk=product.pk %}?q={{ query|urlencode }}{% if active_category %}&categoria={{ active_category|urlencode }}{% endif %}{% if location_active %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}" class="search-masonry-item search-card--{{ card_theme }}{% if not product.is_available %} is-unavailable{% endif %}">
+                            <a href="{% url 'product_detail' pk=product.pk %}?q={{ query|urlencode }}{% if active_category %}&categoria={{ active_category|urlencode }}{% endif %}{% if location_active %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}" class="search-masonry-item search-card--{{ card_theme }}{% if product.is_available %} is-available{% else %} is-unavailable{% endif %}">
                                 <div class="search-masonry-image-wrap">
                                     {% if product.image %}
                                         <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
@@ -73,19 +73,30 @@
                                             </svg>
                                         </div>
                                     {% endif %}
-                                    {% if not product.is_available %}
-                                        <span class="search-masonry-unavailable-tag">Indisponível</span>
+                                    {% if product.distance_label %}
+                                        <span class="search-masonry-distance-chip">{{ product.distance_label }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="search-masonry-caption">
-                                    <h2>{{ product.name }}</h2>
-                                    <div class="search-masonry-footer">
-                                        <span class="search-masonry-source-name">{{ product.establishment.name }}</span>
-                                        {% if product.distance_label %}
-                                            <span class="search-masonry-distance">{{ product.distance_label }}</span>
+                                    <div class="search-masonry-meta">
+                                        <span class="search-masonry-category">{{ product.category.name }}</span>
+                                        {% if product.is_available %}
+                                            <span class="search-masonry-status search-masonry-status--available">
+                                                <span class="search-masonry-status-dot" aria-hidden="true"></span>
+                                                Disponível
+                                            </span>
+                                        {% else %}
+                                            <span class="search-masonry-status search-masonry-status--unavailable">
+                                                <span class="search-masonry-status-dot" aria-hidden="true"></span>
+                                                Indisponível
+                                            </span>
                                         {% endif %}
                                     </div>
-                                    <span class="search-masonry-category">{{ product.category.name }}</span>
+                                    <h2>{{ product.name }}</h2>
+                                    <div class="search-masonry-footer">
+                                        <span class="search-masonry-source-icon" aria-hidden="true">{{ product.establishment.name|slice:":1"|upper }}</span>
+                                        <span class="search-masonry-source-name">{{ product.establishment.name }}</span>
+                                    </div>
                                 </div>
                             </a>
                         {% endfor %}

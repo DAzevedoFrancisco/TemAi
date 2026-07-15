@@ -1,9 +1,9 @@
 (function () {
     const CACHE_KEY = 'mob_user_geo_v1';
     const DEFAULT_OPTIONS = {
-        enableHighAccuracy: false,
-        timeout: 6000,
-        maximumAge: 300000,
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 120000,
     };
 
     function createUserIcon(label) {
