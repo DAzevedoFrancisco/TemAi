@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from apps.main.profile import Profile, set_active_profile
+from apps.main.redirects import is_safe_redirect_url
 from apps.main.services import assign_vendedor_role
 from apps.main.validators import MIN_VENDOR_AGE, calculate_age, can_become_seller
 from django.views.decorators.http import require_POST
@@ -168,7 +169,7 @@ def mark_review_read(request, pk):
     else:
         messages.info(request, 'Comentário já estava marcado como lido.', extra_tags='vendor')
     next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
-    if next_url:
+    if is_safe_redirect_url(request, next_url):
         return redirect(next_url)
     return redirect('vendor:review_inbox')
 

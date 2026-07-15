@@ -34,7 +34,8 @@ from .login_throttle import (
     lockout_error_message,
     register_failed_login,
 )
-from .services import ensure_system_admin, get_post_login_redirect_name, register_user_with_default_role
+from .redirects import get_post_auth_redirect
+from .services import ensure_system_admin, register_user_with_default_role
 from .validators import can_become_seller
 
 User = get_user_model()
@@ -164,11 +165,12 @@ def privacy_view(request):
 
 def auth_view(request):
     if request.user.is_authenticated:
-        return redirect(get_post_login_redirect_name(request.user))
+        return redirect(get_post_auth_redirect(request, request.user))
 
     login_form = LoginForm()
     register_form = RegisterForm()
     active_panel = request.GET.get('mode', 'login')
+    next_url = request.POST.get('next') or request.GET.get('next') or ''
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -190,10 +192,9 @@ def auth_view(request):
                         clear_login_attempts(email)
                         ensure_system_admin()
                         user.refresh_from_db()
-                        if not user.is_administrador:
-                            set_active_profile(request, Profile.CLIENTE)
+                        set_active_profile(request, Profile.CLIENTE)
                         tokens = get_tokens_for_user(user)
-                        response = redirect(get_post_login_redirect_name(user))
+                        response = redirect(get_post_auth_redirect(request, user))
                         return set_jwt_cookies(response, tokens)
 
                     attempts, _locked = register_failed_login(email)
@@ -211,24 +212,24 @@ def auth_view(request):
                     date_of_birth=register_form.cleaned_data['date_of_birth'],
                     gender=register_form.cleaned_data['gender'],
                 )
-                if not user.is_administrador:
-                    set_active_profile(request, Profile.CLIENTE)
+                set_active_profile(request, Profile.CLIENTE)
                 tokens = get_tokens_for_user(user)
                 if user.is_administrador:
                     messages.success(
                         request,
-                        'Conta criada com sucesso. Tem acesso de administrador ao sistema.',
+                        'Conta criada com sucesso. Também tem acesso de administrador — use Administração no menu.',
                         extra_tags='general',
                     )
                 else:
                     messages.success(request, 'Conta criada com sucesso!', extra_tags='general')
-                response = redirect(get_post_login_redirect_name(user))
+                response = redirect(get_post_auth_redirect(request, user))
                 return set_jwt_cookies(response, tokens)
 
     return render(request, 'main/auth.html', {
         'login_form': login_form,
         'register_form': register_form,
         'active_panel': active_panel,
+        'next_url': next_url,
     })
 
 

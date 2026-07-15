@@ -19,6 +19,7 @@ from .engagement import (
 )
 from .forms import EstablishmentReviewForm
 from .models import EstablishmentReview
+from .redirects import is_safe_redirect_url
 from .search import get_public_product
 from .vendor_notifications import get_unread_review_count, get_vendor_reviews_queryset, mark_vendor_reviews_read
 
@@ -29,6 +30,13 @@ def _product_detail_redirect(product, request):
     if params:
         url = f'{url}?{params}'
     return redirect(url)
+
+
+def _safe_next_redirect(request, fallback):
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+    if is_safe_redirect_url(request, next_url):
+        return redirect(next_url)
+    return fallback
 
 
 @login_required_view
@@ -51,19 +59,16 @@ def toggle_product_favorite(request, pk):
             'Não pode gerir favoritos com o perfil actual.',
             extra_tags='product',
         )
-        next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
-        if next_url:
-            return redirect(next_url)
-        return redirect(get_client_catalog_redirect_name(request))
+        return _safe_next_redirect(
+            request,
+            redirect(get_client_catalog_redirect_name(request)),
+        )
 
     product = get_public_product(pk)
 
     if not can_client_engage_product(request.user, product):
         messages.error(request, 'Não pode favoritar produtos do seu próprio estabelecimento.', extra_tags='product')
-        next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
-        if next_url:
-            return redirect(next_url)
-        return _product_detail_redirect(product, request)
+        return _safe_next_redirect(request, _product_detail_redirect(product, request))
 
     added = apply_product_favorite_toggle(request.user, product)
     if added:
@@ -71,10 +76,7 @@ def toggle_product_favorite(request, pk):
     else:
         messages.info(request, f'"{product.name}" foi removido dos favoritos.', extra_tags='product')
 
-    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
-    if next_url:
-        return redirect(next_url)
-    return _product_detail_redirect(product, request)
+    return _safe_next_redirect(request, _product_detail_redirect(product, request))
 
 
 @login_required_view

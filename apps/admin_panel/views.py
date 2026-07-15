@@ -5,9 +5,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.main.models import UserRole
+from apps.main.redirects import redirect_safely
 from apps.main.services import (
+    active_administrator_count,
     delete_user_account,
     demote_from_admin,
+    get_admin_account_deactivate_block_reason,
     get_admin_account_deletion_block_reason,
     promote_to_admin,
 )
@@ -26,24 +29,6 @@ from .queries import (
 )
 
 User = get_user_model()
-
-
-def _active_admin_count():
-    return (
-        User.objects
-        .filter(is_active=True, user_roles__role=UserRole.Role.ADMINISTRADOR)
-        .distinct()
-        .count()
-    )
-
-
-def _admin_role_count():
-    return (
-        User.objects
-        .filter(user_roles__role=UserRole.Role.ADMINISTRADOR)
-        .distinct()
-        .count()
-    )
 
 
 @administrador_required
@@ -87,7 +72,7 @@ def _handle_promote_admin(request, email):
     promote_to_admin(target)
     messages.success(
         request,
-        f'"{target.name}" ({target.email}) foi promovido a administrador. Os outros perfis foram removidos.',
+        f'"{target.name}" ({target.email}) foi promovido a administrador. Mantém os outros perfis e entra sempre como cliente.',
         extra_tags='admin',
     )
     return redirect('admin_panel:admin_users')
@@ -100,7 +85,11 @@ def promote_admin(request):
     if not form.is_valid():
         for error in form.errors.get('email', ['Email inválido.']):
             messages.error(request, error, extra_tags='admin')
-        return redirect(request.POST.get('next') or 'admin_panel:admin_users')
+        return redirect_safely(
+            request,
+            request.POST.get('next'),
+            fallback='admin_panel:admin_users',
+        )
 
     return _handle_promote_admin(request, form.cleaned_data['email'])
 
@@ -118,7 +107,7 @@ def demote_admin(request, pk):
         messages.info(request, f'"{target.email}" já não é administrador.', extra_tags='admin')
         return redirect('admin_panel:admin_users')
 
-    if _active_admin_count() <= 1:
+    if active_administrator_count() <= 1:
         messages.error(
             request,
             'Não pode despromover o último administrador ativo do sistema.',
@@ -129,10 +118,14 @@ def demote_admin(request, pk):
     demote_from_admin(target)
     messages.success(
         request,
-        f'"{target.name}" ({target.email}) foi despromovido e voltou a ser cliente.',
+        f'"{target.name}" ({target.email}) deixou de ser administrador. Os outros perfis mantêm-se.',
         extra_tags='admin',
     )
-    return redirect(request.POST.get('next') or 'admin_panel:admin_users')
+    return redirect_safely(
+        request,
+        request.POST.get('next'),
+        fallback='admin_panel:admin_users',
+    )
 
 
 @administrador_required
@@ -176,9 +169,15 @@ def user_list(request):
 def user_toggle_active(request, pk):
     target = get_object_or_404(User, pk=pk)
 
-    if target.pk == request.user.pk:
-        messages.error(request, 'Não pode bloquear a sua própria conta.', extra_tags='admin')
-        return redirect('admin_panel:user_list')
+    if target.is_active:
+        block_reason = get_admin_account_deactivate_block_reason(target, request.user)
+        if block_reason:
+            messages.error(request, block_reason, extra_tags='admin')
+            return redirect_safely(
+                request,
+                request.POST.get('next'),
+                fallback='admin_panel:user_list',
+            )
 
     target.is_active = not target.is_active
     target.save(update_fields=['is_active'])
@@ -188,7 +187,11 @@ def user_toggle_active(request, pk):
     else:
         messages.info(request, f'Utilizador "{target.name}" foi bloqueado.', extra_tags='admin')
 
-    return redirect(request.POST.get('next') or 'admin_panel:user_list')
+    return redirect_safely(
+        request,
+        request.POST.get('next'),
+        fallback='admin_panel:user_list',
+    )
 
 
 @administrador_required
@@ -199,12 +202,20 @@ def user_delete(request, pk):
     block_reason = get_admin_account_deletion_block_reason(target, request.user)
     if block_reason:
         messages.error(request, block_reason, extra_tags='admin')
-        return redirect(request.POST.get('next') or 'admin_panel:user_list')
+        return redirect_safely(
+            request,
+            request.POST.get('next'),
+            fallback='admin_panel:user_list',
+        )
 
     name = target.name
     delete_user_account(target)
     messages.success(request, f'Utilizador "{name}" foi apagado.', extra_tags='admin')
-    return redirect(request.POST.get('next') or 'admin_panel:user_list')
+    return redirect_safely(
+        request,
+        request.POST.get('next'),
+        fallback='admin_panel:user_list',
+    )
 
 
 @administrador_required
@@ -272,9 +283,11 @@ def establishment_toggle_active(request, pk):
         )
 
     next_url = request.POST.get('next')
-    if next_url:
-        return redirect(next_url)
-    return redirect('admin_panel:establishment_list')
+    return redirect_safely(
+        request,
+        next_url,
+        fallback='admin_panel:establishment_list',
+    )
 
 
 @administrador_required
@@ -286,6 +299,8 @@ def establishment_delete(request, pk):
     messages.success(request, f'Estabelecimento "{name}" foi apagado.', extra_tags='admin')
 
     next_url = request.POST.get('next')
-    if next_url:
-        return redirect(next_url)
-    return redirect('admin_panel:establishment_list')
+    return redirect_safely(
+        request,
+        next_url,
+        fallback='admin_panel:establishment_list',
+    )

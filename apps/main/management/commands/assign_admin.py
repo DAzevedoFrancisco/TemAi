@@ -5,7 +5,10 @@ from apps.main.services import assign_admin_role
 
 
 class Command(BaseCommand):
-    help = 'Atribui o perfil de administrador a um utilizador existente pelo email.'
+    help = (
+        'Atribui o perfil de administrador a um utilizador existente pelo email. '
+        'Não remove os perfis de cliente ou vendedor.'
+    )
 
     def add_arguments(self, parser):
         parser.add_argument('email', type=str, help='Email do utilizador')
@@ -20,5 +23,5 @@ class Command(BaseCommand):
         assign_admin_role(user)
         self.stdout.write(self.style.SUCCESS(
             f'Perfil de administrador atribuído a {user.name} ({user.email}). '
-            f'Outros perfis foram removidos.'
+            f'Os perfis existentes foram mantidos.'
         ))

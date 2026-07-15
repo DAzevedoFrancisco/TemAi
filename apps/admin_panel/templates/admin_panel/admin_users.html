@@ -14,7 +14,7 @@
             <div>
                 <p class="dashboard-eyebrow">Acesso ao painel</p>
                 <h1>Administradores</h1>
-                <p class="admin-page-subtitle">Gira quem tem acesso ao painel de gestão. Ao despromover, a conta volta a ser apenas cliente.</p>
+                <p class="admin-page-subtitle">Gira quem tem acesso ao painel. Promover adiciona o perfil administrador sem remover cliente ou vendedor.</p>
             </div>
         </div>
         <div class="admin-users-hero-stats">
@@ -68,7 +68,7 @@
 
                 <ul class="admin-users-tips">
                     <li>O utilizador deve já ter conta na plataforma.</li>
-                    <li>Perfis de cliente ou vendedor são removidos automaticamente.</li>
+                    <li>Os perfis de cliente e vendedor são mantidos.</li>
                     <li>Não é possível despromover o último administrador ativo.</li>
                 </ul>
             </article>
@@ -83,54 +83,117 @@
             </div>
 
             {% if system_admins %}
-                <ul class="admin-users-list">
+                <div class="dash-table-wrap admin-admins-table-wrap">
+                    <table class="dash-table admin-table admin-data-table admin-admins-data-table">
+                        <thead>
+                            <tr>
+                                <th>Administrador</th>
+                                <th>Perfis</th>
+                                <th>Desde</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin_user in system_admins %}
+                                <tr class="admin-table-row-admin{% if not admin_user.is_active %} admin-row-blocked{% endif %}{% if admin_user.pk == user.pk %} admin-table-row-self{% endif %}">
+                                    <td>
+                                        <div class="admin-user-row admin-user-row--stack">
+                                            <span class="admin-user-row-name">
+                                                {{ admin_user.name }}
+                                                {% if admin_user.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
+                                            </span>
+                                            <span class="admin-user-row-email" title="{{ admin_user.email }}">{{ admin_user.email }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="admin-user-row-roles">
+                                            {% for user_role in admin_user.user_roles.all %}
+                                                {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
+                                            {% empty %}
+                                                Admin
+                                            {% endfor %}
+                                        </span>
+                                    </td>
+                                    <td>{{ admin_user.date_joined|date:"d/m/y" }}</td>
+                                    <td>
+                                        {% if admin_user.is_active %}
+                                            <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
+                                        {% else %}
+                                            <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="table-action">
+                                        {% if admin_user.pk != user.pk %}
+                                            <div class="admin-table-actions">
+                                                <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                    <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                            <circle cx="8.5" cy="7" r="4"/>
+                                                            <line x1="18" y1="8" x2="23" y2="13"/>
+                                                            <line x1="23" y1="8" x2="18" y2="13"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {% else %}
+                                            <span class="admin-self-note">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="admin-list-mobile admin-admins-mobile">
                     {% for admin_user in system_admins %}
-                        <li class="admin-user-card{% if not admin_user.is_active %} admin-user-card-blocked{% endif %}{% if admin_user.pk == user.pk %} admin-user-card-self{% endif %}">
-                            <div class="admin-user-card-avatar" aria-hidden="true">
-                                {{ admin_user.name|slice:":1"|upper }}
-                            </div>
-                            <div class="admin-user-card-body">
-                                <div class="admin-user-card-top">
-                                    <div>
-                                        <strong class="admin-user-card-name">{{ admin_user.name }}</strong>
-                                        {% if admin_user.pk == user.pk %}
-                                            <span class="admin-user-you-badge">Você</span>
+                        <article class="admin-list-mobile-card admin-list-mobile-card--user admin-list-mobile-card--dense{% if not admin_user.is_active %} is-blocked{% endif %}{% if admin_user.pk == user.pk %} is-self{% endif %} admin-mobile-surface">
+                            <div class="admin-list-mobile-card-head">
+                                <div class="admin-list-mobile-card-info">
+                                    <div class="admin-list-mobile-card-title">
+                                        <strong>{{ admin_user.name }}</strong>
+                                        {% if admin_user.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
+                                        {% if admin_user.is_active %}
+                                            <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
+                                        {% else %}
+                                            <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
                                         {% endif %}
                                     </div>
-                                    {% if admin_user.is_active %}
-                                        <span class="admin-badge admin-badge-active">Ativo</span>
-                                    {% else %}
-                                        <span class="admin-badge admin-badge-blocked">Bloqueado</span>
-                                    {% endif %}
+                                    <span class="admin-list-mobile-card-sub">
+                                        {{ admin_user.email }}
+                                        ·
+                                        {% for user_role in admin_user.user_roles.all %}
+                                            {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
+                                        {% empty %}
+                                            Admin
+                                        {% endfor %}
+                                        · {{ admin_user.date_joined|date:"d/m/y" }}
+                                    </span>
                                 </div>
-                                <span class="admin-user-card-email">{{ admin_user.email }}</span>
-                                <div class="admin-user-card-meta">
-                                    <span class="admin-role-pill admin-role-pill-admin">Administrador</span>
-                                    <span class="admin-user-card-since">Desde {{ admin_user.date_joined|date:"d M Y" }}</span>
-                                </div>
-                            </div>
-                            <div class="admin-user-card-action">
                                 {% if admin_user.pk != user.pk %}
-                                    <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                        <button type="submit" class="admin-user-demotion-btn" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                                <circle cx="8.5" cy="7" r="4"/>
-                                                <line x1="18" y1="8" x2="23" y2="13"/>
-                                                <line x1="23" y1="8" x2="18" y2="13"/>
-                                            </svg>
-                                            <span class="admin-user-demotion-btn-text">Despromover</span>
-                                        </button>
-                                    </form>
-                                {% else %}
-                                    <span class="admin-self-note">A sua conta</span>
+                                    <div class="admin-list-mobile-card-actions admin-list-mobile-card-actions--inline">
+                                        <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                            <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                    <circle cx="8.5" cy="7" r="4"/>
+                                                    <line x1="18" y1="8" x2="23" y2="13"/>
+                                                    <line x1="23" y1="8" x2="18" y2="13"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 {% endif %}
                             </div>
-                        </li>
+                        </article>
                     {% endfor %}
-                </ul>
+                </div>
             {% else %}
                 <div class="admin-users-empty">
                     <div class="admin-users-empty-icon" aria-hidden="true">

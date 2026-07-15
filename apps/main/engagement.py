@@ -10,8 +10,6 @@ def user_owns_establishment(user, establishment):
 def can_client_engage_product(user, product):
     if not user.is_authenticated:
         return False
-    if user.is_administrador:
-        return False
     return not user_owns_establishment(user, product.establishment)
 
 

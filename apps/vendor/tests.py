@@ -48,7 +48,10 @@ class ProductCreateTests(TestCase):
         )
         assign_cliente_role(self.user)
         assign_vendedor_role(self.user)
-        self.category = Category.objects.create(name='Alimentação', slug='alimentacao')
+        self.category, _ = Category.objects.get_or_create(
+            slug='alimentacao',
+            defaults={'name': 'Alimentação'},
+        )
         self.establishment = Establishment.objects.create(
             owner=self.user,
             name='Mercado Central',
@@ -79,6 +82,22 @@ class ProductCreateTests(TestCase):
         product = Product.objects.get(name='Arroz')
         self.assertEqual(product.establishment_id, self.establishment.pk)
         self.assertTrue(product.image.name)
+
+    def test_product_name_is_title_cased_on_create(self):
+        self.client.force_login(self.user)
+        url = reverse('vendor:product_create', kwargs={'est_pk': self.establishment.pk})
+
+        response = self.client.post(url, {
+            'name': 'arroz branco especial',
+            'description': 'Pacote de 1kg',
+            'category': self.category.pk,
+            'is_available': 'on',
+            'image': _image_upload(),
+        })
+
+        self.assertEqual(response.status_code, 302)
+        product = Product.objects.get(establishment=self.establishment, description='Pacote de 1kg')
+        self.assertEqual(product.name, 'Arroz Branco Especial')
 
     def test_product_create_shows_error_when_image_upload_fails(self):
         self.client.force_login(self.user)

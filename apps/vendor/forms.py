@@ -1,7 +1,7 @@
 from django import forms
 
 from apps.main.form_utils import apply_pt_field_errors
-from apps.main.validators import MIN_NAME_LENGTH, validate_min_name, validate_mozambique_phone
+from apps.main.validators import MIN_NAME_LENGTH, title_case_name, validate_min_name, validate_mozambique_phone
 
 from .geo import is_within_beira
 from .models import Category, Establishment, Product
@@ -140,6 +140,9 @@ class ProductForm(forms.ModelForm):
         if not self.instance.pk:
             self.fields['is_available'].initial = True
         apply_pt_field_errors(self)
+
+    def clean_name(self):
+        return title_case_name(self.cleaned_data.get('name'))
 
     def clean_image(self):
         image = self.cleaned_data.get('image')

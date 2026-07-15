@@ -89,6 +89,13 @@ def _cloudinary_env_ready():
 
 USE_CLOUDINARY = _cloudinary_env_ready()
 
+# Admin só via `python manage.py assign_admin email` ou createsuperuser.
+# Defina AUTO_PROMOTE_FIRST_USER=True apenas em cenários de bootstrap controlados.
+AUTO_PROMOTE_FIRST_USER = os.environ.get(
+    'AUTO_PROMOTE_FIRST_USER',
+    'false',
+).lower() in {'1', 'true', 'yes', 'on'}
+
 
 # Application definition
 
@@ -258,8 +265,13 @@ STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-if RENDER_EXTERNAL_HOSTNAME and not USE_CLOUDINARY:
-    MEDIA_ROOT = Path('/tmp/temai-media')
+if not DEBUG and RENDER_EXTERNAL_HOSTNAME and not USE_CLOUDINARY:
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured(
+        'Cloudinary é obrigatório em produção no Render. '
+        'Defina CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY e CLOUDINARY_API_SECRET.'
+    )
 
 MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 

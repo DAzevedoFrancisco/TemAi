@@ -12,6 +12,7 @@ User = get_user_model()
 
 
 def suspend_establishments_for_admin_role(user):
+    """Legado: já não é usado na promoção. Mantido para limpeza de dados antigos."""
     now = timezone.now()
     for establishment in Establishment.objects.filter(owner=user, is_active=True):
         establishment.is_active = False
@@ -42,9 +43,10 @@ def assign_vendedor_role(user):
 
 
 def assign_admin_role(user):
-    suspend_establishments_for_admin_role(user)
-    user.user_roles.all().delete()
+    """Adiciona o perfil administrador sem remover cliente/vendedor."""
     user.add_role(UserRole.Role.ADMINISTRADOR)
+    if not user.is_cliente and not user.is_vendedor:
+        assign_cliente_role(user)
 
 
 def has_system_admin():
@@ -52,6 +54,11 @@ def has_system_admin():
 
 
 def ensure_system_admin():
+    from django.conf import settings
+
+    if not getattr(settings, 'AUTO_PROMOTE_FIRST_USER', False):
+        return None
+
     if has_system_admin():
         return None
 
@@ -73,13 +80,8 @@ def register_user_with_default_role(*, email, password, name, date_of_birth, gen
             date_of_birth=date_of_birth,
             gender=gender,
         )
-        if not has_system_admin():
-            oldest_user = User.objects.order_by('date_joined', 'pk').first()
-            assign_admin_role(oldest_user)
-            if user.pk != oldest_user.pk:
-                assign_cliente_role(user)
-        else:
-            assign_cliente_role(user)
+        assign_cliente_role(user)
+        ensure_system_admin()
         user.refresh_from_db()
         return user
 
@@ -88,15 +90,21 @@ def promote_to_admin(user):
     assign_admin_role(user)
 
 
+def _clear_user_role_cache(user):
+    if hasattr(user, '_role_values_cache'):
+        del user._role_values_cache
+
+
 def demote_from_admin(user):
-    user.user_roles.all().delete()
-    assign_cliente_role(user)
+    user.user_roles.filter(role=UserRole.Role.ADMINISTRADOR).delete()
+    _clear_user_role_cache(user)
+    if not user.is_cliente and not user.is_vendedor:
+        assign_cliente_role(user)
     restore_establishments_after_admin_demote(user)
 
 
 def get_post_login_redirect_name(user):
-    if user.is_administrador:
-        return 'admin_panel:dashboard'
+    """Todos entram como cliente; o painel admin é acesso opcional."""
     return 'home'
 
 
@@ -109,11 +117,32 @@ def administrator_count():
     )
 
 
+def active_administrator_count():
+    return (
+        User.objects
+        .filter(is_active=True, user_roles__role=UserRole.Role.ADMINISTRADOR)
+        .distinct()
+        .count()
+    )
+
+
 def get_admin_account_deletion_block_reason(target, actor):
     if target.pk == actor.pk:
         return 'Não pode apagar a sua própria conta.'
     if target.is_administrador and administrator_count() <= 1:
         return 'Não pode apagar o último administrador do sistema.'
+    return None
+
+
+def get_admin_account_deactivate_block_reason(target, actor):
+    if target.pk == actor.pk:
+        return 'Não pode bloquear a sua própria conta.'
+    if (
+        target.is_administrador
+        and target.is_active
+        and active_administrator_count() <= 1
+    ):
+        return 'Não pode bloquear o último administrador ativo do sistema.'
     return None
 
 

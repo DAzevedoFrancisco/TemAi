@@ -16,11 +16,16 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
+from django.db import connection
 from django.http import HttpResponse
 from django.urls import path, include
 
 
 def health_check(_request):
+    try:
+        connection.ensure_connection()
+    except Exception:
+        return HttpResponse('db unavailable', status=503, content_type='text/plain')
     return HttpResponse('ok', content_type='text/plain')
 
 

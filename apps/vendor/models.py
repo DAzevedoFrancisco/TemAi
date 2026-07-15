@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db import models
 
-from apps.main.validators import MIN_NAME_LENGTH, validate_mozambique_phone
+from apps.main.validators import MIN_NAME_LENGTH, title_case_name, validate_mozambique_phone
 
 
 class Category(models.Model):
@@ -81,6 +81,11 @@ class Product(models.Model):
     class Meta:
         db_table = 'product'
         ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = title_case_name(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -108,12 +108,10 @@
     <article class="dash-panel dash-panel-table admin-scroll-table-panel admin-users-table-panel admin-mobile-surface">
         {% if users %}
             <div class="dash-table-wrap admin-scroll-table-wrap">
-                <table class="dash-table admin-table admin-data-table">
+                <table class="dash-table admin-table admin-data-table admin-users-data-table">
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Sexo</th>
+                            <th>Utilizador</th>
                             <th>Perfis</th>
                             <th>Registo</th>
                             <th>Estado</th>
@@ -124,26 +122,29 @@
                         {% for item in users %}
                             <tr class="{% if item.is_administrador %}admin-table-row-admin{% endif %}{% if not item.is_active %} admin-row-blocked{% endif %}{% if item.pk == user.pk %} admin-table-row-self{% endif %}">
                                 <td>
-                                    <span class="admin-table-name">{{ item.name }}</span>
-                                    {% if item.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
-                                </td>
-                                <td class="admin-table-cell-email" title="{{ item.email }}">{{ item.email }}</td>
-                                <td>{{ item.get_gender_display }}</td>
-                                <td class="admin-table-cell-wrap">
-                                    {% for user_role in item.user_roles.all %}
-                                        <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
-                                            {{ user_role.get_role_display }}
+                                    <div class="admin-user-row admin-user-row--stack">
+                                        <span class="admin-user-row-name">
+                                            {{ item.name }}
+                                            {% if item.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
                                         </span>
-                                    {% empty %}
-                                        <span class="admin-directory-no-role">—</span>
-                                    {% endfor %}
+                                        <span class="admin-user-row-email" title="{{ item.email }}">{{ item.email }}</span>
+                                    </div>
                                 </td>
-                                <td>{{ item.date_joined|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="admin-user-row-roles">
+                                        {% for user_role in item.user_roles.all %}
+                                            {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
+                                        {% empty %}
+                                            —
+                                        {% endfor %}
+                                    </span>
+                                </td>
+                                <td>{{ item.date_joined|date:"d/m/y" }}</td>
                                 <td>
                                     {% if item.is_active %}
-                                        <span class="admin-badge admin-badge-active">Ativo</span>
+                                        <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
                                     {% else %}
-                                        <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                        <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
                                     {% endif %}
                                 </td>
                                 <td class="table-action">
@@ -170,47 +171,42 @@
 
             <div class="admin-list-mobile">
                 {% for item in users %}
-                    <article class="admin-list-mobile-card{% if not item.is_active %} is-blocked{% endif %}{% if item.pk == user.pk %} is-self{% endif %} admin-mobile-surface">
+                    <article class="admin-list-mobile-card admin-list-mobile-card--user admin-list-mobile-card--dense{% if not item.is_active %} is-blocked{% endif %}{% if item.pk == user.pk %} is-self{% endif %} admin-mobile-surface">
                         <div class="admin-list-mobile-card-head">
-                            <span class="admin-dashboard-avatar" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
                             <div class="admin-list-mobile-card-info">
                                 <div class="admin-list-mobile-card-title">
                                     <strong>{{ item.name }}</strong>
                                     {% if item.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
+                                    {% if item.is_active %}
+                                        <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
+                                    {% else %}
+                                        <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
+                                    {% endif %}
                                 </div>
-                                <span class="admin-list-mobile-card-sub">{{ item.email }}</span>
+                                <span class="admin-list-mobile-card-sub">
+                                    {{ item.email }}
+                                    ·
+                                    {% for user_role in item.user_roles.all %}
+                                        {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
+                                    {% empty %}
+                                        —
+                                    {% endfor %}
+                                    · {{ item.date_joined|date:"d/m/y" }}
+                                </span>
                             </div>
-                            {% if item.is_active %}
-                                <span class="admin-badge admin-badge-active">Ativo</span>
-                            {% else %}
-                                <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                            {% if item.pk != user.pk %}
+                                <div class="admin-list-mobile-card-actions admin-list-mobile-card-actions--inline">
+                                    {% url 'admin_panel:user_toggle_active' pk=item.pk as toggle_url %}
+                                    {% url 'admin_panel:user_delete' pk=item.pk as delete_url %}
+                                    {% if item.is_active %}
+                                        {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='block' label='Bloquear utilizador' btn_class='admin-icon-btn-danger' next=request.get_full_path %}
+                                    {% else %}
+                                        {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='unblock' label='Desbloquear utilizador' btn_class='admin-icon-btn-success' next=request.get_full_path %}
+                                    {% endif %}
+                                    {% include 'admin_panel/partials/icon_action_button.html' with url=delete_url icon_type='delete' label='Apagar utilizador' btn_class='admin-icon-btn-delete' next=request.get_full_path confirm_title='Apagar utilizador' confirm='Tem a certeza que deseja apagar este utilizador? Esta ação não pode ser desfeita.' %}
+                                </div>
                             {% endif %}
                         </div>
-                        <div class="admin-list-mobile-card-meta">
-                            <span>{{ item.get_gender_display }}</span>
-                            <span>{{ item.date_joined|date:"d/m/Y" }}</span>
-                        </div>
-                        <div class="admin-directory-roles admin-directory-roles-inline">
-                            {% for user_role in item.user_roles.all %}
-                                <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
-                                    {{ user_role.get_role_display }}
-                                </span>
-                            {% empty %}
-                                <span class="admin-directory-no-role">—</span>
-                            {% endfor %}
-                        </div>
-                        {% if item.pk != user.pk %}
-                            <div class="admin-list-mobile-card-actions">
-                                {% url 'admin_panel:user_toggle_active' pk=item.pk as toggle_url %}
-                                {% url 'admin_panel:user_delete' pk=item.pk as delete_url %}
-                                {% if item.is_active %}
-                                    {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='block' label='Bloquear utilizador' btn_class='admin-icon-btn-danger' next=request.get_full_path %}
-                                {% else %}
-                                    {% include 'admin_panel/partials/icon_action_button.html' with url=toggle_url icon_type='unblock' label='Desbloquear utilizador' btn_class='admin-icon-btn-success' next=request.get_full_path %}
-                                {% endif %}
-                                {% include 'admin_panel/partials/icon_action_button.html' with url=delete_url icon_type='delete' label='Apagar utilizador' btn_class='admin-icon-btn-delete' next=request.get_full_path confirm_title='Apagar utilizador' confirm='Tem a certeza que deseja apagar este utilizador? Esta ação não pode ser desfeita.' %}
-                            </div>
-                        {% endif %}
                     </article>
                 {% endfor %}
             </div>

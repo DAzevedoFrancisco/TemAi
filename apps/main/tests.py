@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import Client, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
+from apps.main.forms import RegisterForm
 from apps.main.login_throttle import (
     LOGIN_ATTEMPT_LIMIT,
     clear_login_attempts,
@@ -91,22 +92,34 @@ class UserRoleTests(TestCase):
         self.assertTrue(user.is_cliente)
         self.assertFalse(user.is_vendedor)
 
-    def test_first_registered_user_becomes_admin(self):
+    def test_first_registered_user_is_cliente_by_default(self):
         user = register_user_with_default_role(
             email='primeiro@example.com',
             password='senha123',
-            name='Primeiro Admin',
+            name='Primeiro Cliente',
             date_of_birth='1990-01-01',
             gender=User.Gender.MASCULINO,
         )
+        self.assertTrue(user.is_cliente)
+        self.assertFalse(user.is_administrador)
+
+    def test_auto_promote_can_make_first_user_admin_when_enabled(self):
+        with override_settings(AUTO_PROMOTE_FIRST_USER=True):
+            user = register_user_with_default_role(
+                email='primeiro-admin@example.com',
+                password='senha123',
+                name='Primeiro Admin',
+                date_of_birth='1990-01-01',
+                gender=User.Gender.MASCULINO,
+            )
         self.assertTrue(user.is_administrador)
-        self.assertFalse(user.is_cliente)
+        self.assertTrue(user.is_cliente)
 
     def test_second_registered_user_becomes_cliente(self):
         register_user_with_default_role(
             email='primeiro@example.com',
             password='senha123',
-            name='Primeiro Admin',
+            name='Primeiro Cliente',
             date_of_birth='1990-01-01',
             gender=User.Gender.MASCULINO,
         )
@@ -131,13 +144,14 @@ class UserRoleTests(TestCase):
         assign_cliente_role(user)
         self.assertFalse(has_system_admin())
 
-        promoted = ensure_system_admin()
+        with override_settings(AUTO_PROMOTE_FIRST_USER=True):
+            promoted = ensure_system_admin()
         user.refresh_from_db()
 
         self.assertEqual(promoted.pk, user.pk)
         self.assertTrue(user.is_administrador)
 
-    def test_registration_promotes_oldest_when_no_admin_exists(self):
+    def test_registration_promotes_oldest_when_auto_promote_enabled(self):
         oldest = User.objects.create_user(
             email='antigo@example.com',
             password='senha123',
@@ -147,25 +161,26 @@ class UserRoleTests(TestCase):
         )
         assign_cliente_role(oldest)
 
-        new_user = register_user_with_default_role(
-            email='novo@example.com',
-            password='senha123',
-            name='Novo Cliente',
-            date_of_birth='2000-01-01',
-            gender=User.Gender.FEMININO,
-        )
+        with override_settings(AUTO_PROMOTE_FIRST_USER=True):
+            new_user = register_user_with_default_role(
+                email='novo@example.com',
+                password='senha123',
+                name='Novo Cliente',
+                date_of_birth='2000-01-01',
+                gender=User.Gender.FEMININO,
+            )
         oldest.refresh_from_db()
 
         self.assertTrue(oldest.is_administrador)
         self.assertTrue(new_user.is_cliente)
         self.assertFalse(new_user.is_administrador)
 
-    def test_assign_admin_role_removes_other_roles(self):
+    def test_assign_admin_role_keeps_other_roles(self):
         user = User.objects.create_user(
             email='admin@example.com',
             password='senha123',
             name='Admin Teste',
-            date_of_birth='1990-01-01',
+            date_of_birth=date(1990, 1, 1),
             gender=User.Gender.MASCULINO,
         )
         assign_cliente_role(user)
@@ -173,9 +188,9 @@ class UserRoleTests(TestCase):
         assign_admin_role(user)
 
         self.assertTrue(user.is_administrador)
-        self.assertFalse(user.is_cliente)
-        self.assertFalse(user.is_vendedor)
-        self.assertEqual(user.user_roles.count(), 1)
+        self.assertTrue(user.is_cliente)
+        self.assertTrue(user.is_vendedor)
+        self.assertEqual(user.user_roles.count(), 3)
 
     def test_create_superuser_assigns_admin_role(self):
         user = User.objects.create_superuser(
@@ -186,6 +201,7 @@ class UserRoleTests(TestCase):
             gender=User.Gender.MASCULINO,
         )
         self.assertTrue(user.is_administrador)
+        self.assertTrue(user.is_cliente)
 
     def test_is_administrador_requires_admin_role(self):
         user = User.objects.create_user(
@@ -201,7 +217,7 @@ class UserRoleTests(TestCase):
         assign_admin_role(user)
         self.assertTrue(user.is_administrador)
 
-    def test_promote_to_admin_assigns_admin_role_only(self):
+    def test_promote_to_admin_keeps_cliente_role(self):
         user = User.objects.create_user(
             email='promote@example.com',
             password='senha123',
@@ -215,16 +231,18 @@ class UserRoleTests(TestCase):
 
         user.refresh_from_db()
         self.assertTrue(user.is_administrador)
-        self.assertFalse(user.is_cliente)
+        self.assertTrue(user.is_cliente)
 
-    def test_demote_from_admin_restores_cliente_role(self):
+    def test_demote_from_admin_keeps_existing_roles(self):
         user = User.objects.create_user(
             email='demote@example.com',
             password='senha123',
             name='Demote Teste',
-            date_of_birth='1990-01-01',
+            date_of_birth=date(1990, 1, 1),
             gender=User.Gender.MASCULINO,
         )
+        assign_cliente_role(user)
+        assign_vendedor_role(user)
         assign_admin_role(user)
 
         demote_from_admin(user)
@@ -232,6 +250,7 @@ class UserRoleTests(TestCase):
         user.refresh_from_db()
         self.assertFalse(user.is_administrador)
         self.assertTrue(user.is_cliente)
+        self.assertTrue(user.is_vendedor)
 
 
 class SearchCoordinateTests(TestCase):
@@ -609,18 +628,21 @@ class AdminRoleEstablishmentTests(TestCase):
         self.active_shop = _create_establishment(self.user, name='Loja Activa')
         self.blocked_shop = _create_establishment(self.user, name='Loja Bloqueada', is_active=False)
 
-    def test_promote_to_admin_suspends_active_establishments_only(self):
+    def test_promote_to_admin_keeps_active_establishments(self):
         promote_to_admin(self.user)
 
         self.active_shop.refresh_from_db()
         self.blocked_shop.refresh_from_db()
 
-        self.assertFalse(self.active_shop.is_active)
-        self.assertTrue(self.active_shop.suspended_for_admin_role)
+        self.assertTrue(self.active_shop.is_active)
+        self.assertFalse(self.active_shop.suspended_for_admin_role)
         self.assertFalse(self.blocked_shop.is_active)
         self.assertFalse(self.blocked_shop.suspended_for_admin_role)
 
-    def test_demote_from_admin_restores_suspended_establishments(self):
+    def test_demote_from_admin_restores_legacy_suspended_establishments(self):
+        self.active_shop.is_active = False
+        self.active_shop.suspended_for_admin_role = True
+        self.active_shop.save(update_fields=['is_active', 'suspended_for_admin_role'])
         promote_to_admin(self.user)
         demote_from_admin(self.user)
 
@@ -644,25 +666,30 @@ class AdminClientCatalogTests(TestCase):
             date_of_birth=date(1990, 1, 1),
             gender=User.Gender.MASCULINO,
         )
+        assign_cliente_role(self.user)
         assign_admin_role(self.user)
 
-    def test_search_redirects_admin_to_admin_panel(self):
+    def test_search_allows_admin_in_client_profile(self):
         self.client.force_login(self.user)
+        session = self.client.session
+        session['active_profile'] = 'cliente'
+        session.save()
 
         response = self.client.get(reverse('search_results'), {'q': 'arroz'})
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('admin_panel:dashboard'))
+        self.assertEqual(response.status_code, 200)
 
-    def test_favorites_redirects_admin_to_admin_panel(self):
+    def test_favorites_allows_admin_in_client_profile(self):
         self.client.force_login(self.user)
+        session = self.client.session
+        session['active_profile'] = 'cliente'
+        session.save()
 
         response = self.client.get(reverse('favorites'))
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('admin_panel:dashboard'))
+        self.assertEqual(response.status_code, 200)
 
-    def test_account_settings_logo_links_to_admin_panel(self):
+    def test_account_settings_shows_admin_panel_link(self):
         self.client.force_login(self.user)
 
         response = self.client.get(reverse('account_settings'))
@@ -670,7 +697,7 @@ class AdminClientCatalogTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin_panel:dashboard'))
         self.assertContains(response, 'Voltar ao painel de administração')
-        self.assertNotContains(response, 'Favoritos')
+        self.assertContains(response, 'Favoritos')
 
 
 class LoginThrottleServiceTests(SimpleTestCase):
@@ -706,6 +733,7 @@ class LoginThrottleServiceTests(SimpleTestCase):
 class LoginThrottleTests(TestCase):
     def setUp(self):
         self.client = Client()
+        clear_login_attempts('login@example.com')
         register_user_with_default_role(
             email='segundo@example.com',
             password='SenhaSegura123!',
@@ -727,6 +755,9 @@ class LoginThrottleTests(TestCase):
             'email': 'login@example.com',
             'password': 'errada',
         }
+
+    def tearDown(self):
+        clear_login_attempts('login@example.com')
 
     def _post_login(self):
         return self.client.post(self.login_url, {
@@ -761,6 +792,8 @@ class LoginThrottleTests(TestCase):
         })
 
         self.assertEqual(response.status_code, 302)
+
+        self.client.get(reverse('logout'))
 
         response = self._post_login()
         self.assertEqual(response.status_code, 200)

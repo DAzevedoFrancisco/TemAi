@@ -126,4 +126,5 @@ class MeAPIView(APIView):
             'date_of_birth': user.date_of_birth.isoformat(),
             'roles': user.get_roles_display(),
             'is_vendedor': user.is_vendedor,
+            'is_administrador': user.is_administrador,
         })

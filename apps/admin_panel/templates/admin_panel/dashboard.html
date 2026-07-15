@@ -80,34 +80,34 @@
             <div class="admin-dashboard-panel-body">
                 {% if recent_users %}
                     <div class="dash-table-wrap admin-dashboard-panel-content">
-                        <table class="dash-table admin-table">
+                        <table class="dash-table admin-table admin-users-recent-table">
                             <thead>
                                 <tr>
-                                    <th>Nome</th>
-                                    <th>Perfil</th>
-                                    <th>Estado</th>
+                                    <th>Utilizador</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for item in recent_users %}
                                     <tr>
-                                        <td>{{ item.name }}</td>
                                         <td>
-                                            <div class="admin-directory-roles admin-directory-roles-inline">
-                                                {% for user_role in item.user_roles.all %}
-                                                    <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
-                                                        {{ user_role.get_role_display }}
-                                                    </span>
-                                                {% empty %}
-                                                    <span class="admin-directory-no-role">—</span>
-                                                {% endfor %}
+                                            <div class="admin-user-row">
+                                                <span class="admin-user-row-name">{{ item.name }}</span>
+                                                <span class="admin-user-row-sep" aria-hidden="true">·</span>
+                                                <span class="admin-user-row-roles">
+                                                    {% for user_role in item.user_roles.all %}
+                                                        {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
+                                                    {% empty %}
+                                                        —
+                                                    {% endfor %}
+                                                </span>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="admin-user-row-status">
                                             {% if item.is_active %}
-                                                <span class="admin-badge admin-badge-active">Ativo</span>
+                                                <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
                                             {% else %}
-                                                <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                                <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -118,25 +118,23 @@
 
                     <div class="admin-dashboard-mobile-list admin-dashboard-panel-content">
                         {% for item in recent_users %}
-                            <article class="admin-dashboard-mobile-card">
+                            <article class="admin-dashboard-mobile-card admin-dashboard-mobile-card--user admin-dashboard-mobile-card--dense">
                                 <div class="admin-dashboard-mobile-card-head">
                                     <div class="admin-dashboard-mobile-card-info">
                                         <strong>{{ item.name }}</strong>
+                                        <span class="admin-user-row-roles">
+                                            {% for user_role in item.user_roles.all %}
+                                                {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
+                                            {% empty %}
+                                                —
+                                            {% endfor %}
+                                        </span>
                                     </div>
                                     {% if item.is_active %}
-                                        <span class="admin-badge admin-badge-active">Ativo</span>
+                                        <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
                                     {% else %}
-                                        <span class="admin-badge admin-badge-blocked">Bloqueado</span>
+                                        <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
                                     {% endif %}
-                                </div>
-                                <div class="admin-directory-roles admin-directory-roles-inline">
-                                    {% for user_role in item.user_roles.all %}
-                                        <span class="admin-role-pill{% if user_role.role == 'administrador' %} admin-role-pill-admin{% elif user_role.role == 'vendedor' %} admin-role-pill-vendor{% else %} admin-role-pill-client{% endif %}">
-                                            {{ user_role.get_role_display }}
-                                        </span>
-                                    {% empty %}
-                                        <span class="admin-directory-no-role">—</span>
-                                    {% endfor %}
                                 </div>
                             </article>
                         {% endfor %}
@@ -163,22 +161,26 @@
             <div class="admin-dashboard-panel-body">
                 {% if recent_establishments %}
                     <div class="dash-table-wrap admin-dashboard-panel-content">
-                        <table class="dash-table admin-table">
+                        <table class="dash-table admin-table admin-establishments-recent-table">
                             <thead>
                                 <tr>
-                                    <th>Nome</th>
-                                    <th>Dono</th>
-                                    <th>Produtos</th>
+                                    <th>Estabelecimento</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for establishment in recent_establishments %}
                                     <tr>
                                         <td>
-                                            <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-table-link">{{ establishment.name }}</a>
+                                            <div class="admin-user-row">
+                                                <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-user-row-name admin-table-link">{{ establishment.name }}</a>
+                                                <span class="admin-user-row-sep" aria-hidden="true">·</span>
+                                                <span class="admin-user-row-roles">{{ establishment.owner.name }}</span>
+                                            </div>
                                         </td>
-                                        <td>{{ establishment.owner.name }}</td>
-                                        <td><span class="table-badge">{{ establishment.products_count }}</span></td>
+                                        <td class="admin-user-row-status">
+                                            <span class="table-badge table-badge-xs">{{ establishment.products_count }}</span>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -187,15 +189,15 @@
 
                     <div class="admin-dashboard-mobile-list admin-dashboard-panel-content">
                         {% for establishment in recent_establishments %}
-                            <article class="admin-dashboard-mobile-card">
+                            <article class="admin-dashboard-mobile-card admin-dashboard-mobile-card--establishment admin-dashboard-mobile-card--dense">
                                 <div class="admin-dashboard-mobile-card-head">
                                     <div class="admin-dashboard-mobile-card-info">
                                         <strong>{{ establishment.name }}</strong>
-                                        <span>{{ establishment.owner.name }}</span>
+                                        <span class="admin-user-row-roles">{{ establishment.owner.name }}</span>
                                     </div>
-                                    <span class="table-badge">{{ establishment.products_count }}</span>
+                                    <span class="table-badge table-badge-xs">{{ establishment.products_count }}</span>
                                 </div>
-                                <div class="admin-dashboard-mobile-card-foot">
+                                <div class="admin-dashboard-mobile-card-foot admin-dashboard-mobile-card-foot--dense">
                                     <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-dashboard-mobile-link">
                                         Ver detalhes
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>

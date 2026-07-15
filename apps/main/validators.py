@@ -14,6 +14,12 @@ def normalize_whitespace(value):
     return ' '.join((value or '').split())
 
 
+def title_case_name(value):
+    """Capitaliza a primeira letra de cada palavra (ex: 'arroz branco' → 'Arroz Branco')."""
+    parts = normalize_whitespace(value).split()
+    return ' '.join(part[:1].upper() + part[1:].lower() for part in parts)
+
+
 def validate_min_name(value, *, field_label='O nome', min_length=MIN_NAME_LENGTH):
     name = normalize_whitespace(value)
     if len(name) < min_length:

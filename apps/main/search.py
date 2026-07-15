@@ -16,6 +16,7 @@ from apps.vendor.models import Category, Product
 def public_products_queryset():
     return Product.objects.filter(
         is_active=True,
+        is_available=True,
         establishment__is_active=True,
         category__is_active=True,
     ).select_related('establishment', 'category')

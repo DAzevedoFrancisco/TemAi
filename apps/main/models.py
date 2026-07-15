@@ -20,6 +20,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
         user = self.create_user(email, password, **extra_fields)
         UserRole.objects.get_or_create(user=user, role=UserRole.Role.ADMINISTRADOR)
+        UserRole.objects.get_or_create(user=user, role=UserRole.Role.CLIENTE)
         return user
 
 
