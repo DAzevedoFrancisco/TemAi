@@ -48,7 +48,12 @@
         }
     }
 
-    MobUserGeolocation.requestPosition()
+    MobUserGeolocation.requestPosition({
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+        forceFresh: true,
+    })
         .then((position) => {
             if (!isWithinBeira(position.lat, position.lng)) {
                 setBlocked(

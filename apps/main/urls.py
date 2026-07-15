@@ -15,6 +15,7 @@ from .views_engagement import (
 urlpatterns = [
     path('', views.home, name='home'),
     path('pesquisa/', views.search_results, name='search_results'),
+    path('api/pesquisa/sugestoes/', views.search_suggestions, name='search_suggestions'),
     path('produtos/<int:pk>/', views.product_detail, name='product_detail'),
     path('produtos/<int:pk>/favorito/', toggle_product_favorite, name='product_favorite_toggle'),
     path('favoritos/', favorites_list, name='favorites'),

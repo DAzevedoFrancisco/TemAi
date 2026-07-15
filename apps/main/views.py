@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.shortcuts import redirect, render
@@ -15,6 +16,7 @@ from .search import (
     parse_user_coordinates,
     search_products,
     sort_products_by_distance,
+    suggest_product_names,
 )
 from apps.vendor.geo import format_distance_km, haversine_km
 from .engagement import (
@@ -46,6 +48,15 @@ def home(request):
             else False
         ),
     })
+
+
+def search_suggestions(request):
+    if request.user.is_authenticated and not can_use_client_catalog(request):
+        return JsonResponse({'suggestions': []})
+
+    query = request.GET.get('q', '').strip()
+    suggestions = suggest_product_names(query)
+    return JsonResponse({'suggestions': suggestions})
 
 
 def search_results(request):

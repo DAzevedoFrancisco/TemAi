@@ -89,7 +89,18 @@
         mapEl.dataset.mapReady = 'true';
 
         if (typeof MobUserGeolocation !== 'undefined') {
-            MobUserGeolocation.attachToMap(map, mapEl, { fitPadding: 0.3 });
+            const params = new URLSearchParams(window.location.search);
+            const lat = Number(params.get('lat'));
+            const lng = Number(params.get('lng'));
+            const knownPosition = Number.isFinite(lat) && Number.isFinite(lng)
+                ? { lat, lng }
+                : null;
+
+            MobUserGeolocation.attachToMap(map, mapEl, {
+                fitPadding: 0.3,
+                position: knownPosition,
+                quiet: Boolean(knownPosition),
+            });
         }
 
         return true;

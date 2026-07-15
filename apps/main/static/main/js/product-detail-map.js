@@ -78,7 +78,7 @@
 
         if (typeof MobUserGeolocation !== 'undefined' && mapEl.dataset.userGeoAttached !== 'true') {
             mapEl.dataset.userGeoAttached = 'true';
-            MobUserGeolocation.attachToMap(map, mapEl);
+            MobUserGeolocation.attachToMap(map, mapEl, { quiet: false });
         }
 
         window.setTimeout(() => {

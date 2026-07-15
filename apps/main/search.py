@@ -81,6 +81,22 @@ def sort_products_by_distance(products, user_lat, user_lng):
     return enriched
 
 
+def suggest_product_names(query, limit=8):
+    """Sugestões distintas de nomes de produtos para autocomplete."""
+    term = (query or '').strip()
+    if len(term) < 1:
+        return []
+
+    names = (
+        public_products_queryset()
+        .filter(name__icontains=term)
+        .order_by('name')
+        .values_list('name', flat=True)
+        .distinct()[:limit]
+    )
+    return list(names)
+
+
 def get_search_categories(query):
     term = (query or '').strip()
     if not term:
