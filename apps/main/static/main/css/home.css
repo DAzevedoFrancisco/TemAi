@@ -1982,6 +1982,43 @@ body:has(.product-detail-page) {
     border: 1px solid #a7f3d0;
 }
 
+.search-masonry-distance {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.24rem 0.58rem;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+    white-space: nowrap;
+    background: #ecfeff;
+    color: #0e7490;
+    border: 1px solid #a5f3fc;
+}
+
+.search-distance-hint {
+    margin: 0 0 0.85rem;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.search-distance-hint--pending {
+    color: #2563eb;
+}
+
+.search-distance-hint--warning {
+    color: #b45309;
+}
+
+.search-map-popup-distance {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0e7490;
+}
+
 .search-masonry-badge-unavailable {
     background: #fef2f2;
     color: #b91c1c;
@@ -5244,6 +5281,35 @@ body:has(.become-seller-page) {
 
 .become-seller-form {
     margin: 0;
+}
+
+.become-seller-geo-status {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.65rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    text-align: left;
+}
+
+.become-seller-geo-status--ok {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #047857;
+}
+
+.become-seller-geo-status--blocked {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.become-seller-confirm:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 .become-seller-confirm {

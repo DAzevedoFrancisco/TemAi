@@ -1,4 +1,5 @@
 from decimal import Decimal
+from math import asin, cos, radians, sin, sqrt
 
 BEIRA_CENTER_LAT = Decimal('-19.843600')
 BEIRA_CENTER_LNG = Decimal('34.838900')
@@ -22,6 +23,36 @@ def is_within_beira(latitude, longitude):
         BEIRA_BOUNDS['lat_min'] <= lat <= BEIRA_BOUNDS['lat_max']
         and BEIRA_BOUNDS['lng_min'] <= lng <= BEIRA_BOUNDS['lng_max']
     )
+
+
+def haversine_km(lat1, lng1, lat2, lng2):
+    """Distância aproximada em km entre dois pontos (fórmula de Haversine)."""
+    try:
+        lat1_f = float(lat1)
+        lng1_f = float(lng1)
+        lat2_f = float(lat2)
+        lng2_f = float(lng2)
+    except (TypeError, ValueError):
+        return None
+
+    earth_radius_km = 6371.0
+    d_lat = radians(lat2_f - lat1_f)
+    d_lng = radians(lng2_f - lng1_f)
+    a = (
+        sin(d_lat / 2) ** 2
+        + cos(radians(lat1_f)) * cos(radians(lat2_f)) * sin(d_lng / 2) ** 2
+    )
+    return earth_radius_km * 2 * asin(sqrt(a))
+
+
+def format_distance_km(distance_km):
+    if distance_km is None:
+        return None
+    if distance_km < 1:
+        return f'{int(round(distance_km * 1000))} m'
+    if distance_km < 10:
+        return f'{distance_km:.1f} km'
+    return f'{int(round(distance_km))} km'
 
 
 def _is_mozambique_latitude(value):

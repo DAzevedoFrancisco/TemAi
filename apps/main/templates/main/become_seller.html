@@ -34,17 +34,29 @@
 
                 {% if eligible %}
                     <p class="become-seller-lead">
-                        Ao confirmar, o seu perfil de vendedor será ativado.
+                        Ao confirmar, o seu perfil de vendedor será ativado. É necessário autorizar a localização e estar na cidade da Beira.
                     </p>
                     <ul class="become-seller-requirements">
                         <li>Ter pelo menos <strong>{{ min_vendor_age }} anos</strong> — requisito cumprido ({{ user_age }} anos)</li>
+                        <li>Autorizar a localização GPS no navegador</li>
+                        <li>Estar fisicamente na área da cidade da Beira</li>
                         <li>Cadastrar pelo menos um estabelecimento na Beira</li>
                         <li>Manter informações e produtos atualizados</li>
                     </ul>
-                    <form method="post" class="become-seller-form">
+
+                    <p class="become-seller-geo-status" id="become-seller-geo-status" role="status" aria-live="polite">
+                        A verificar a sua localização...
+                    </p>
+
+                    <form method="post" class="become-seller-form" id="become-seller-form" hidden>
                         {% csrf_token %}
-                        <button type="submit" class="become-seller-confirm">Confirmar e continuar</button>
+                        <input type="hidden" name="lat" id="become-seller-lat" value="">
+                        <input type="hidden" name="lng" id="become-seller-lng" value="">
+                        <button type="submit" class="become-seller-confirm" id="become-seller-submit" disabled>
+                            Confirmar e continuar
+                        </button>
                     </form>
+                    <a href="{% url 'home' %}" class="become-seller-cancel" id="become-seller-cancel" hidden>Voltar ao início</a>
                 {% else %}
                     <p class="become-seller-lead become-seller-lead--blocked">
                         Não é possível ativar o perfil de vendedor com a data de nascimento associada à sua conta.
@@ -62,5 +74,9 @@
     </div>
 
     {% include 'main/partials/client_light_scripts.html' %}
+    {% if eligible %}
+    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
+    <script src="{% static 'main/js/become-seller-location.js' %}"></script>
+    {% endif %}
 </body>
 </html>

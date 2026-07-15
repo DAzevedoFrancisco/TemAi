@@ -90,6 +90,29 @@ def become_seller(request):
             )
             return redirect('vendor:become_seller')
 
+        from apps.main.search import parse_user_coordinates
+        from apps.vendor.geo import is_within_beira
+
+        user_lat, user_lng = parse_user_coordinates(
+            request.POST.get('lat'),
+            request.POST.get('lng'),
+        )
+        if user_lat is None or user_lng is None:
+            messages.error(
+                request,
+                'É obrigatório autorizar a localização GPS para se tornar vendedor.',
+                extra_tags='vendor',
+            )
+            return redirect('vendor:become_seller')
+
+        if not is_within_beira(user_lat, user_lng):
+            messages.error(
+                request,
+                'A sua localização está fora da cidade da Beira. Só pode tornar-se vendedor na Beira.',
+                extra_tags='vendor',
+            )
+            return redirect('vendor:become_seller')
+
         assign_vendedor_role(request.user)
         messages.success(request, 'Perfil de vendedor atribuído com sucesso!', extra_tags='vendor')
         set_active_profile(request, Profile.VENDEDOR)

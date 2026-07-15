@@ -392,11 +392,57 @@ class BecomeSellerTests(TestCase):
         self.client.force_login(user)
 
         self.assertTrue(can_become_seller(user))
-        response = self.client.post(reverse('vendor:become_seller'))
+        response = self.client.post(
+            reverse('vendor:become_seller'),
+            {
+                'lat': '-19.843600',
+                'lng': '34.838900',
+            },
+        )
 
         self.assertEqual(response.status_code, 302)
         user.refresh_from_db()
         self.assertTrue(user.is_vendedor)
+
+    def test_become_seller_requires_location(self):
+        user = User.objects.create_user(
+            email='semgps@example.com',
+            password='senha123',
+            name='Sem GPS',
+            date_of_birth=date.today() - timedelta(days=365 * 22),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(user)
+        self.client.force_login(user)
+
+        response = self.client.post(reverse('vendor:become_seller'))
+
+        self.assertEqual(response.status_code, 302)
+        user.refresh_from_db()
+        self.assertFalse(user.is_vendedor)
+
+    def test_become_seller_rejects_outside_beira(self):
+        user = User.objects.create_user(
+            email='maputo@example.com',
+            password='senha123',
+            name='Fora Beira',
+            date_of_birth=date.today() - timedelta(days=365 * 25),
+            gender=User.Gender.FEMININO,
+        )
+        assign_cliente_role(user)
+        self.client.force_login(user)
+
+        response = self.client.post(
+            reverse('vendor:become_seller'),
+            {
+                'lat': '-25.969200',
+                'lng': '32.573200',
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        user.refresh_from_db()
+        self.assertFalse(user.is_vendedor)
 
     def test_assign_vendedor_role_rejects_underage(self):
         user = User.objects.create_user(

@@ -46,18 +46,23 @@
 
                 {% if query and categories %}
                     <div class="search-category-filters search-category-scroll">
-                        <a href="{% url 'search_results' %}?q={{ query|urlencode }}" class="category-pill{% if not active_category %} active{% endif %}">Todas</a>
+                        <a href="{% url 'search_results' %}?q={{ query|urlencode }}{% if location_active %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}" class="category-pill{% if not active_category %} active{% endif %}">Todas</a>
                         {% for category in categories %}
-                            <a href="{% url 'search_results' %}?q={{ query|urlencode }}&categoria={{ category.slug }}" class="category-pill{% if active_category == category.slug %} active{% endif %}">{{ category.name }}</a>
+                            <a href="{% url 'search_results' %}?q={{ query|urlencode }}&categoria={{ category.slug }}{% if location_active %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}" class="category-pill{% if active_category == category.slug %} active{% endif %}">{{ category.name }}</a>
                         {% endfor %}
                     </div>
                 {% endif %}
 
                 {% if query and products %}
+                    {% if location_active %}
+                        <p class="search-distance-hint">Resultados ordenados por proximidade à sua localização.</p>
+                    {% else %}
+                        <p class="search-distance-hint search-distance-hint--pending" id="search-geo-hint" hidden>A obter a sua localização para ordenar por distância...</p>
+                    {% endif %}
                     <div class="search-results-masonry">
                         {% for product in products %}
                             {% cycle 'violet' 'blue' 'amber' 'emerald' as card_theme silent %}
-                            <a href="{% url 'product_detail' pk=product.pk %}?q={{ query|urlencode }}{% if active_category %}&categoria={{ active_category|urlencode }}{% endif %}" class="search-masonry-item search-card--{{ card_theme }}">
+                            <a href="{% url 'product_detail' pk=product.pk %}?q={{ query|urlencode }}{% if active_category %}&categoria={{ active_category|urlencode }}{% endif %}{% if location_active %}&lat={{ user_lat }}&lng={{ user_lng }}{% endif %}" class="search-masonry-item search-card--{{ card_theme }}">
                                 <div class="search-masonry-image-wrap">
                                     {% if product.image %}
                                         <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
@@ -72,6 +77,9 @@
                                 <div class="search-masonry-caption">
                                     <div class="search-masonry-meta">
                                         <span class="search-masonry-category">{{ product.category.name }}</span>
+                                        {% if product.distance_label %}
+                                            <span class="search-masonry-distance">{{ product.distance_label }}</span>
+                                        {% endif %}
                                         {% if product.is_available %}
                                             <span class="search-masonry-badge search-masonry-badge-available">
                                                 <span class="search-masonry-badge-dot" aria-hidden="true"></span>
@@ -128,12 +136,13 @@
 
     {% include 'main/partials/client_light_scripts.html' %}
     <script src="{% static 'main/js/search-input.js' %}"></script>
+    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
+    <script src="{% static 'main/js/search-distance.js' %}"></script>
     {% if query and show_search_map %}
     {{ map_markers|json_script:"search-map-markers-data" }}
     <script src="{% static 'main/vendor/leaflet/leaflet.js' %}"></script>
     <script src="{% static 'main/js/map-tiles.js' %}"></script>
     <script src="{% static 'main/js/location-map.js' %}"></script>
-    <script src="{% static 'main/js/user-geolocation.js' %}"></script>
     <script src="{% static 'main/js/search-results-map.js' %}"></script>
     {% endif %}
 </body>

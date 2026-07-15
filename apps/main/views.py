@@ -12,8 +12,11 @@ from .search import (
     get_establishment_coordinates,
     get_public_product,
     get_search_categories,
+    parse_user_coordinates,
     search_products,
+    sort_products_by_distance,
 )
+from apps.vendor.geo import format_distance_km, haversine_km
 from .engagement import (
     can_client_engage_product,
     get_approved_reviews,
@@ -51,13 +54,24 @@ def search_results(request):
 
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
+    user_lat, user_lng = parse_user_coordinates(
+        request.GET.get('lat'),
+        request.GET.get('lng'),
+    )
+    location_active = user_lat is not None and user_lng is not None
+
     products = list(search_products(query, category_slug=category_slug or None))
+    if location_active:
+        products = sort_products_by_distance(products, user_lat, user_lng)
+
     map_markers = []
     if request.user.is_authenticated:
         map_markers = build_search_map_markers(
             products,
             query=query,
             category_slug=category_slug,
+            user_lat=user_lat if location_active else None,
+            user_lng=user_lng if location_active else None,
         )
 
     return render(request, 'main/search_results.html', {
@@ -68,6 +82,9 @@ def search_results(request):
         'results_count': len(products),
         'map_markers': map_markers,
         'show_search_map': request.user.is_authenticated and bool(map_markers),
+        'location_active': location_active,
+        'user_lat': user_lat,
+        'user_lng': user_lng,
     })
 
 
@@ -92,6 +109,15 @@ def product_detail(request, pk):
         and establishment_lat is not None
         and establishment_lng is not None
     )
+    user_lat, user_lng = parse_user_coordinates(
+        request.GET.get('lat'),
+        request.GET.get('lng'),
+    )
+    distance_km = None
+    distance_label = None
+    if user_lat is not None and user_lng is not None:
+        distance_km = haversine_km(user_lat, user_lng, establishment_lat, establishment_lng)
+        distance_label = format_distance_km(distance_km)
 
     return render(request, 'main/product_detail.html', {
         'product': product,
@@ -104,6 +130,7 @@ def product_detail(request, pk):
             'lng': establishment_lng,
             'name': establishment.name,
         } if show_product_map else None,
+        'distance_label': distance_label,
         'back_query': back_query,
         'back_category': back_category,
         'is_favorited': is_product_favorited(request.user, product),

@@ -33,6 +33,9 @@
         return (
             `<div class="search-map-popup">`
             + `<strong class="search-map-popup-store">${escapeHtml(store.name)}</strong>`
+            + (store.distance_label
+                ? `<span class="search-map-popup-distance">${escapeHtml(store.distance_label)}</span>`
+                : '')
             + (store.address
                 ? `<span class="search-map-popup-address">${escapeHtml(store.address)}</span>`
                 : '')
