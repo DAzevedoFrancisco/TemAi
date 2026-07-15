@@ -707,6 +707,7 @@ body.mobile-nav-open {
     border: 1px solid #e2e8f0;
     background: #fff;
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+    color: #0f172a;
 }
 
 .search-autocomplete[hidden] {
@@ -737,6 +738,7 @@ body.mobile-nav-open {
 .search-autocomplete-name {
     font-size: 0.9rem;
     font-weight: 600;
+    color: #0f172a;
 }
 
 .search-autocomplete-hint {
@@ -747,6 +749,15 @@ body.mobile-nav-open {
 
 .navbar-search-input-wrap .search-autocomplete {
     top: calc(100% + 0.4rem);
+}
+
+.search-autocomplete .search-autocomplete-item,
+.search-autocomplete .search-autocomplete-name {
+    color: #0f172a;
+}
+
+.search-autocomplete .search-autocomplete-hint {
+    color: #64748b;
 }
 
 .content .container .search-box .search input {
@@ -936,8 +947,8 @@ body:has(.product-detail-page) {
     color: #0e7490;
 }
 
-.content.search-page-images .search-results-page .search-masonry-source-icon {
-    color: #fff;
+.content.search-page-images .search-results-page .search-masonry-source-name {
+    color: #475569;
 }
 
 .content.search-page-images .search-results-page .search-results-summary-label {
@@ -986,7 +997,6 @@ body:has(.product-detail-page) {
     .search-masonry-status-chip--unavailable,
     .search-masonry-distance,
     .search-masonry-source-name,
-    .search-masonry-source-icon,
     .category-pill
 ) {
     color: inherit;
@@ -2114,6 +2124,29 @@ body:has(.product-detail-page) {
     background: linear-gradient(180deg, #fff 0%, #fbfbfe 100%);
 }
 
+.search-masonry-caption h2 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 800;
+    line-height: 1.28;
+    color: #0f172a;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.search-masonry-source-name {
+    display: block;
+    min-width: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .search-masonry-meta {
     display: flex;
     align-items: center;
@@ -2152,52 +2185,6 @@ body:has(.product-detail-page) {
     font-size: 0.62rem;
     font-weight: 800;
     white-space: nowrap;
-}
-
-.search-masonry-caption h2 {
-    margin: 0;
-    font-size: 0.98rem;
-    font-weight: 800;
-    line-height: 1.28;
-    color: #0f172a;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.search-masonry-footer {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-    margin-top: 0.1rem;
-}
-
-.search-masonry-source-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--card-accent), color-mix(in srgb, var(--card-accent) 55%, #111827));
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 800;
-    box-shadow: 0 3px 10px var(--card-accent-soft);
-}
-
-.search-masonry-source-name {
-    flex: 1;
-    min-width: 0;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #475569;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .search-results-empty {
@@ -3949,12 +3936,6 @@ footer,
 
     .search-masonry-caption h2 {
         font-size: 0.8rem;
-    }
-
-    .search-masonry-source-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 0.58rem;
     }
 
     .search-masonry-source-name {

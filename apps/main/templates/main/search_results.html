@@ -86,16 +86,13 @@
                                     {% endif %}
                                 </div>
                                 <div class="search-masonry-caption">
+                                    <h2>{{ product.name }}</h2>
+                                    <span class="search-masonry-source-name">{{ product.establishment.name }}</span>
                                     <div class="search-masonry-meta">
                                         <span class="search-masonry-category">{{ product.category.name }}</span>
                                         {% if product.distance_label %}
                                             <span class="search-masonry-distance">{{ product.distance_label }}</span>
                                         {% endif %}
-                                    </div>
-                                    <h2>{{ product.name }}</h2>
-                                    <div class="search-masonry-footer">
-                                        <span class="search-masonry-source-icon" aria-hidden="true">{{ product.establishment.name|slice:":1"|upper }}</span>
-                                        <span class="search-masonry-source-name">{{ product.establishment.name }}</span>
                                     </div>
                                 </div>
                             </a>
