@@ -1,0 +1,11 @@
+{% for user_role in roles %}
+    {% if user_role.role == 'administrador' %}
+        <span class="admin-role-chip is-admin">Admin</span>
+    {% elif user_role.role == 'vendedor' %}
+        <span class="admin-role-chip is-vendor">Vend</span>
+    {% else %}
+        <span class="admin-role-chip is-client">Cli</span>
+    {% endif %}
+{% empty %}
+    <span class="admin-role-chip is-empty">—</span>
+{% endfor %}

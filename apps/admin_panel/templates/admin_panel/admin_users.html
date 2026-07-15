@@ -84,44 +84,39 @@
 
             {% if system_admins %}
                 <div class="dash-table-wrap admin-admins-table-wrap">
-                    <table class="dash-table admin-table admin-data-table admin-admins-data-table">
+                    <table class="dash-table admin-table admin-data-table admin-admins-data-table admin-pretty-table">
                         <thead>
                             <tr>
                                 <th>Administrador</th>
                                 <th>Perfis</th>
                                 <th>Desde</th>
                                 <th>Estado</th>
-                                <th></th>
+                                <th class="is-actions">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for admin_user in system_admins %}
                                 <tr class="admin-table-row-admin{% if not admin_user.is_active %} admin-row-blocked{% endif %}{% if admin_user.pk == user.pk %} admin-table-row-self{% endif %}">
                                     <td>
-                                        <div class="admin-user-row admin-user-row--stack">
-                                            <span class="admin-user-row-name">
-                                                {{ admin_user.name }}
-                                                {% if admin_user.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
-                                            </span>
-                                            <span class="admin-user-row-email" title="{{ admin_user.email }}">{{ admin_user.email }}</span>
+                                        <div class="admin-identity-cell">
+                                            <span class="admin-identity-avatar is-admin" aria-hidden="true">{{ admin_user.name|slice:":1"|upper }}</span>
+                                            <div class="admin-identity-copy">
+                                                <span class="admin-identity-name">
+                                                    {{ admin_user.name }}
+                                                    {% if admin_user.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
+                                                </span>
+                                                <span class="admin-identity-meta" title="{{ admin_user.email }}">{{ admin_user.email }}</span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="admin-user-row-roles">
-                                            {% for user_role in admin_user.user_roles.all %}
-                                                {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
-                                            {% empty %}
-                                                Admin
-                                            {% endfor %}
-                                        </span>
+                                        <div class="admin-role-chips">
+                                            {% include 'admin_panel/partials/role_chips.html' with roles=admin_user.user_roles.all %}
+                                        </div>
                                     </td>
-                                    <td>{{ admin_user.date_joined|date:"d/m/y" }}</td>
+                                    <td><span class="admin-table-date">{{ admin_user.date_joined|date:"d/m/y" }}</span></td>
                                     <td>
-                                        {% if admin_user.is_active %}
-                                            <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
-                                        {% else %}
-                                            <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
-                                        {% endif %}
+                                        {% include 'admin_panel/partials/status_chip.html' with is_active=admin_user.is_active %}
                                     </td>
                                     <td class="table-action">
                                         {% if admin_user.pk != user.pk %}
@@ -153,26 +148,17 @@
                     {% for admin_user in system_admins %}
                         <article class="admin-list-mobile-card admin-list-mobile-card--user admin-list-mobile-card--dense{% if not admin_user.is_active %} is-blocked{% endif %}{% if admin_user.pk == user.pk %} is-self{% endif %} admin-mobile-surface">
                             <div class="admin-list-mobile-card-head">
+                                <span class="admin-identity-avatar is-admin" aria-hidden="true">{{ admin_user.name|slice:":1"|upper }}</span>
                                 <div class="admin-list-mobile-card-info">
                                     <div class="admin-list-mobile-card-title">
                                         <strong>{{ admin_user.name }}</strong>
                                         {% if admin_user.pk == user.pk %}<span class="admin-user-you-badge">Você</span>{% endif %}
-                                        {% if admin_user.is_active %}
-                                            <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
-                                        {% else %}
-                                            <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
-                                        {% endif %}
+                                        {% include 'admin_panel/partials/status_chip.html' with is_active=admin_user.is_active %}
                                     </div>
-                                    <span class="admin-list-mobile-card-sub">
-                                        {{ admin_user.email }}
-                                        ·
-                                        {% for user_role in admin_user.user_roles.all %}
-                                            {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
-                                        {% empty %}
-                                            Admin
-                                        {% endfor %}
-                                        · {{ admin_user.date_joined|date:"d/m/y" }}
-                                    </span>
+                                    <span class="admin-list-mobile-card-sub">{{ admin_user.email }} · {{ admin_user.date_joined|date:"d/m/y" }}</span>
+                                    <div class="admin-role-chips admin-role-chips--compact">
+                                        {% include 'admin_panel/partials/role_chips.html' with roles=admin_user.user_roles.all %}
+                                    </div>
                                 </div>
                                 {% if admin_user.pk != user.pk %}
                                     <div class="admin-list-mobile-card-actions admin-list-mobile-card-actions--inline">

@@ -91,24 +91,18 @@
                                 {% for item in recent_users %}
                                     <tr>
                                         <td>
-                                            <div class="admin-user-row">
-                                                <span class="admin-user-row-name">{{ item.name }}</span>
-                                                <span class="admin-user-row-sep" aria-hidden="true">·</span>
-                                                <span class="admin-user-row-roles">
-                                                    {% for user_role in item.user_roles.all %}
-                                                        {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
-                                                    {% empty %}
-                                                        —
-                                                    {% endfor %}
-                                                </span>
+                                            <div class="admin-identity-cell">
+                                                <span class="admin-identity-avatar{% if item.is_administrador %} is-admin{% elif item.is_vendedor %} is-vendor{% else %} is-client{% endif %}" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
+                                                <div class="admin-identity-copy">
+                                                    <span class="admin-identity-name">{{ item.name }}</span>
+                                                    <div class="admin-role-chips admin-role-chips--compact">
+                                                        {% include 'admin_panel/partials/role_chips.html' with roles=item.user_roles.all %}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="admin-user-row-status">
-                                            {% if item.is_active %}
-                                                <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
-                                            {% else %}
-                                                <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
-                                            {% endif %}
+                                            {% include 'admin_panel/partials/status_chip.html' with is_active=item.is_active %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -120,21 +114,14 @@
                         {% for item in recent_users %}
                             <article class="admin-dashboard-mobile-card admin-dashboard-mobile-card--user admin-dashboard-mobile-card--dense">
                                 <div class="admin-dashboard-mobile-card-head">
+                                    <span class="admin-identity-avatar{% if item.is_administrador %} is-admin{% elif item.is_vendedor %} is-vendor{% else %} is-client{% endif %}" aria-hidden="true">{{ item.name|slice:":1"|upper }}</span>
                                     <div class="admin-dashboard-mobile-card-info">
                                         <strong>{{ item.name }}</strong>
-                                        <span class="admin-user-row-roles">
-                                            {% for user_role in item.user_roles.all %}
-                                                {% if user_role.role == 'administrador' %}Admin{% elif user_role.role == 'vendedor' %}Vend{% else %}Cli{% endif %}{% if not forloop.last %}/{% endif %}
-                                            {% empty %}
-                                                —
-                                            {% endfor %}
-                                        </span>
+                                        <div class="admin-role-chips admin-role-chips--compact">
+                                            {% include 'admin_panel/partials/role_chips.html' with roles=item.user_roles.all %}
+                                        </div>
                                     </div>
-                                    {% if item.is_active %}
-                                        <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
-                                    {% else %}
-                                        <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
-                                    {% endif %}
+                                    {% include 'admin_panel/partials/status_chip.html' with is_active=item.is_active %}
                                 </div>
                             </article>
                         {% endfor %}
@@ -172,14 +159,16 @@
                                 {% for establishment in recent_establishments %}
                                     <tr>
                                         <td>
-                                            <div class="admin-user-row">
-                                                <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-user-row-name admin-table-link">{{ establishment.name }}</a>
-                                                <span class="admin-user-row-sep" aria-hidden="true">·</span>
-                                                <span class="admin-user-row-roles">{{ establishment.owner.name }}</span>
+                                            <div class="admin-identity-cell">
+                                                <span class="admin-identity-avatar is-store" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
+                                                <div class="admin-identity-copy">
+                                                    <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-identity-name admin-table-link">{{ establishment.name }}</a>
+                                                    <span class="admin-identity-meta">{{ establishment.owner.name }}</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="admin-user-row-status">
-                                            <span class="table-badge table-badge-xs">{{ establishment.products_count }}</span>
+                                            <span class="admin-count-chip">{{ establishment.products_count }}</span>
                                         </td>
                                     </tr>
                                 {% endfor %}

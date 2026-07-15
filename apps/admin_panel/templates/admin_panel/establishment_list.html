@@ -96,38 +96,36 @@
     <article class="dash-panel dash-panel-table admin-scroll-table-panel admin-establishments-table-panel admin-mobile-surface">
         {% if establishments %}
             <div class="dash-table-wrap admin-scroll-table-wrap">
-                <table class="dash-table admin-table admin-data-table admin-establishments-data-table">
+                <table class="dash-table admin-table admin-data-table admin-establishments-data-table admin-pretty-table">
                     <thead>
                         <tr>
                             <th>Estabelecimento</th>
                             <th>Produtos</th>
                             <th>Criado</th>
                             <th>Estado</th>
-                            <th></th>
+                            <th class="is-actions">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for establishment in establishments %}
                             <tr class="{% if not establishment.is_active %}admin-row-blocked{% endif %}">
                                 <td>
-                                    <div class="admin-user-row admin-user-row--stack">
-                                        <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-user-row-name admin-table-link">{{ establishment.name }}</a>
-                                        <span class="admin-user-row-email" title="{{ establishment.owner.name }} · {{ establishment.address }}">
-                                            {{ establishment.owner.name }}
-                                            {% if establishment.phone %} · {{ establishment.phone }}{% endif %}
-                                        </span>
+                                    <div class="admin-identity-cell">
+                                        <span class="admin-identity-avatar is-store" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
+                                        <div class="admin-identity-copy">
+                                            <a href="{% url 'admin_panel:establishment_detail' pk=establishment.pk %}" class="admin-identity-name admin-table-link">{{ establishment.name }}</a>
+                                            <span class="admin-identity-meta" title="{{ establishment.owner.name }} · {{ establishment.address }}">
+                                                {{ establishment.owner.name }}{% if establishment.phone %} · {{ establishment.phone }}{% endif %}
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="table-badge table-badge-xs">{{ establishment.products_count }}</span>
+                                    <span class="admin-count-chip">{{ establishment.products_count }}</span>
                                 </td>
-                                <td>{{ establishment.created_at|date:"d/m/y" }}</td>
+                                <td><span class="admin-table-date">{{ establishment.created_at|date:"d/m/y" }}</span></td>
                                 <td>
-                                    {% if establishment.is_active %}
-                                        <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
-                                    {% else %}
-                                        <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
-                                    {% endif %}
+                                    {% include 'admin_panel/partials/status_chip.html' with is_active=establishment.is_active %}
                                 </td>
                                 <td class="table-action">
                                     <div class="admin-table-actions">
@@ -154,15 +152,12 @@
                 {% for establishment in establishments %}
                     <article class="admin-list-mobile-card admin-list-mobile-card--establishment admin-list-mobile-card--dense{% if not establishment.is_active %} is-blocked{% endif %} admin-mobile-surface">
                         <div class="admin-list-mobile-card-head">
+                            <span class="admin-identity-avatar is-store" aria-hidden="true">{{ establishment.name|slice:":1"|upper }}</span>
                             <div class="admin-list-mobile-card-info">
                                 <div class="admin-list-mobile-card-title">
                                     <strong>{{ establishment.name }}</strong>
-                                    {% if establishment.is_active %}
-                                        <span class="admin-badge admin-badge-active admin-badge-xs">Ativo</span>
-                                    {% else %}
-                                        <span class="admin-badge admin-badge-blocked admin-badge-xs">Bloq.</span>
-                                    {% endif %}
-                                    <span class="table-badge table-badge-xs">{{ establishment.products_count }}</span>
+                                    {% include 'admin_panel/partials/status_chip.html' with is_active=establishment.is_active %}
+                                    <span class="admin-count-chip">{{ establishment.products_count }}</span>
                                 </div>
                                 <span class="admin-list-mobile-card-sub">
                                     {{ establishment.owner.name }}
