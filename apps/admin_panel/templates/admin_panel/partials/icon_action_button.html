@@ -1,8 +1,21 @@
 {% comment %}
 Icon-only action button. Required: url, icon_type (block|unblock|delete), label, btn_class
-Optional: next, confirm
+Optional: next, confirm, confirm_title
+
+Destructive actions (delete / block / unblock) always use the shared confirm
+modal and data-no-loader so the page-loader never covers the dialog.
 {% endcomment %}
-<form method="post" action="{{ url }}" class="admin-table-action-form"{% if confirm %} data-confirm-message="{{ confirm }}"{% if confirm_title %} data-confirm-title="{{ confirm_title }}"{% endif %}{% endif %}>
+{% if confirm %}
+<form method="post" action="{{ url }}" class="admin-table-action-form" data-no-loader="true" data-confirm-message="{{ confirm }}" data-confirm-title="{{ confirm_title|default:'Confirmar ação' }}">
+{% elif icon_type == 'block' %}
+<form method="post" action="{{ url }}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="Bloquear" data-confirm-message="Tem a certeza que deseja bloquear? O acesso fica restrito até desbloquear.">
+{% elif icon_type == 'unblock' %}
+<form method="post" action="{{ url }}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="Desbloquear" data-confirm-message="Tem a certeza que deseja desbloquear? O acesso será restaurado.">
+{% elif icon_type == 'delete' %}
+<form method="post" action="{{ url }}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="{{ confirm_title|default:'Apagar' }}" data-confirm-message="{{ confirm|default:'Tem a certeza que deseja apagar? Esta ação não pode ser desfeita.' }}">
+{% else %}
+<form method="post" action="{{ url }}" class="admin-table-action-form">
+{% endif %}
     {% csrf_token %}
     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
     <button type="submit" class="admin-icon-btn {{ btn_class }}" aria-label="{{ label }}" title="{{ label }}">

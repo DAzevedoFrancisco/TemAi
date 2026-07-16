@@ -141,6 +141,7 @@ def dashboard(request):
         'establishments_count': establishments.count(),
         'products_count': products_count,
         'categories_count': categories_count,
+        'unread_reviews_count': get_unread_review_count(request.user),
     })
 
 
@@ -223,6 +224,20 @@ def establishment_edit(request, pk):
         'establishment': establishment,
         'require_user_location': False,
     })
+
+
+@vendedor_required
+@require_POST
+def establishment_delete(request, pk):
+    establishment = get_object_or_404(Establishment, pk=pk, owner=request.user)
+    name = establishment.name
+    establishment.delete()
+    messages.success(
+        request,
+        f'Estabelecimento "{name}" foi eliminado.',
+        extra_tags='vendor',
+    )
+    return redirect('vendor:establishment_list')
 
 
 @vendedor_required

@@ -54,15 +54,7 @@
 
                 {% if user.is_authenticated %}
 
-                    {% if user.is_vendedor %}
-
-                        <a href="{% url 'switch_profile' %}?profile=vendedor" class="client-nav-btn client-nav-btn-ghost vendor-link">Painel</a>
-
-                    {% else %}
-
-                        <a href="{% url 'vendor:become_seller' %}" class="client-nav-btn client-nav-btn-ghost vendor-link">Vender</a>
-
-                    {% endif %}
+                    {% include 'main/partials/profile_cascade.html' with variant='light' %}
 
                     {% include 'main/partials/nav_user_chip.html' %}
 

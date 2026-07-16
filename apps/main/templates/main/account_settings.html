@@ -191,43 +191,13 @@
                             <p>{{ delete_block_reason }}</p>
                         </div>
                     {% else %}
-                        <form method="post" class="account-form" novalidate id="account-delete-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="form_type" value="delete">
-
-                            {% if delete_form.non_field_errors %}
-                                <div class="account-alert account-alert-error">
-                                    {% for error in delete_form.non_field_errors %}
-                                        <p>{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-
-                            <p class="account-danger-note">
-                                Esta acção é irreversível. Os seus estabelecimentos, produtos, favoritos e avaliações serão removidos.
-                            </p>
-
-                            <div class="account-field">
-                                <label for="account-delete-password">Senha actual</label>
-                                <div class="account-input-wrap">
-                                    <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                    {{ delete_form.password }}
-                                </div>
-                                {% for error in delete_form.password.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
-                            </div>
-
-                            <div class="account-field">
-                                <label for="account-delete-confirm">Escreva ELIMINAR para confirmar</label>
-                                <div class="account-input-wrap account-input-wrap-plain">
-                                    {{ delete_form.confirm_text }}
-                                </div>
-                                {% for error in delete_form.confirm_text.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
-                            </div>
-
-                            <button type="button" class="account-btn account-btn-danger" id="account-delete-open">
-                                Eliminar conta definitivamente
-                            </button>
-                        </form>
+                        <p class="account-danger-note">
+                            Esta acção é irreversível. Os seus estabelecimentos, produtos, favoritos e avaliações serão removidos.
+                            Para continuar, confirme com a senha e escreva <strong>ELIMINAR</strong>.
+                        </p>
+                        <button type="button" class="account-btn account-btn-danger" id="account-delete-open">
+                            Eliminar conta definitivamente
+                        </button>
                     {% endif %}
                 </section>
             </div>
@@ -236,17 +206,52 @@
         {% include 'main/partials/client_footer.html' %}
     </div>
 
+    {% if not delete_block_reason %}
     <div class="logout-modal" id="account-delete-modal" hidden>
         <div class="logout-modal-overlay" id="account-delete-overlay"></div>
         <div class="logout-modal-content account-delete-modal-content" role="dialog" aria-labelledby="account-delete-modal-title" aria-modal="true">
-            <h3 id="account-delete-modal-title">Eliminar conta</h3>
-            <p>Tem a certeza de que deseja eliminar a sua conta? Esta acção é permanente e não pode ser anulada.</p>
-            <div class="logout-modal-actions">
-                <button type="button" class="logout-modal-cancel" id="account-delete-cancel">Cancelar</button>
-                <button type="button" class="logout-modal-confirm account-delete-confirm" id="account-delete-confirm">Eliminar</button>
-            </div>
+            <h3 id="account-delete-modal-title">Confirmar eliminação</h3>
+            <p>Introduza a senha e escreva ELIMINAR para apagar a conta de forma permanente.</p>
+
+            <form method="post" class="account-form account-delete-modal-form" novalidate id="account-delete-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="delete">
+
+                {% if delete_form.non_field_errors %}
+                    <div class="account-alert account-alert-error">
+                        {% for error in delete_form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="account-field">
+                    <label for="account-delete-password">Senha actual</label>
+                    <div class="account-input-wrap">
+                        <svg class="account-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        {{ delete_form.password }}
+                    </div>
+                    {% for error in delete_form.password.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                </div>
+
+                <div class="account-field">
+                    <label for="account-delete-confirm">Escreva ELIMINAR para confirmar</label>
+                    <div class="account-input-wrap account-input-wrap-plain">
+                        {{ delete_form.confirm_text }}
+                    </div>
+                    {% for error in delete_form.confirm_text.errors %}<span class="account-field-error">{{ error }}</span>{% endfor %}
+                </div>
+
+                <div class="logout-modal-actions account-delete-modal-actions">
+                    <button type="button" class="logout-modal-cancel" id="account-delete-cancel">Cancelar</button>
+                    <button type="submit" class="logout-modal-confirm account-delete-confirm" id="account-delete-confirm">
+                        Eliminar conta
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+    {% endif %}
 
     {% include 'main/partials/client_scripts.html' %}
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
@@ -257,24 +262,19 @@
             const modal = document.getElementById('account-delete-modal');
             const overlay = document.getElementById('account-delete-overlay');
             const cancelBtn = document.getElementById('account-delete-cancel');
-            const confirmBtn = document.getElementById('account-delete-confirm');
+            const passwordInput = document.getElementById('account-delete-password');
 
             if (!form || !openBtn || !modal) {
                 return;
             }
 
-            let submitting = false;
-
             function openModal() {
                 modal.hidden = false;
                 document.body.style.overflow = 'hidden';
-                confirmBtn?.focus();
+                window.setTimeout(() => passwordInput?.focus(), 50);
             }
 
             function closeModal() {
-                if (submitting) {
-                    return;
-                }
                 modal.hidden = true;
                 if (!document.body.classList.contains('mobile-nav-open')) {
                     document.body.style.overflow = '';
@@ -285,23 +285,16 @@
             openBtn.addEventListener('click', openModal);
             cancelBtn?.addEventListener('click', (event) => {
                 event.preventDefault();
-                event.stopPropagation();
                 closeModal();
             });
             overlay?.addEventListener('click', (event) => {
                 event.preventDefault();
                 closeModal();
             });
-            confirmBtn?.addEventListener('click', (event) => {
-                event.preventDefault();
-                if (submitting) {
-                    return;
-                }
-                submitting = true;
-                confirmBtn.disabled = true;
-                cancelBtn && (cancelBtn.disabled = true);
-                form.requestSubmit ? form.requestSubmit() : form.submit();
-            });
+
+            {% if delete_form.errors %}
+            openModal();
+            {% endif %}
 
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape' && !modal.hidden) {

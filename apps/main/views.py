@@ -197,6 +197,8 @@ def auth_view(request):
                         user.refresh_from_db()
                         set_active_profile(request, Profile.CLIENTE)
                         tokens = get_tokens_for_user(user)
+                        # Descarta flashes pendentes (ex.: logout) para não aparecerem após entrar.
+                        list(messages.get_messages(request))
                         response = redirect(get_post_auth_redirect(request, user))
                         return set_jwt_cookies(response, tokens)
 
@@ -258,5 +260,4 @@ def logout_view(request):
 
     logout(request)
     response = redirect('auth')
-    messages.info(request, 'Sessão terminada. Inicie sessão novamente para continuar.', extra_tags='general')
     return clear_jwt_cookies(response)

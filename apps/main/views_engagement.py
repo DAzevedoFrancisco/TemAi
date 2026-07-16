@@ -186,3 +186,21 @@ def moderate_review(request, pk):
         messages.error(request, 'Ação inválida.', extra_tags='vendor')
 
     return redirect('vendor:establishment_reviews', pk=establishment_pk)
+
+
+@vendedor_required
+@require_POST
+def review_delete(request, pk):
+    review = get_object_or_404(
+        EstablishmentReview,
+        pk=pk,
+        establishment__owner=request.user,
+    )
+    establishment_pk = review.establishment_id
+    review.delete()
+    messages.success(request, 'Comentário eliminado com sucesso.', extra_tags='vendor')
+
+    next_url = request.POST.get('next')
+    if is_safe_redirect_url(request, next_url):
+        return redirect(next_url)
+    return redirect('vendor:establishment_reviews', pk=establishment_pk)

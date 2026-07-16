@@ -31,7 +31,13 @@
     }
 
     menu.querySelectorAll('a, button.vendor-link, button.client-nav-item-logout').forEach((element) => {
-        element.addEventListener('click', () => setMenuOpen(false));
+        element.addEventListener('click', () => {
+            // Manter o menu aberto ao expandir o seletor de perfil.
+            if (element.classList.contains('profile-cascade-toggle')) {
+                return;
+            }
+            setMenuOpen(false);
+        });
     });
 
     document.addEventListener('keydown', (event) => {

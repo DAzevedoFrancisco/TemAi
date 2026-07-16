@@ -7,14 +7,14 @@
     <header class="admin-users-hero">
         <div class="admin-users-hero-main">
             <div class="admin-users-hero-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
             </div>
             <div>
                 <p class="dashboard-eyebrow">Acesso ao painel</p>
                 <h1>Administradores</h1>
-                <p class="admin-page-subtitle">Gira quem tem acesso ao painel. Promover adiciona o perfil administrador sem remover cliente ou vendedor.</p>
+                <p class="admin-page-subtitle">Promova contas existentes sem remover os outros perfis.</p>
             </div>
         </div>
         <div class="admin-users-hero-stats">
@@ -38,7 +38,7 @@
             <article class="admin-users-promote-card">
                 <div class="admin-users-promote-head">
                     <span class="admin-users-promote-icon" aria-hidden="true">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                             <circle cx="8.5" cy="7" r="4"/>
                             <line x1="20" y1="8" x2="20" y2="14"/>
@@ -47,7 +47,7 @@
                     </span>
                     <div>
                         <h2>Novo administrador</h2>
-                        <p>Promova uma conta existente pelo email.</p>
+                        <p>Promova pelo email da conta.</p>
                     </div>
                 </div>
 
@@ -59,18 +59,14 @@
                         {{ promote_form.email }}
                     </div>
                     <button type="submit" class="admin-users-promote-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <polyline points="20 6 9 17 4 12"/>
                         </svg>
-                        Promover a administrador
+                        Promover
                     </button>
                 </form>
 
-                <ul class="admin-users-tips">
-                    <li>O utilizador deve já ter conta na plataforma.</li>
-                    <li>Os perfis de cliente e vendedor são mantidos.</li>
-                    <li>Não é possível despromover o último administrador ativo.</li>
-                </ul>
+                <p class="admin-users-promote-note">Mantém os perfis de cliente/vendedor. Não é possível despromover o último admin ativo.</p>
             </article>
         </aside>
 
@@ -121,7 +117,7 @@
                                     <td class="table-action">
                                         {% if admin_user.pk != user.pk %}
                                             <div class="admin-table-actions">
-                                                <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form">
+                                                <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="Despromover administrador" data-confirm-message="Tem a certeza que deseja remover o papel de administrador de {{ admin_user.name }}?">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                                     <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
@@ -162,7 +158,7 @@
                                 </div>
                                 {% if admin_user.pk != user.pk %}
                                     <div class="admin-list-mobile-card-actions admin-list-mobile-card-actions--inline">
-                                        <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form">
+                                        <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="Despromover administrador" data-confirm-message="Tem a certeza que deseja remover o papel de administrador de {{ admin_user.name }}?">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                             <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">

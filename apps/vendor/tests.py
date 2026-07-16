@@ -173,3 +173,148 @@ class EstablishmentCreateLocationTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Establishment.objects.filter(name='Loja Beira Centro', owner=self.user).exists())
+
+
+@override_settings(
+    SECURE_SSL_REDIRECT=False,
+    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
+)
+class EstablishmentDeleteTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.owner = User.objects.create_user(
+            email='dono-loja@example.com',
+            password='SenhaSegura123!',
+            name='Dono Loja',
+            date_of_birth=date(1990, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(self.owner)
+        assign_vendedor_role(self.owner)
+        self.other = User.objects.create_user(
+            email='outro-vendedor@example.com',
+            password='SenhaSegura123!',
+            name='Outro Vendedor',
+            date_of_birth=date(1991, 1, 1),
+            gender=User.Gender.FEMININO,
+        )
+        assign_cliente_role(self.other)
+        assign_vendedor_role(self.other)
+        self.category, _ = Category.objects.get_or_create(
+            slug='alimentacao',
+            defaults={'name': 'Alimentação'},
+        )
+        self.establishment = Establishment.objects.create(
+            owner=self.owner,
+            name='Loja Para Apagar',
+            address='Rua Teste 2, Beira',
+            phone='841111222',
+            opening_hours='09:00 - 17:00',
+            latitude=-19.8436,
+            longitude=34.8389,
+        )
+        Product.objects.create(
+            establishment=self.establishment,
+            category=self.category,
+            name='Produto Cascata',
+            description='Será removido com o estabelecimento',
+            is_available=True,
+        )
+        self.url = reverse('vendor:establishment_delete', kwargs={'pk': self.establishment.pk})
+
+    def test_owner_can_delete_establishment_and_products(self):
+        self.client.force_login(self.owner)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('vendor:establishment_list'))
+        self.assertFalse(Establishment.objects.filter(pk=self.establishment.pk).exists())
+        self.assertFalse(Product.objects.filter(name='Produto Cascata').exists())
+
+    def test_other_vendor_cannot_delete_establishment(self):
+        self.client.force_login(self.other)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Establishment.objects.filter(pk=self.establishment.pk).exists())
+
+    def test_get_is_not_allowed(self):
+        self.client.force_login(self.owner)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 405)
+        self.assertTrue(Establishment.objects.filter(pk=self.establishment.pk).exists())
+
+
+@override_settings(
+    SECURE_SSL_REDIRECT=False,
+    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
+)
+class ReviewDeleteTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.owner = User.objects.create_user(
+            email='dono-reviews@example.com',
+            password='SenhaSegura123!',
+            name='Dono Reviews',
+            date_of_birth=date(1990, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(self.owner)
+        assign_vendedor_role(self.owner)
+        self.other = User.objects.create_user(
+            email='outro-reviews@example.com',
+            password='SenhaSegura123!',
+            name='Outro Reviews',
+            date_of_birth=date(1991, 1, 1),
+            gender=User.Gender.FEMININO,
+        )
+        assign_cliente_role(self.other)
+        assign_vendedor_role(self.other)
+        self.client_user = User.objects.create_user(
+            email='cliente-reviews@example.com',
+            password='SenhaSegura123!',
+            name='Cliente Reviews',
+            date_of_birth=date(1992, 1, 1),
+            gender=User.Gender.FEMININO,
+        )
+        assign_cliente_role(self.client_user)
+        self.establishment = Establishment.objects.create(
+            owner=self.owner,
+            name='Loja Com Comentarios',
+            address='Rua Teste 3, Beira',
+            phone='842222333',
+            opening_hours='09:00 - 17:00',
+            latitude=-19.8436,
+            longitude=34.8389,
+        )
+        from apps.main.models import EstablishmentReview
+        self.review = EstablishmentReview.objects.create(
+            user=self.client_user,
+            establishment=self.establishment,
+            rating=4,
+            comment='Bom atendimento',
+            status=EstablishmentReview.Status.APPROVED,
+        )
+        self.url = reverse('vendor:review_delete', kwargs={'pk': self.review.pk})
+
+    def test_owner_can_delete_review(self):
+        from apps.main.models import EstablishmentReview
+        self.client.force_login(self.owner)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(EstablishmentReview.objects.filter(pk=self.review.pk).exists())
+
+    def test_other_vendor_cannot_delete_review(self):
+        from apps.main.models import EstablishmentReview
+        self.client.force_login(self.other)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(EstablishmentReview.objects.filter(pk=self.review.pk).exists())

@@ -211,9 +211,14 @@ def user_delete(request, pk):
     name = target.name
     delete_user_account(target)
     messages.success(request, f'Utilizador "{name}" foi apagado.', extra_tags='admin')
+
+    next_url = request.POST.get('next')
+    # Evitar redireccionar para o detalhe do utilizador já apagado.
+    if next_url and f'/utilizadores/{pk}/' in next_url:
+        next_url = None
     return redirect_safely(
         request,
-        request.POST.get('next'),
+        next_url,
         fallback='admin_panel:user_list',
     )
 
@@ -299,6 +304,9 @@ def establishment_delete(request, pk):
     messages.success(request, f'Estabelecimento "{name}" foi apagado.', extra_tags='admin')
 
     next_url = request.POST.get('next')
+    # Evitar redireccionar para o detalhe do estabelecimento já apagado.
+    if next_url and f'/estabelecimentos/{pk}/' in next_url:
+        next_url = None
     return redirect_safely(
         request,
         next_url,

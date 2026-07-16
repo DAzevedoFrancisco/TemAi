@@ -124,5 +124,4 @@ def switch_profile(request):
         return redirect('admin_panel:dashboard')
 
     set_active_profile(request, Profile.CLIENTE)
-    messages.success(request, 'Perfil alterado para Cliente.', extra_tags='profile')
     return redirect('home')

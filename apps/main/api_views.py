@@ -87,7 +87,6 @@ class LoginAPIView(APIView):
 
         tokens = get_tokens_for_user(user)
         response = Response({
-            'message': 'Login efetuado com sucesso.',
             'user': {
                 'name': user.name,
                 'email': user.email,

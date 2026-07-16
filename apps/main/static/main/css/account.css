@@ -216,6 +216,14 @@ body:has(.account-page) {
     display: none;
 }
 
+.account-card-danger .account-card-head p {
+    display: block;
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #9f1239;
+}
+
 .account-card-icon {
     width: 2rem;
     height: 2rem;
@@ -436,25 +444,49 @@ body:has(.account-page) {
 
 .account-card-danger {
     grid-column: 1 / -1;
-    border-color: #fecaca;
-    background: linear-gradient(180deg, #fff 0%, #fff8f8 100%);
+    border-color: #f87171;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.08);
 }
 
 .account-card-icon-danger {
-    background: #dc2626;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    background: #fee2e2;
+    color: #dc2626;
+    box-shadow: none;
 }
 
 .account-card-icon-danger svg {
-    stroke: #fff;
+    stroke: #dc2626;
 }
 
 .account-danger-note {
-    margin: 0 0 0.35rem;
-    font-size: 0.78rem;
-    line-height: 1.45;
+    margin: 0;
+    padding: 0.7rem 0.8rem;
+    border-radius: 0.65rem;
+    background: #fff1f2;
+    border: 1px solid #fecaca;
+    font-size: 0.8rem;
+    line-height: 1.5;
     color: #7f1d1d;
+}
+
+.account-card-danger .account-field label {
+    color: #7f1d1d;
+}
+
+.account-card-danger .account-input-wrap input {
+    background: #fff;
+    border-color: #fecaca;
+    color: #0f172a;
+}
+
+.account-card-danger .account-input-wrap input::placeholder {
+    color: #94a3b8;
+}
+
+.account-card-danger .account-input-wrap:focus-within input {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.14);
 }
 
 .account-btn-danger {
@@ -468,12 +500,45 @@ body:has(.account-page) {
 }
 
 .account-delete-modal-content {
-    background-color: #1d1d20;
+    background: #fff;
+    color: #0f172a;
+    text-align: left;
+    max-width: 440px;
+}
+
+.account-delete-modal-content h3 {
+    color: #7f1d1d;
+}
+
+.account-delete-modal-content > p {
+    color: #475569;
+    margin-bottom: 1rem;
+}
+
+.account-delete-modal-form {
+    gap: 0.85rem;
+}
+
+.account-delete-modal-form .account-field label {
+    color: #334155;
+    font-size: 0.78rem;
+}
+
+.account-delete-modal-form .account-input-wrap input {
+    background: #fff;
+    border-color: #e2e8f0;
+    color: #0f172a;
+}
+
+.account-delete-modal-actions {
+    margin-top: 0.35rem;
+    justify-content: flex-end;
 }
 
 .logout-modal-confirm.account-delete-confirm {
     background: linear-gradient(135deg, #ef4444, #b91c1c);
     color: #fff;
+    border-color: #b91c1c;
 }
 
 .logout-modal-confirm.account-delete-confirm:hover {
@@ -484,6 +549,17 @@ body:has(.account-page) {
 .logout-modal-cancel:disabled {
     opacity: 0.65;
     cursor: wait;
+}
+
+#account-delete-modal .logout-modal-cancel {
+    color: #4b5563;
+    border-color: #d1d5db;
+    background: #fff;
+}
+
+#account-delete-modal .logout-modal-cancel:hover {
+    color: #1e1e2a;
+    background: #f3f4f6;
 }
 
 /* Nav link activo na página de conta */
