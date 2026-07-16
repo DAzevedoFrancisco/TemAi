@@ -197,11 +197,6 @@ def auth_view(request):
                         user.refresh_from_db()
                         set_active_profile(request, Profile.CLIENTE)
                         tokens = get_tokens_for_user(user)
-                        messages.success(
-                            request,
-                            'Login efetuado com sucesso.',
-                            extra_tags='general',
-                        )
                         response = redirect(get_post_auth_redirect(request, user))
                         return set_jwt_cookies(response, tokens)
 

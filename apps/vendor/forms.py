@@ -24,6 +24,16 @@ class EstablishmentForm(forms.ModelForm):
             'invalid': 'Coordenada de longitude inválida.',
         },
     )
+    user_latitude = forms.DecimalField(
+        widget=forms.HiddenInput(),
+        required=False,
+        error_messages={'invalid': 'Coordenada de latitude do utilizador inválida.'},
+    )
+    user_longitude = forms.DecimalField(
+        widget=forms.HiddenInput(),
+        required=False,
+        error_messages={'invalid': 'Coordenada de longitude do utilizador inválida.'},
+    )
 
     class Meta:
         model = Establishment
@@ -68,7 +78,8 @@ class EstablishmentForm(forms.ModelForm):
             },
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, require_user_location=False, **kwargs):
+        self.require_user_location = require_user_location
         super().__init__(*args, **kwargs)
         self.fields['name'].min_length = MIN_NAME_LENGTH
         self.fields['name'].widget.attrs.setdefault('minlength', MIN_NAME_LENGTH)
@@ -91,7 +102,20 @@ class EstablishmentForm(forms.ModelForm):
         if latitude is not None and longitude is not None:
             if not is_within_beira(latitude, longitude):
                 raise forms.ValidationError(
-                    'A localização deve estar dentro da cidade da Beira, Sofala, Moçambique.'
+                    'A localização do estabelecimento deve estar dentro da cidade da Beira, Sofala, Moçambique.'
+                )
+
+        if self.require_user_location:
+            user_lat = cleaned_data.get('user_latitude')
+            user_lng = cleaned_data.get('user_longitude')
+            if user_lat is None or user_lng is None:
+                raise forms.ValidationError(
+                    'É obrigatório autorizar a localização GPS para cadastrar um estabelecimento.'
+                )
+            if not is_within_beira(user_lat, user_lng):
+                raise forms.ValidationError(
+                    'A sua localização está fora da cidade da Beira. '
+                    'Só pode cadastrar estabelecimentos estando na Beira.'
                 )
 
         return cleaned_data

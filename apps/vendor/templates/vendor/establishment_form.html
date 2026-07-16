@@ -34,7 +34,13 @@
                     <div class="establishment-form-hero-text">
                         <span class="establishment-form-eyebrow">{% if is_edit %}Editar negócio{% else %}Novo negócio{% endif %}</span>
                         <h2 class="profile-style-title">{{ title }}</h2>
-                        <p class="establishment-form-subtitle">Preencha os dados do estabelecimento e marque a localização na cidade da Beira.</p>
+                        <p class="establishment-form-subtitle">
+                            {% if require_user_location %}
+                                Confirme a sua localização GPS na Beira, preencha os dados e marque o ponto do estabelecimento no mapa.
+                            {% else %}
+                                Preencha os dados do estabelecimento e marque a localização na cidade da Beira.
+                            {% endif %}
+                        </p>
                     </div>
 
                     <div class="establishment-form-hero-icon" aria-hidden="true">
@@ -111,6 +117,14 @@
                                 <p class="establishment-map-hint">Toque no mapa para marcar o ponto do estabelecimento na Beira.</p>
                             </div>
 
+                            {% if require_user_location %}
+                                <p class="establishment-geo-status" id="user-geo-status" role="status" aria-live="polite">
+                                    A verificar a sua localização GPS...
+                                </p>
+                                {{ form.user_latitude }}
+                                {{ form.user_longitude }}
+                            {% endif %}
+
                             <p class="establishment-geo-status" id="geo-status" role="status" aria-live="polite" hidden></p>
 
                             {{ form.latitude }}
@@ -130,7 +144,7 @@
                 <footer class="establishment-form-footer">
                     <div class="establishment-form-actions">
                         <a href="{% if is_edit %}{% url 'vendor:establishment_list' %}{% else %}{% url 'vendor:dashboard' %}{% endif %}" class="btn-discard">Cancelar</a>
-                        <button type="submit" class="btn-save">
+                        <button type="submit" class="btn-save" id="establishment-submit"{% if require_user_location %} disabled{% endif %}>
                             {% if is_edit %}Guardar alterações{% else %}Cadastrar{% endif %}
                         </button>
                     </div>
@@ -144,11 +158,19 @@
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="{% static 'main/js/map-tiles.js' %}"></script>
+{% if require_user_location %}
+<script src="{% static 'main/js/user-geolocation.js' %}"></script>
+{% endif %}
 <script>
     const BEIRA_BOUNDS = L.latLngBounds(L.latLng(-19.902, 34.802), L.latLng(-19.768, 34.928));
     const BEIRA_CENTER = [-19.8436, 34.8389];
+    const REQUIRE_USER_LOCATION = {{ require_user_location|yesno:"true,false" }};
     const latInput = document.getElementById('id_latitude');
     const lngInput = document.getElementById('id_longitude');
+    const userLatInput = document.getElementById('id_user_latitude');
+    const userLngInput = document.getElementById('id_user_longitude');
+    const submitBtn = document.getElementById('establishment-submit');
+    const userGeoStatus = document.getElementById('user-geo-status');
     const savedLat = parseFloat(latInput.value);
     const savedLng = parseFloat(lngInput.value);
     const hasSavedLocation = !Number.isNaN(savedLat) && !Number.isNaN(savedLng)
@@ -170,6 +192,7 @@
     }).addTo(map);
 
     let marker = null;
+    let userLocationReady = !REQUIRE_USER_LOCATION;
 
     function isInsideBeira(lat, lng) {
         return BEIRA_BOUNDS.contains(L.latLng(lat, lng));
@@ -199,6 +222,7 @@
 
         latInput.value = lat.toFixed(6);
         lngInput.value = lng.toFixed(6);
+        updateSubmitState();
     }
 
     if (hasSavedLocation) setMarker(savedLat, savedLng);
@@ -219,6 +243,25 @@
         geoStatus.className = `establishment-geo-status establishment-geo-status--${type}`;
     }
 
+    function setUserGeoStatus(message, type = 'info') {
+        if (!userGeoStatus) {
+            return;
+        }
+        userGeoStatus.hidden = !message;
+        userGeoStatus.textContent = message || '';
+        userGeoStatus.className = message
+            ? `establishment-geo-status establishment-geo-status--${type}`
+            : 'establishment-geo-status';
+    }
+
+    function updateSubmitState() {
+        if (!submitBtn || !REQUIRE_USER_LOCATION) {
+            return;
+        }
+        const hasPin = Boolean(latInput.value && lngInput.value);
+        submitBtn.disabled = !(userLocationReady && hasPin);
+    }
+
     function refreshMapSize() {
         map.invalidateSize({ animate: false });
     }
@@ -232,5 +275,52 @@
         const mapObserver = new ResizeObserver(() => refreshMapSize());
         mapObserver.observe(mapContainer);
     }
+
+    if (REQUIRE_USER_LOCATION && typeof MobUserGeolocation !== 'undefined') {
+        MobUserGeolocation.requestPosition({
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+            forceFresh: true,
+        })
+            .then((position) => {
+                if (!isInsideBeira(position.lat, position.lng)) {
+                    userLocationReady = false;
+                    setUserGeoStatus(
+                        'A sua localização actual está fora da cidade da Beira. '
+                        + 'Só pode cadastrar estabelecimentos estando na Beira.',
+                        'warning'
+                    );
+                    updateSubmitState();
+                    return;
+                }
+
+                userLatInput.value = position.lat.toFixed(6);
+                userLngInput.value = position.lng.toFixed(6);
+                userLocationReady = true;
+                setUserGeoStatus('Localização GPS confirmada na Beira. Pode marcar o estabelecimento no mapa.', 'info');
+                if (typeof MobUserGeolocation.attachToMap === 'function') {
+                    MobUserGeolocation.attachToMap(map, document.getElementById('map'), {
+                        position,
+                        quiet: true,
+                        skipFitBounds: true,
+                    });
+                }
+                updateSubmitState();
+            })
+            .catch((error) => {
+                userLocationReady = false;
+                let message = 'Não foi possível obter a sua localização. Active o GPS e autorize o acesso.';
+                if (error && error.code === 1) {
+                    message = 'Localização recusada. Sem autorização do GPS não pode cadastrar o estabelecimento.';
+                } else if (error && error.code === 0) {
+                    message = 'Este dispositivo ou navegador não suporta geolocalização.';
+                }
+                setUserGeoStatus(message, 'warning');
+                updateSubmitState();
+            });
+    }
+
+    updateSubmitState();
 </script>
 {% endblock %}

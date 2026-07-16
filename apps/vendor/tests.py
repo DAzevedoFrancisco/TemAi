@@ -115,3 +115,61 @@ class ProductCreateTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Product.objects.filter(name='Feijão').exists())
         self.assertContains(response, 'Não foi possível guardar a imagem do produto')
+
+
+@override_settings(
+    SECURE_SSL_REDIRECT=False,
+    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
+)
+class EstablishmentCreateLocationTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email='vendedor-loja@example.com',
+            password='SenhaSegura123!',
+            name='Vendedor Loja',
+            date_of_birth=date(1990, 1, 1),
+            gender=User.Gender.MASCULINO,
+        )
+        assign_cliente_role(self.user)
+        assign_vendedor_role(self.user)
+        self.client.force_login(self.user)
+        self.url = reverse('vendor:establishment_create')
+        self.valid_payload = {
+            'name': 'Loja Beira Centro',
+            'address': 'Avenida Samora Machel, Beira',
+            'phone': '841234567',
+            'opening_hours': '08:00 - 18:00',
+            'latitude': '-19.843600',
+            'longitude': '34.838900',
+            'user_latitude': '-19.843600',
+            'user_longitude': '34.838900',
+        }
+
+    def test_create_requires_user_gps(self):
+        payload = dict(self.valid_payload)
+        payload.pop('user_latitude')
+        payload.pop('user_longitude')
+
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Establishment.objects.filter(name='Loja Beira Centro').exists())
+        self.assertContains(response, 'É obrigatório autorizar a localização GPS')
+
+    def test_create_rejects_user_outside_beira(self):
+        payload = dict(self.valid_payload)
+        payload['user_latitude'] = '-25.969200'
+        payload['user_longitude'] = '32.573200'
+
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Establishment.objects.filter(name='Loja Beira Centro').exists())
+        self.assertContains(response, 'fora da cidade da Beira')
+
+    def test_create_succeeds_with_user_in_beira(self):
+        response = self.client.post(self.url, self.valid_payload)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Establishment.objects.filter(name='Loja Beira Centro', owner=self.user).exists())

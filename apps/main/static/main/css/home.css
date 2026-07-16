@@ -4491,15 +4491,19 @@ body:has(.favorites-page) {
     width: min(720px, calc(100% - 2rem));
     margin: 0 auto;
     padding: calc(4.75rem + 0.5rem) 0 0.5rem;
+    /* Não interceptar cliques na navbar por baixo do padding */
+    pointer-events: none;
 }
 
-.home-flash-wrap:empty {
+.home-flash-wrap:empty,
+.home-flash-wrap:not(:has(.client-message)) {
     display: none;
     padding: 0;
 }
 
 .home-flash-wrap .client-messages {
     margin-bottom: 0;
+    pointer-events: auto;
 }
 
 .home-flash-wrap .client-message {

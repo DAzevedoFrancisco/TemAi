@@ -186,7 +186,10 @@ def establishment_list(request):
 
 @vendedor_required
 def establishment_create(request):
-    form = EstablishmentForm(request.POST or None)
+    form = EstablishmentForm(
+        request.POST or None,
+        require_user_location=True,
+    )
 
     if request.method == 'POST' and form.is_valid():
         establishment = form.save(commit=False)
@@ -199,6 +202,7 @@ def establishment_create(request):
         'form': form,
         'title': 'Cadastrar estabelecimento',
         'is_edit': False,
+        'require_user_location': True,
     })
 
 
@@ -217,6 +221,7 @@ def establishment_edit(request, pk):
         'title': 'Editar estabelecimento',
         'is_edit': True,
         'establishment': establishment,
+        'require_user_location': False,
     })
 
 

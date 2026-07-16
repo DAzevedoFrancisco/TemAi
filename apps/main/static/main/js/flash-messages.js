@@ -40,10 +40,14 @@
             removed = true;
 
             const container = messageEl.closest('.client-messages, .dash-messages, .home-flash-messages');
+            const flashWrap = messageEl.closest('.home-flash-wrap');
             messageEl.remove();
 
             if (container && !container.querySelector('.client-message, .dash-message')) {
                 container.remove();
+            }
+            if (flashWrap && !flashWrap.querySelector('.client-message')) {
+                flashWrap.remove();
             }
         };
 
