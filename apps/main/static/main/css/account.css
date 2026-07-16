@@ -216,14 +216,6 @@ body:has(.account-page) {
     display: none;
 }
 
-.account-card-danger .account-card-head p {
-    display: block;
-    margin: 0.2rem 0 0;
-    font-size: 0.78rem;
-    line-height: 1.45;
-    color: #9f1239;
-}
-
 .account-card-icon {
     width: 2rem;
     height: 2rem;
@@ -248,6 +240,11 @@ body:has(.account-page) {
 .content.account-page .account-card-icon-security svg {
     color: #7c3aed;
     stroke: #7c3aed;
+}
+
+.content.account-page .account-card-icon-danger svg {
+    color: #b91c1c;
+    stroke: #b91c1c;
 }
 
 .account-card-icon-profile {
@@ -405,6 +402,12 @@ body:has(.account-page) {
     color: #b91c1c;
 }
 
+.content.account-page .account-alert,
+.content.account-page .account-alert p,
+.content.account-page .account-alert strong {
+    color: inherit;
+}
+
 .account-alert p {
     margin: 0;
 }
@@ -442,25 +445,39 @@ body:has(.account-page) {
     background: #f5f3ff;
 }
 
-.account-card-danger {
+.content.account-page .account-card-danger {
     grid-column: 1 / -1;
-    border-color: #f87171;
-    background: #fff;
+    border: 1.5px solid #fca5a5;
+    background: linear-gradient(180deg, #fff 0%, #fff8f8 100%);
     box-shadow: 0 6px 18px rgba(220, 38, 38, 0.08);
 }
 
-.account-card-icon-danger {
+.content.account-page .account-card-danger .account-card-head {
+    align-items: flex-start;
+    border-bottom-color: #fecaca;
+}
+
+.content.account-page .account-card-danger .account-card-head h2 {
+    color: #991b1b;
+}
+
+.content.account-page .account-card-danger .account-card-head p {
+    display: block;
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #9f1239;
+}
+
+.content.account-page .account-card-icon-danger {
     background: #fee2e2;
-    color: #dc2626;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
     box-shadow: none;
 }
 
-.account-card-icon-danger svg {
-    stroke: #dc2626;
-}
-
-.account-danger-note {
-    margin: 0;
+.content.account-page .account-danger-note {
+    margin: 0 0 0.75rem;
     padding: 0.7rem 0.8rem;
     border-radius: 0.65rem;
     background: #fff1f2;
@@ -470,33 +487,39 @@ body:has(.account-page) {
     color: #7f1d1d;
 }
 
-.account-card-danger .account-field label {
+.content.account-page .account-danger-note strong {
+    color: #991b1b;
+    font-weight: 700;
+}
+
+.content.account-page .account-card-danger .account-field label {
     color: #7f1d1d;
 }
 
-.account-card-danger .account-input-wrap input {
+.content.account-page .account-card-danger .account-input-wrap input {
     background: #fff;
     border-color: #fecaca;
     color: #0f172a;
 }
 
-.account-card-danger .account-input-wrap input::placeholder {
+.content.account-page .account-card-danger .account-input-wrap input::placeholder {
     color: #94a3b8;
 }
 
-.account-card-danger .account-input-wrap:focus-within input {
+.content.account-page .account-card-danger .account-input-wrap:focus-within input {
     border-color: #ef4444;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.14);
 }
 
-.account-btn-danger {
+.content.account-page .account-btn-danger {
     background: linear-gradient(135deg, #ef4444, #b91c1c);
     color: #fff;
     box-shadow: 0 6px 16px rgba(185, 28, 28, 0.22);
 }
 
-.account-btn-danger:hover {
+.content.account-page .account-btn-danger:hover {
     background: linear-gradient(135deg, #f87171, #dc2626);
+    color: #fff;
 }
 
 .account-delete-modal-content {
@@ -507,12 +530,17 @@ body:has(.account-page) {
 }
 
 .account-delete-modal-content h3 {
-    color: #7f1d1d;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #9f1239;
+    margin-bottom: 0.45rem;
 }
 
 .account-delete-modal-content > p {
-    color: #475569;
+    font-size: 0.85rem;
+    color: #64748b;
     margin-bottom: 1rem;
+    line-height: 1.5;
 }
 
 .account-delete-modal-form {
