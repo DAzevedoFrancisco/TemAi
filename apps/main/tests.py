@@ -742,7 +742,7 @@ class LoginThrottleServiceTests(SimpleTestCase):
         attempts, locked = register_failed_login('login@example.com')
         self.assertEqual(attempts, 1)
         self.assertFalse(locked)
-        self.assertIn('Restam 3 tentativas', failed_login_error_message('login@example.com', attempts))
+        self.assertIn('Restam 2 tentativas', failed_login_error_message('login@example.com', attempts))
 
 
 @override_settings(SECURE_SSL_REDIRECT=False)
@@ -786,19 +786,22 @@ class LoginThrottleTests(TestCase):
         response = self._post_login()
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Restam 3 tentativas')
+        self.assertContains(response, 'Restam 2 tentativas')
 
-    def test_web_login_locks_after_four_failed_attempts(self):
-        for _ in range(4):
-            self._post_login()
+    def test_web_login_locks_after_three_failed_attempts(self):
+        for _ in range(2):
+            response = self._post_login()
+            self.assertEqual(response.status_code, 200)
 
         response = self._post_login()
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Excedeu o limite de 4 tentativas')
+        self.assertContains(response, 'Excedeu o limite de 3 tentativas')
+        self.assertContains(response, 'id="login-submit" disabled')
+        self.assertContains(response, 'login-lockout-notice')
 
     def test_web_login_clears_attempts_after_success(self):
-        for _ in range(3):
+        for _ in range(2):
             self._post_login()
 
         response = self.client.post(self.login_url, {
@@ -813,10 +816,10 @@ class LoginThrottleTests(TestCase):
 
         response = self._post_login()
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Restam 3 tentativas')
+        self.assertContains(response, 'Restam 2 tentativas')
 
-    def test_api_login_locks_after_four_failed_attempts(self):
-        for index in range(3):
+    def test_api_login_locks_after_three_failed_attempts(self):
+        for index in range(2):
             response = self.client.post(
                 self.api_login_url,
                 data=self.payload,
@@ -830,4 +833,4 @@ class LoginThrottleTests(TestCase):
             content_type='application/json',
         )
         self.assertEqual(response.status_code, 429)
-        self.assertIn('Excedeu o limite de 4 tentativas', response.json()['detail'])
+        self.assertIn('Excedeu o limite de 3 tentativas', response.json()['detail'])

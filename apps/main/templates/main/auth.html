@@ -67,7 +67,9 @@
                         <p>Introduza as suas credenciais para continuar</p>
                     </div>
 
-                    <form method="post" class="auth-form" novalidate>
+                    <form method="post" class="auth-form" id="login-form" novalidate
+                          data-locked="{% if login_locked %}true{% else %}false{% endif %}"
+                          data-lockout-seconds="{{ login_lockout_seconds }}">
                         {% csrf_token %}
                         <input type="hidden" name="form_type" value="login">
                         {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
@@ -78,6 +80,12 @@
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
+                        {% endif %}
+
+                        {% if login_locked %}
+                            <p class="form-alert warning" id="login-lockout-notice" role="status">
+                                Aguarde <span id="login-lockout-countdown">{{ login_lockout_seconds }}</span>s para voltar a tentar.
+                            </p>
                         {% endif %}
 
                         <div class="input-field">
@@ -98,7 +106,7 @@
                             {% for error in login_form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                         </div>
 
-                        <button type="submit" class="auth-btn">Entrar</button>
+                        <button type="submit" class="auth-btn" id="login-submit"{% if login_locked %} disabled aria-disabled="true"{% endif %}>Entrar</button>
                     </form>
                 </div>
 
@@ -194,6 +202,7 @@
         });
     </script>
     <script src="{% static 'main/js/auth-password-toggle.js' %}"></script>
+    <script src="{% static 'main/js/auth-login-lock.js' %}"></script>
     <script src="{% static 'main/js/auth-cache-guard.js' %}"></script>
 </body>
 </html>

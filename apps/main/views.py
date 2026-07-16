@@ -30,6 +30,7 @@ from .forms import EstablishmentReviewForm
 from .login_throttle import (
     clear_login_attempts,
     failed_login_error_message,
+    get_lockout_seconds_remaining,
     is_login_locked,
     lockout_error_message,
     register_failed_login,
@@ -171,6 +172,8 @@ def auth_view(request):
     register_form = RegisterForm()
     active_panel = request.GET.get('mode', 'login')
     next_url = request.POST.get('next') or request.GET.get('next') or ''
+    login_locked = False
+    login_lockout_seconds = 0
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -194,11 +197,19 @@ def auth_view(request):
                         user.refresh_from_db()
                         set_active_profile(request, Profile.CLIENTE)
                         tokens = get_tokens_for_user(user)
+                        messages.success(
+                            request,
+                            'Login efetuado com sucesso.',
+                            extra_tags='general',
+                        )
                         response = redirect(get_post_auth_redirect(request, user))
                         return set_jwt_cookies(response, tokens)
 
-                    attempts, _locked = register_failed_login(email)
+                    attempts, locked = register_failed_login(email)
                     login_form.add_error(None, failed_login_error_message(email, attempts))
+                    if locked:
+                        login_lockout_seconds = get_lockout_seconds_remaining(email)
+                        login_locked = login_lockout_seconds > 0
 
         elif form_type == 'register':
             register_form = RegisterForm(request.POST)
@@ -225,11 +236,20 @@ def auth_view(request):
                 response = redirect(get_post_auth_redirect(request, user))
                 return set_jwt_cookies(response, tokens)
 
+    login_email = ''
+    if login_form.is_bound:
+        login_email = (login_form.data.get('email') or '').strip()
+    if login_email:
+        login_lockout_seconds = get_lockout_seconds_remaining(login_email.lower())
+        login_locked = login_lockout_seconds > 0
+
     return render(request, 'main/auth.html', {
         'login_form': login_form,
         'register_form': register_form,
         'active_panel': active_panel,
         'next_url': next_url,
+        'login_locked': login_locked,
+        'login_lockout_seconds': login_lockout_seconds,
     })
 
 

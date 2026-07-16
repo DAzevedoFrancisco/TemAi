@@ -2,7 +2,7 @@ import time
 
 from django.core.cache import cache
 
-LOGIN_ATTEMPT_LIMIT = 4
+LOGIN_ATTEMPT_LIMIT = 3
 LOGIN_LOCKOUT_SECONDS = 60
 
 
@@ -34,7 +34,7 @@ def lockout_error_message(email: str) -> str:
     minutes = max(1, (remaining + 59) // 60)
     if minutes == 1:
         return (
-            'Excedeu o limite de 4 tentativas de login. '
+            f'Excedeu o limite de {LOGIN_ATTEMPT_LIMIT} tentativas de login. '
             'Aguarde 1 minuto antes de tentar novamente.'
         )
     return (
