@@ -66,7 +66,7 @@
                     </button>
                 </form>
 
-                <p class="admin-users-promote-note">Mantém os perfis de cliente/vendedor. Não é possível despromover o último admin ativo.</p>
+                <p class="admin-users-promote-note">Mantém os perfis de cliente/vendedor. Pode despromover-se a si próprio se sobrar outro administrador activo.</p>
             </article>
         </aside>
 
@@ -115,12 +115,12 @@
                                         {% include 'admin_panel/partials/status_chip.html' with is_active=admin_user.is_active %}
                                     </td>
                                     <td class="table-action">
-                                        {% if admin_user.pk != user.pk %}
+                                        {% if admin_user.pk != user.pk or can_self_demote %}
                                             <div class="admin-table-actions">
-                                                <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="Despromover administrador" data-confirm-message="Tem a certeza que deseja remover o papel de administrador de {{ admin_user.name }}?">
+                                                <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="{% if admin_user.pk == user.pk %}Despromover a sua conta{% else %}Despromover administrador{% endif %}" data-confirm-message="{% if admin_user.pk == user.pk %}Tem a certeza que deseja remover o seu próprio papel de administrador? Deixará de aceder ao painel de gestão.{% else %}Tem a certeza que deseja remover o papel de administrador de {{ admin_user.name }}?{% endif %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                                    <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
+                                                    <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="{% if admin_user.pk == user.pk %}Despromover a sua conta{% else %}Despromover {{ admin_user.name }}{% endif %}" aria-label="{% if admin_user.pk == user.pk %}Despromover a sua conta{% else %}Despromover {{ admin_user.name }}{% endif %}">
                                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                                             <circle cx="8.5" cy="7" r="4"/>
@@ -131,7 +131,7 @@
                                                 </form>
                                             </div>
                                         {% else %}
-                                            <span class="admin-self-note">—</span>
+                                            <span class="admin-self-note" title="Único administrador activo">—</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -156,12 +156,12 @@
                                         {% include 'admin_panel/partials/role_chips.html' with roles=admin_user.user_roles.all %}
                                     </div>
                                 </div>
-                                {% if admin_user.pk != user.pk %}
+                                {% if admin_user.pk != user.pk or can_self_demote %}
                                     <div class="admin-list-mobile-card-actions admin-list-mobile-card-actions--inline">
-                                        <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="Despromover administrador" data-confirm-message="Tem a certeza que deseja remover o papel de administrador de {{ admin_user.name }}?">
+                                        <form method="post" action="{% url 'admin_panel:demote_admin' pk=admin_user.pk %}" class="admin-table-action-form" data-no-loader="true" data-confirm-title="{% if admin_user.pk == user.pk %}Despromover a sua conta{% else %}Despromover administrador{% endif %}" data-confirm-message="{% if admin_user.pk == user.pk %}Tem a certeza que deseja remover o seu próprio papel de administrador? Deixará de aceder ao painel de gestão.{% else %}Tem a certeza que deseja remover o papel de administrador de {{ admin_user.name }}?{% endif %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                            <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="Despromover {{ admin_user.name }}" aria-label="Despromover {{ admin_user.name }}">
+                                            <button type="submit" class="admin-icon-btn admin-icon-btn-danger" title="{% if admin_user.pk == user.pk %}Despromover a sua conta{% else %}Despromover {{ admin_user.name }}{% endif %}" aria-label="{% if admin_user.pk == user.pk %}Despromover a sua conta{% else %}Despromover {{ admin_user.name }}{% endif %}">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                                     <circle cx="8.5" cy="7" r="4"/>

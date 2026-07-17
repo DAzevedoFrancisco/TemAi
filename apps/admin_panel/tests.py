@@ -73,6 +73,19 @@ class AdminPanelGuardTests(TestCase):
         self.admin.refresh_from_db()
         self.assertTrue(self.admin.is_administrador)
 
+    def test_can_self_demote_when_another_admin_exists(self):
+        assign_admin_role(self.other)
+        response = self.client.post(
+            reverse('admin_panel:demote_admin', kwargs={'pk': self.admin.pk}),
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('home'))
+        self.admin.refresh_from_db()
+        self.assertFalse(self.admin.is_administrador)
+        self.assertTrue(self.admin.is_cliente)
+        self.other.refresh_from_db()
+        self.assertTrue(self.other.is_administrador)
+
     def test_promote_admin_keeps_existing_roles(self):
         response = self.client.post(
             reverse('admin_panel:promote_admin'),

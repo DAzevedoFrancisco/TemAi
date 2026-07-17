@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.main.models import UserRole
+from apps.main.profile import Profile, set_active_profile
 from apps.main.redirects import redirect_safely
 from apps.main.services import (
     active_administrator_count,
@@ -46,12 +47,14 @@ def dashboard(request):
 @administrador_required
 def admin_users(request):
     system_admins = get_system_admins()
+    admins_active_count = system_admins.filter(is_active=True).count()
     return render(request, 'admin_panel/admin_users.html', {
         'promote_form': PromoteAdminForm(),
         'system_admins': system_admins,
         'admins_total': system_admins.count(),
-        'admins_active_count': system_admins.filter(is_active=True).count(),
+        'admins_active_count': admins_active_count,
         'admins_blocked_count': system_admins.filter(is_active=False).count(),
+        'can_self_demote': admins_active_count > 1,
     })
 
 
@@ -98,16 +101,14 @@ def promote_admin(request):
 @require_POST
 def demote_admin(request, pk):
     target = get_object_or_404(User, pk=pk)
-
-    if target.pk == request.user.pk:
-        messages.error(request, 'Não pode despromover a sua própria conta.', extra_tags='admin')
-        return redirect('admin_panel:admin_users')
+    is_self = target.pk == request.user.pk
 
     if not target.has_role(UserRole.Role.ADMINISTRADOR):
         messages.info(request, f'"{target.email}" já não é administrador.', extra_tags='admin')
         return redirect('admin_panel:admin_users')
 
-    if active_administrator_count() <= 1:
+    # Impede deixar o sistema sem administrador activo (inclui autodespromoção).
+    if target.is_active and active_administrator_count() <= 1:
         messages.error(
             request,
             'Não pode despromover o último administrador ativo do sistema.',
@@ -116,6 +117,16 @@ def demote_admin(request, pk):
         return redirect('admin_panel:admin_users')
 
     demote_from_admin(target)
+
+    if is_self:
+        set_active_profile(request, Profile.CLIENTE)
+        messages.success(
+            request,
+            'Deixou de ser administrador. Os outros perfis mantêm-se.',
+            extra_tags='admin',
+        )
+        return redirect('home')
+
     messages.success(
         request,
         f'"{target.name}" ({target.email}) deixou de ser administrador. Os outros perfis mantêm-se.',
