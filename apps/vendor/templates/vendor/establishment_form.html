@@ -307,6 +307,9 @@
                         skipFitBounds: true,
                     });
                 }
+                if (!hasSavedLocation) {
+                    map.setView([position.lat, position.lng], 15);
+                }
                 updateSubmitState();
             })
             .catch((error) => {
