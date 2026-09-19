@@ -71,7 +71,7 @@ class Product(models.Model):
         related_name='products',
     )
     name = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to=product_image_path, blank=True, null=True)
     is_available = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)

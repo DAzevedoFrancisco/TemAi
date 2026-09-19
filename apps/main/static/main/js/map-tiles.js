@@ -3,7 +3,7 @@
     // no Firefox (Tracking Protection / referrer em HTTP local).
     const PROVIDERS = [
         {
-            url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+            url: 'https://{s}.basemaps.cartocdn.com/ rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_3ko9_1_9482ecc00a2e520779f11c61',
             options: {
                 maxZoom: 20,
                 subdomains: 'abcd',

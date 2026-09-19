@@ -148,9 +148,6 @@ class ProductForm(forms.ModelForm):
                 'required': 'O nome do produto é obrigatório.',
                 'max_length': 'O nome é demasiado longo.',
             },
-            'description': {
-                'required': 'A descrição é obrigatória.',
-            },
             'category': {
                 'required': 'Selecione uma categoria.',
                 'invalid_choice': 'Selecione uma categoria válida.',
